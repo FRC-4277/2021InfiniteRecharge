@@ -40,21 +40,26 @@ public class DriveTrain extends SubsystemBase {
     backLeftMotor.configFactoryDefault();
     backRightMotor.configFactoryDefault();
 
-    // Invert right side, so green is forward for it
-    frontRightMotor.setInverted(true);
-    backRightMotor.setInverted(true);
+    // Invert left side, so green is forward for it
+    frontLeftMotor.setInverted(true);
+    backLeftMotor.setInverted(true);
 
     // Don't let WPI invert, we did through TalonSRX APIs
     drive.setRightSideInverted(false);
 
-    SmartDashboard.putData(frontLeftMotor);
+    /*SmartDashboard.putData(frontLeftMotor);
     SmartDashboard.putData(frontRightMotor);
     SmartDashboard.putData(backLeftMotor);
-    SmartDashboard.putData(backRightMotor);
+    SmartDashboard.putData(backRightMotor);*/
   }
 
-  public void joystickDrive(double x, double y) {
-    drive.arcadeDrive(x, y);
+  public void joystickDrive(double x, double y, boolean quick) {
+    //drive.arcadeDrive(x, y);
+    if (x <= .15) {
+      drive.curvatureDrive(x, y, true);
+    } else {
+      drive.curvatureDrive(x, y, quick);
+    }
   }
 
   @Override

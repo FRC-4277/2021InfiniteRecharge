@@ -22,4 +22,8 @@ public final class Constants {
         public static final int BACK_LEFT = 60;
         public static final int BACK_RIGHT = 44;
     }
+
+    public static class Intake {
+        public static final int MOTOR_ID = 59;
+    }
 }

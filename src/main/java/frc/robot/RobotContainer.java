@@ -9,10 +9,17 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import static edu.wpi.first.wpilibj.XboxController.Button.*;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JoystickDriveCommand;
+import frc.robot.commands.ReverseIntakeCommand;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
+import frc.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -24,8 +31,11 @@ public class RobotContainer {
   private XboxController xboxController = new XboxController(0);
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
+  private final Intake intake = new Intake();
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, xboxController);
+  private final IntakeCommand intakeCommand = new IntakeCommand(intake);
+  private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
 
@@ -34,6 +44,7 @@ public class RobotContainer {
    */
   public RobotContainer() {
     SmartDashboard.putData(driveTrain);
+    SmartDashboard.putData(intake);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -49,6 +60,11 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    XboxTrigger leftTrigger = new XboxTrigger(xboxController, Hand.kLeft);
+    leftTrigger.whileActiveContinuous(intakeCommand);
+
+    JoystickButton leftBumper = new JoystickButton(xboxController, kBumperLeft.value);
+    leftBumper.whileActiveContinuous(reverseIntakeCommand);
   }
 
 
