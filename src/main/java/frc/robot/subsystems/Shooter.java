@@ -11,28 +11,45 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.InvertType;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
 import static frc.robot.Constants.Shooter.*;
 
+import java.util.Map;
+
 public class Shooter extends SubsystemBase {
-  public static final double FORWARDS_SPEED = 0.5;
-  public static final double BACKWARDS_SPEED = 0.5; 
+  //public static final double FORWARDS_SPEED = 0.5;
+  //public static final double BACKWARDS_SPEED = -0.5; 
   
+  private ShuffleboardTab settingsTab;
   private TalonSRX topMotor = new TalonSRX(TOP_MOTOR_ID);
   private TalonSRX bottomMotor = new TalonSRX(BOTTOM_MOTOR_ID);
+
+  private NetworkTableEntry shooterSpeedEntry;
 
   /**
    * Creates a new Shooter.
    */
-  public Shooter() {
+  public Shooter(ShuffleboardTab settingsTab) {
+    this.settingsTab = settingsTab;
     topMotor.configFactoryDefault();
     bottomMotor.configFactoryDefault();
     bottomMotor.follow(topMotor);
-    bottomMotor.setInverted(InvertType.OpposteMaster);
+    bottomMotor.setInverted(InvertType.OpposeMaster);
+
+    // ShuffleBoard
+    shooterSpeedEntry = settingsTab
+    .add("Shooter Speed", 0.5)
+    .withWidget(BuiltInWidgets.kNumberSlider)
+    .withProperties(Map.of("min", 0, "max", 1))
+    .getEntry();
   }
 
   public void runForward() {
-    topMotor.set(ControlMode.PercentOutput, FORWARDS_SPEED); 
+    topMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble()); 
   }
 
   public boolean rampUp(int ticksPer100ms) {
@@ -40,8 +57,8 @@ public class Shooter extends SubsystemBase {
     return true;
   }
 
-  public void runShooterBackwards() {
-    topMotor.set(ControlMode.PercentOutput, BACKWARDS_SPEED);
+  public void runBackwards() {
+    topMotor.set(ControlMode.PercentOutput, -shooterSpeedEntry.getValue().getDouble());
   }
 
   public void stopShooter() {

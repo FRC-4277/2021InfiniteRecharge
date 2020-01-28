@@ -7,16 +7,20 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import static edu.wpi.first.wpilibj.XboxController.Button.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.commands.MoveHopperDownCommand;
 import frc.robot.commands.MoveHopperUpCommand;
 import frc.robot.commands.ReverseIntakeCommand;
+import frc.robot.commands.ShooterBackwardsCommand;
 import frc.robot.commands.ShooterForwardCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
@@ -33,12 +37,21 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  // Pneumatics
+  //private Compressor compressor = new Compressor(0);
+  // todo : uncomment when compressor added
+
+  // Controllers
   private XboxController xboxController = new XboxController(0);
+
+  // ShuffleBoard
+  private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
+
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper();
-  private final Shooter shooter = new Shooter();
+  private final Shooter shooter = new Shooter(settingsTab);
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, xboxController);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake);
@@ -46,13 +59,14 @@ public class RobotContainer {
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
+  private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-
 
   /**
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    // Subsystems
     SmartDashboard.putData(driveTrain);
     SmartDashboard.putData(intake);
     SmartDashboard.putData(hopper);
@@ -86,6 +100,9 @@ public class RobotContainer {
 
     JoystickButton xButton = new JoystickButton(xboxController, kX.value);
     xButton.whileActiveOnce(shooterForwardCommand);
+
+    JoystickButton bButton = new JoystickButton(xboxController, kB.value);
+    bButton.whileActiveOnce(shooterBackwardsCommand);
   }
 
 

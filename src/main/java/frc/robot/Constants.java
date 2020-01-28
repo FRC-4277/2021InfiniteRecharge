@@ -28,11 +28,11 @@ public final class Constants {
     }
 
     public static class VerticalHopper {
-        public static final int MOTOR_ID = -1; // TODO : change
+        public static final int MOTOR_ID = 16; // TODO : change
     }
 
     public static class Shooter {
-        public static final int TOP_MOTOR_ID = -1; // todo : change
-        public static final int BOTTOM_MOTOR_ID = -1; //todo : change
+        public static final int TOP_MOTOR_ID = 30; // todo : change
+        public static final int BOTTOM_MOTOR_ID = 31; //todo : change
     }
 }
