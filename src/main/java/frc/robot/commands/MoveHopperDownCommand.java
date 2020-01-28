@@ -8,18 +8,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.VerticalHopper;
 
-public class ReverseIntakeCommand extends CommandBase {
-  private Intake intake;
-
+public class MoveHopperDownCommand extends CommandBase {
+  private VerticalHopper hopper;
+  
   /**
-   * Creates a new ReverseIntakeCommand.
+   * Creates a new MoveHopperUpCommand.
    */
-  public ReverseIntakeCommand(Intake intake) {
-    this.intake = intake;
-    addRequirements(intake);
+  public MoveHopperDownCommand(VerticalHopper hopper) {
+    this.hopper = hopper;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(hopper);
   }
 
   // Called when the command is initially scheduled.
@@ -30,13 +30,13 @@ public class ReverseIntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    intake.runReverseIntake();
+    hopper.moveDown();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
+    hopper.stopMoving();
   }
 
   // Returns true when the command should end.

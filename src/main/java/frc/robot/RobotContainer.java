@@ -14,9 +14,14 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JoystickDriveCommand;
+import frc.robot.commands.MoveHopperDownCommand;
+import frc.robot.commands.MoveHopperUpCommand;
 import frc.robot.commands.ReverseIntakeCommand;
+import frc.robot.commands.ShooterForwardCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.VerticalHopper;
 import frc.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -32,10 +37,15 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
   private final Intake intake = new Intake();
+  private final VerticalHopper hopper = new VerticalHopper();
+  private final Shooter shooter = new Shooter();
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, xboxController);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
+  private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
+  private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
+  private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
 
@@ -45,6 +55,8 @@ public class RobotContainer {
   public RobotContainer() {
     SmartDashboard.putData(driveTrain);
     SmartDashboard.putData(intake);
+    SmartDashboard.putData(hopper);
+    SmartDashboard.putData(shooter);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -61,10 +73,19 @@ public class RobotContainer {
    */
   private void configureButtonBindings() {
     XboxTrigger leftTrigger = new XboxTrigger(xboxController, Hand.kLeft);
-    leftTrigger.whileActiveContinuous(intakeCommand);
+    leftTrigger.whileActiveOnce(intakeCommand);
 
     JoystickButton leftBumper = new JoystickButton(xboxController, kBumperLeft.value);
-    leftBumper.whileActiveContinuous(reverseIntakeCommand);
+    leftBumper.whileActiveOnce(reverseIntakeCommand);
+
+    XboxTrigger rightTrigger = new XboxTrigger(xboxController, Hand.kRight);
+    rightTrigger.whileActiveOnce(moveHopperUpCommand);
+
+    JoystickButton rightBumper = new JoystickButton(xboxController, kBumperRight.value);
+    rightBumper.whileActiveOnce(moveHopperDownCommand);
+
+    JoystickButton xButton = new JoystickButton(xboxController, kX.value);
+    xButton.whileActiveOnce(shooterForwardCommand);
   }
 
 

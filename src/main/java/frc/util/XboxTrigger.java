@@ -32,6 +32,6 @@ public class XboxTrigger extends Trigger {
 
     @Override
     public boolean get() {
-        return controller.getTriggerAxis(Hand.kLeft) >= threshold;
+        return controller.getTriggerAxis(hand) >= threshold;
     }
 }

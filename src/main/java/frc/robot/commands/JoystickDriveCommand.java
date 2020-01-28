@@ -29,7 +29,8 @@ public class JoystickDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    driveTrain.joystickDrive(controller.getY(Hand.kLeft), controller.getX(Hand.kRight), controller.getXButton());
+    // y is inverted on Xbox Controller
+    driveTrain.joystickDrive(-controller.getY(Hand.kLeft), controller.getX(Hand.kRight), controller.getXButton());
   }
 
   // Returns true when the command should end.

@@ -41,8 +41,8 @@ public class DriveTrain extends SubsystemBase {
     backRightMotor.configFactoryDefault();
 
     // Invert left side, so green is forward for it
-    frontLeftMotor.setInverted(true);
-    backLeftMotor.setInverted(true);
+    frontRightMotor.setInverted(true);
+    backRightMotor.setInverted(true);
 
     // Don't let WPI invert, we did through TalonSRX APIs
     drive.setRightSideInverted(false);
