@@ -28,11 +28,24 @@ public final class Constants {
     }
 
     public static class VerticalHopper {
-        public static final int MOTOR_ID = 16; // TODO : change
+        public static final int MOTOR_ID = 16;
     }
 
     public static class Shooter {
-        public static final int TOP_MOTOR_ID = 30; // todo : change
-        public static final int BOTTOM_MOTOR_ID = 31; //todo : change
+        public static final int TOP_MOTOR_ID = 30;
+        public static final int BOTTOM_MOTOR_ID = 31;
+    }
+
+    public static class Climber {
+        public static final int MAIN_MOTOR_ID = 17;
+        public static final int SECONDARY_MOTOR_ID = 18;
+    }
+
+    public static class HookDeploy {
+        public static final int MOTOR_ID = 19;
+    }
+
+    public static class ColorWheel {
+        public static final int MOTOR_ID = 20;
     }
 }
