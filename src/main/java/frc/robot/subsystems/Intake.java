@@ -12,9 +12,10 @@ import static frc.robot.Constants.Intake.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Intake extends SubsystemBase {
-  private TalonSRX motor = new TalonSRX(MOTOR_ID);
+  private VictorSPX motor = new VictorSPX(MOTOR_ID);
   private static final double INTAKE_SPEED = .75;
   private static final double REVERSE_INTAKE_SPEED = -0.5;
 
@@ -23,7 +24,7 @@ public class Intake extends SubsystemBase {
    */
   public Intake() {
     motor.configFactoryDefault();
-    motor.setInverted(true);
+    motor.setInverted(MOTOR_INVERTED);
   }
 
   public void runIntake() {

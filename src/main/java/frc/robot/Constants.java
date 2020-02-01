@@ -25,10 +25,12 @@ public final class Constants {
 
     public static class Intake {
         public static final int MOTOR_ID = 59;
+        public static final boolean MOTOR_INVERTED = false;
     }
 
     public static class VerticalHopper {
         public static final int MOTOR_ID = 16;
+
     }
 
     public static class Shooter {

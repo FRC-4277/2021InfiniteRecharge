@@ -12,11 +12,12 @@ import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class VerticalHopper extends SubsystemBase {
   public static final double UP_SPEED = 0.5;
   public static final double DOWN_SPEED = -0.5;
-  private TalonSRX motor = new TalonSRX(MOTOR_ID);
+  private VictorSPX motor = new VictorSPX(MOTOR_ID);
   
   /**
    * Creates a new VerticalHopper.
