@@ -4,6 +4,9 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/2020InfiniteRecharge.iml" filepath="$PROJECT_DIR$/2020InfiniteRecharge.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/2020InfiniteRecharge.main.iml" filepath="$PROJECT_DIR$/.idea/modules/2020InfiniteRecharge.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/recharge-plugin/2020InfiniteRecharge.recharge-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/recharge-plugin/2020InfiniteRecharge.recharge-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/recharge-plugin/2020InfiniteRecharge.recharge-plugin.main.iml" filepath="$PROJECT_DIR$/.idea/modules/recharge-plugin/2020InfiniteRecharge.recharge-plugin.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/recharge-plugin/2020InfiniteRecharge.recharge-plugin.test.iml" filepath="$PROJECT_DIR$/.idea/modules/recharge-plugin/2020InfiniteRecharge.recharge-plugin.test.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/2020InfiniteRecharge.test.iml" filepath="$PROJECT_DIR$/.idea/modules/2020InfiniteRecharge.test.iml" />
     </modules>
   </component>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import frc4277.shuffleboard.plugin.hopper.ResizableCanvas?>
+
+<StackPane fx:id="root" minWidth="400" minHeight="100" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frc4277.shuffleboard.plugin.hopper.VerticalHopperWidget">
+   <ResizableCanvas fx:id="canvas" BorderPane.alignment="CENTER" />
+</StackPane>

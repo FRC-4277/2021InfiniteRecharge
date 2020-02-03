@@ -3,6 +3,10 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
       <module name="2020InfiniteRecharge.main" target="11" />
+      <module name="2020InfiniteRecharge.plugin.main" target="11" />
+      <module name="2020InfiniteRecharge.plugin.test" target="11" />
+      <module name="2020InfiniteRecharge.recharge-plugin.main" target="11" />
+      <module name="2020InfiniteRecharge.recharge-plugin.test" target="11" />
       <module name="2020InfiniteRecharge.test" target="11" />
     </bytecodeTargetLevel>
   </component>

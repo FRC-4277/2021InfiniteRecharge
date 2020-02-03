@@ -7,18 +7,25 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VerticalHopper extends SubsystemBase {
   public static final double UP_SPEED = 0.5;
   public static final double DOWN_SPEED = -0.5;
   private VictorSPX motor = new VictorSPX(MOTOR_ID);
-  
+
+  private boolean gateClosed = true;
+  private boolean[] cellsPresent = new boolean[]{false, false, false, false, false};
+  private double speedRunning = 0.0;
+  private VerticalHopperSendable sendable = new VerticalHopperSendable();
+
   /**
    * Creates a new VerticalHopper.
    */
@@ -42,5 +49,20 @@ public class VerticalHopper extends SubsystemBase {
 
   public void stopMoving() {
     motor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public VerticalHopperSendable getSendable() {
+    return sendable;
+  }
+
+  public class VerticalHopperSendable implements Sendable {
+
+    @Override
+    public void initSendable(SendableBuilder builder) {
+      builder.setSmartDashboardType("VerticalHopper");
+      builder.addBooleanProperty("gateClosed", () -> gateClosed, null);
+      builder.addBooleanArrayProperty("cellsPresent", () -> cellsPresent, null);
+      builder.addDoubleProperty("speedRunning", () -> speedRunning, null);
+    }
   }
 }

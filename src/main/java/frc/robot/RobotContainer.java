@@ -14,6 +14,7 @@ import static edu.wpi.first.wpilibj.XboxController.Button.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JoystickDriveCommand;
@@ -46,6 +47,7 @@ public class RobotContainer {
 
   // ShuffleBoard
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
+  private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
 
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
@@ -77,6 +79,18 @@ public class RobotContainer {
 
     // Default Commands
     driveTrain.setDefaultCommand(driveCommand);
+
+    // ShuffleBoard
+    setupDriverTab();
+  }
+
+  private void setupDriverTab() {
+    SendableRegistry.add(hopper.getSendable(), "VerticalHopper");
+
+    driverTab.add(hopper.getSendable())
+    .withWidget("VerticalHopper")
+    .withPosition(0,0)
+    .withSize(3, 2);
   }
 
   /**
@@ -105,6 +119,9 @@ public class RobotContainer {
     bButton.whileActiveOnce(shooterBackwardsCommand);
   }
 
+  protected void switchToDriverView() {
+    Shuffleboard.selectTab("Driver");
+  }
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
