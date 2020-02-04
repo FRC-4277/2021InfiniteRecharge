@@ -176,6 +176,8 @@ imgui.ini
 .idea/**/dictionaries
 .idea/**/shelf
 
+misc.xml
+
 # Generated files
 .idea/**/contentModel.xml
 .idea/libraries
