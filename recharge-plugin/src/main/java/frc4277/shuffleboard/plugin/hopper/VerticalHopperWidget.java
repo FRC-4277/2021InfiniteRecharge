@@ -5,7 +5,7 @@ import java.io.IOException;
 import edu.wpi.first.shuffleboard.api.widget.Description;
 import edu.wpi.first.shuffleboard.api.widget.ParametrizedController;
 import edu.wpi.first.shuffleboard.api.widget.SimpleAnnotatedWidget;
-import javafx.concurrent.Task;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -16,6 +16,9 @@ import javafx.scene.paint.Color;
 @Description(name = "VerticalHopper", dataTypes = VerticalHopper.class)
 @ParametrizedController("VerticalHopper.fxml")
 public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> {
+    // Stop animation 40ms after speed is no longer not 0
+    private static final long MAXIMUM_ANIMATION_REQUEST_AGE = 40;
+
     @FXML
     StackPane root;
     @FXML
@@ -32,6 +35,8 @@ public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> 
     private Image[] bottomArrow = new Image[]{loadImage("bottom_arrow_1.png"),loadImage("bottom_arrow_2.png")};
     private Image gate = loadImage("gate.png");
     private boolean animationLoop = false;
+    private int animationPeriodMs;
+    private long animationRequestTime = -1;
 
     @FXML
     private void initialize() {
@@ -39,6 +44,19 @@ public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> 
         canvas.setDrawConsumer(this::draw);
 
         dataProperty().subscribe((observable, oldValue, newValue) -> draw());
+
+        new Thread(() -> {
+            Runnable update = this::draw;
+            while (true) {
+                long time = System.currentTimeMillis();
+                if ((time - animationRequestTime) <= MAXIMUM_ANIMATION_REQUEST_AGE) {
+                    try {
+                        Thread.sleep(animationPeriodMs);
+                    } catch (InterruptedException ignored) {  }
+                    Platform.runLater(update);
+                }
+            }
+        }, "Vertical Hopper Animation").start();
     }
 
     public void draw() {
@@ -70,18 +88,13 @@ public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> 
         }
         // Speed
         double speed = hopper.getSpeedRunning();
-        if (speed > 0) {
-            // Going up
-            int periodMs = (int) (600 - (500 * speed));
-            Image arrow = topArrow[getAnimationLoop() ? 0 : 1];
-            graphicsContext.drawImage(arrow, 0,0);
-            delay(this::draw, periodMs);
-        } else if (speed < 0) {
-            // Going down
-            int periodMs = (int) (600 - (500 * Math.abs(speed)));
-            Image arrow = bottomArrow[getAnimationLoop() ? 0 : 1];
-            graphicsContext.drawImage(arrow, 0,0);
-            delay(this::draw, periodMs);
+        if (speed > 0.05 || speed < 0.05) {
+            animationPeriodMs = (int) (600 - (500 * Math.abs(speed)));
+            Image[] animationArrows = speed > 0 ? topArrow : bottomArrow;
+            Image arrow = animationArrows[getAnimationLoop() ? 0 : 1];
+            graphicsContext.drawImage(arrow, 0, 0);
+            // Set this so the Thread in initialize() will Thread.sleep for periodMs and draw again
+            animationRequestTime = System.currentTimeMillis();
         }
     }
 
@@ -97,66 +110,6 @@ public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> 
     public boolean getAnimationLoop() {
         return animationLoop = !animationLoop;
     }
-
-    public void delay(Runnable runnable, int ms) {
-        Task<Void> sleeper = new Task<>() {
-            @Override
-            protected Void call() {
-                try {
-                    Thread.sleep(ms);
-                } catch (InterruptedException ignored) {
-                }
-                return null;
-            }
-        };
-        sleeper.setOnSucceeded(event -> runnable.run());
-        sleeper.run();
-    }
-
-    /*public void drawLine(Graphics2D graphics2D, Line line) {
-        graphics2D.drawLine(line.x1, line.y1, line.x2, line.y2);
-    }
-
-    public class Line {
-        public int x1, y1, x2, y2;
-
-        public Line(int x1, int y1, int x2, int y2) {
-            this.x1 = x1;
-            this.y1 = y1;
-            this.x2 = x2;
-            this.y2 = y2;
-        }
-    }
-
-    public class Render {
-        public int width, height;
-        public PulleyRender pulleyRender;
-        public List<CellRender> cellRenders;
-        public GateRender gateRender;
-    }
-
-    public class PulleyRender {
-        public Line topLine, bottomLine;
-        public int thickness = 5;
-    }
-
-    public class CellRender {
-        // Top Left
-        public int x1, y1;
-        public int width, height;
-
-        public CellRender(int x1, int y1, int width, int height) {
-            this.x1 = x1;
-            this.y1 = y1;
-            this.width = width;
-            this.height = height;
-        }
-    }
-
-    public class GateRender {
-        public Line line;
-        public int thickness = 4;
-    }*/
 
     @Override
     public Pane getView() {
