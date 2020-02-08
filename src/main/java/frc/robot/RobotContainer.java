@@ -12,10 +12,14 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import static edu.wpi.first.wpilibj.XboxController.Button.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import frc.robot.commands.IntakeCommand;
 import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.commands.MoveHopperDownCommand;
@@ -23,6 +27,7 @@ import frc.robot.commands.MoveHopperUpCommand;
 import frc.robot.commands.ReverseIntakeCommand;
 import frc.robot.commands.ShooterBackwardsCommand;
 import frc.robot.commands.ShooterForwardCommand;
+import frc.robot.commands.autonomous.LazyRamseteCommand;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -30,6 +35,8 @@ import frc.robot.subsystems.VerticalHopper;
 import frc.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -62,6 +69,9 @@ public class RobotContainer {
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
+
+  private SendableChooser<Command> chooser;
+
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   /**
@@ -82,6 +92,21 @@ public class RobotContainer {
 
     // ShuffleBoard
     setupDriverTab();
+    
+    if (Constants.DriveTrain.USING_ENCODERS) {
+      // Starting position Chooser
+      SendableChooser<Pose2d> poseChooser = new SendableChooser<>();
+      poseChooser.addDefault("Facing Towards Wall, lined up w/ triangle", new Pose2d(1.0366, -3.7382, Rotation2d.fromDegrees(-180)));
+
+      Supplier<Pose2d> poseSupplier = poseChooser::getSelected;
+
+      // Backwards 4m command
+      Command backwards4m = new LazyRamseteCommand(driveTrain, () -> driveTrain.generateStraightTrajectory(poseSupplier.get(), -4));
+
+      // Autonomous Chooser
+      chooser = new SendableChooser<>();
+      chooser.addDefault("Simple 4m Autonomous Line (facing towards wall)", backwards4m);
+    }
   }
 
   private void setupDriverTab() {
@@ -123,6 +148,11 @@ public class RobotContainer {
     Shuffleboard.selectTab("Driver");
   }
 
+  public void autonomousInit() {
+    driveTrain.zeroGyro();
+    // Reset Pose2d
+  }
+
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
@@ -130,7 +160,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
+    return (chooser == null ? null : chooser.getSelected());
     //return m_autoCommand;
   }
 }

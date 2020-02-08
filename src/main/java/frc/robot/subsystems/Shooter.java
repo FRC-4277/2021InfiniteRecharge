@@ -42,7 +42,7 @@ public class Shooter extends SubsystemBase {
 
     // ShuffleBoard
     shooterSpeedEntry = settingsTab
-    .add("Shooter Speed", 0.5)
+    .add("Shooter Speed", 0.75)
     .withWidget(BuiltInWidgets.kNumberSlider)
     .withProperties(Map.of("min", 0, "max", 1))
     .getEntry();

@@ -7,6 +7,11 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
+import edu.wpi.first.wpilibj.util.Units;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -21,6 +26,37 @@ public final class Constants {
         public static final int FRONT_RIGHT = 58;
         public static final int BACK_LEFT = 60;
         public static final int BACK_RIGHT = 44;
+
+        public static final boolean USING_ENCODERS = false;
+        // todo : add from characterization data @
+        public static final double KS_VOLTS = 0.22; // @
+        public static final double KS_VOLT_SECONDS_PER_METER = 1.98; // @
+        public static final double KS_VOLT_SECONDS_SQUARED_PER_METER = 0.2; // @
+        public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(20); //todo : check
+        public static final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
+        public static final DifferentialDriveVoltageConstraint VOLTAGE_CONSTRAINT = 
+            new DifferentialDriveVoltageConstraint(
+                new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER),
+                 KINEMATICS, 10); //10V max to account for battery sag
+        public static final double MAX_SPEED_METERS_PER_SECOND = 3; //todo : change @
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; //todo : change @
+        // RAMSETE constants
+        public static final double kRamseteB = 2; // ?
+        public static final double kRamseteZeta = 0.7; // ?
+        // Encoders (on back)
+        public static final boolean LEFT_BACK_SENSOR_PHASE = false;
+        public static final boolean RIGHT_BACK_SENSOR_PHASE = false;
+        // Wheel
+        public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(6);
+        public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
+        public static final int ENCODER_TICKS_PER_ROTATION = 4096;
+        // Drive velocity PID (TALONSRX)
+        public static final double DRIVE_P = 0.1; // @
+        public static final double DRIVE_I = 0.1; // @
+        public static final double DRIVE_D = 0.1; // @
+        public static final double DRIVE_F = 0.1; // @
+        public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = 10 * ENCODER_TICKS_PER_ROTATION; // 10rpm
+        
     }
 
     public static class Intake {
@@ -29,7 +65,10 @@ public final class Constants {
     }
 
     public static class VerticalHopper {
-        public static final int MOTOR_ID = 16;
+        // Looking at the robot from the front
+        public static final int LEFT_MOTOR_ID = 16;
+        public static final boolean LEFT_MOTOR_INVERTED = false;
+        public static final int RIGHT_MOTOR_ID = -1; //todo: change
 
     }
 

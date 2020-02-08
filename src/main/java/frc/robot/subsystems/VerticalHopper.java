@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.wpilibj.Sendable;
@@ -19,7 +20,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 public class VerticalHopper extends SubsystemBase {
   public static final double UP_SPEED = 0.5;
   public static final double DOWN_SPEED = -0.5;
-  private VictorSPX motor = new VictorSPX(MOTOR_ID);
+  private VictorSPX leftMotor = new VictorSPX(LEFT_MOTOR_ID);
+  private VictorSPX rightMotor = new VictorSPX(RIGHT_MOTOR_ID);
 
   private boolean gateClosed = true;
   private boolean[] cellsPresent = new boolean[]{false, false, false, false, false};
@@ -30,8 +32,11 @@ public class VerticalHopper extends SubsystemBase {
    * Creates a new VerticalHopper.
    */
   public VerticalHopper() {
-    motor.configFactoryDefault();
-    motor.setInverted(true);
+    leftMotor.configFactoryDefault();
+    leftMotor.setInverted(LEFT_MOTOR_INVERTED);
+    rightMotor.configFactoryDefault();
+    rightMotor.follow(leftMotor);
+    rightMotor.setInverted(InvertType.OpposeMaster);
   }
 
   @Override
@@ -40,15 +45,15 @@ public class VerticalHopper extends SubsystemBase {
   }
 
   public void moveUp() {
-    motor.set(ControlMode.PercentOutput, UP_SPEED);
+    leftMotor.set(ControlMode.PercentOutput, UP_SPEED);
   }
 
   public void moveDown() {
-    motor.set(ControlMode.PercentOutput, DOWN_SPEED);
+    leftMotor.set(ControlMode.PercentOutput, DOWN_SPEED);
   }
 
   public void stopMoving() {
-    motor.set(ControlMode.PercentOutput, 0);
+    leftMotor.set(ControlMode.PercentOutput, 0);
   }
 
   public VerticalHopperSendable getSendable() {
