@@ -72,6 +72,12 @@ public final class Constants {
 
     }
 
+    public static class Gate {
+        public static final int SOLENOID_ID = 0;
+        public static final boolean CLOSE_STATE = true;
+        public static final boolean OPEN_STATE = !CLOSE_STATE;
+    }
+
     public static class Shooter {
         public static final int TOP_MOTOR_ID = 30;
         public static final int BOTTOM_MOTOR_ID = 31;

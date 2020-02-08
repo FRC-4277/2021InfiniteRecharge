@@ -7,6 +7,8 @@
       <module name="2020InfiniteRecharge.plugin.test" target="11" />
       <module name="2020InfiniteRecharge.recharge-plugin.main" target="11" />
       <module name="2020InfiniteRecharge.recharge-plugin.test" target="11" />
+      <module name="2020InfiniteRecharge.recharge-vision.main" target="11" />
+      <module name="2020InfiniteRecharge.recharge-vision.test" target="11" />
       <module name="2020InfiniteRecharge.test" target="11" />
     </bytecodeTargetLevel>
   </component>

@@ -88,7 +88,7 @@ public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> 
         }
         // Speed
         double speed = hopper.getSpeedRunning();
-        if (speed > 0.05 || speed < 0.05) {
+        if (speed > 0.05 || speed < -0.05) {
             animationPeriodMs = (int) (600 - (500 * Math.abs(speed)));
             Image[] animationArrows = speed > 0 ? topArrow : bottomArrow;
             Image arrow = animationArrows[getAnimationLoop() ? 0 : 1];

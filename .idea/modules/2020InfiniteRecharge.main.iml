@@ -8,6 +8,7 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:3.1.401" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.wpilibj:wpilibj-java:2020.2.2" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.ntcore:ntcore-java:2020.2.2" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.wpiutil:wpiutil-java:2020.2.2" level="project" />

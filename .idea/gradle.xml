@@ -10,6 +10,7 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/recharge-plugin" />
+            <option value="$PROJECT_DIR$/recharge-vision" />
           </set>
         </option>
         <option name="useAutoImport" value="true" />

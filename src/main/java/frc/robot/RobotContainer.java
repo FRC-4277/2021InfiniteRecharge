@@ -27,8 +27,10 @@ import frc.robot.commands.MoveHopperUpCommand;
 import frc.robot.commands.ReverseIntakeCommand;
 import frc.robot.commands.ShooterBackwardsCommand;
 import frc.robot.commands.ShooterForwardCommand;
+import frc.robot.commands.ToggleGateCommand;
 import frc.robot.commands.autonomous.LazyRamseteCommand;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Gate;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.VerticalHopper;
@@ -61,6 +63,7 @@ public class RobotContainer {
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper();
   private final Shooter shooter = new Shooter(settingsTab);
+  private final Gate gate = new Gate();
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, xboxController);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake);
@@ -69,7 +72,8 @@ public class RobotContainer {
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
-
+  private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
+  
   private SendableChooser<Command> chooser;
 
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -142,6 +146,9 @@ public class RobotContainer {
 
     JoystickButton bButton = new JoystickButton(xboxController, kB.value);
     bButton.whileActiveOnce(shooterBackwardsCommand);
+
+    JoystickButton aButton = new JoystickButton(xboxController, kA.value);
+    aButton.whileActiveOnce(toggleGateCommand);
   }
 
   protected void switchToDriverView() {
