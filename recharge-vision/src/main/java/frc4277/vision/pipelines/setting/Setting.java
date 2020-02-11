@@ -44,7 +44,11 @@ public class Setting<T> {
     @SuppressWarnings("unchecked")
     private void setValue(Object o) {
         try {
-            Setting.this.value = (T) o;
+            if (o instanceof Double && valueClass.equals(Integer.class)) {
+                Setting.this.value = (T) (Object) ((Double) o).intValue();
+            } else {
+                Setting.this.value = (T) o;
+            }
             lastUpdateTimestamp = System.currentTimeMillis();
         } catch (Exception e) {
             System.out.println("Failed to cast value of entry " + entry.getName() + " to " + valueClass.getCanonicalName());
@@ -54,6 +58,10 @@ public class Setting<T> {
     public T get() {
         if ((System.currentTimeMillis() - lastUpdateTimestamp) >= MAXIMUM_CACHE_MS) {
             setValue(entry.getValue().getValue());
+        }
+        if (value == null) {
+            value = defaultValue;
+            entry.setValue(defaultValue);
         }
         return value;
     }

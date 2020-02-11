@@ -11,8 +11,10 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.vision.VisionThread;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import frc4277.vision.pipelines.MainPipeline;
 import frc4277.vision.pipelines.Pipeline;
 import frc4277.vision.pipelines.Pipelines;
@@ -42,6 +44,7 @@ public final class Main {
 
   // Shuffleboard
   private ShuffleboardTab visionTab;
+  private NetworkTableEntry pipelineOutputEntry;
 
   public static void main(String[] args) {
     boolean ntServer = false;
@@ -69,8 +72,8 @@ public final class Main {
 
     setupNetworkTables();
     setupPSEye();
-    setupPipelines();
     setupShuffleboard();
+    setupPipelines();
 
 
     System.out.println("Startup complete.");
@@ -120,7 +123,7 @@ public final class Main {
     }, NT_UPDATE_FLAGS);
 
     // Exposure Setting (String), 0-100 or "auto"
-    NetworkTableEntry exposureEntry = psEyeTable.getEntry("exposure");
+    /*NetworkTableEntry exposureEntry = psEyeTable.getEntry("exposure");
     exposureEntry.addListener(notification -> {
       if (!notification.value.isValid() ||
               !notification.value.isString() ||
@@ -142,14 +145,20 @@ public final class Main {
           psEye.setExposureManual(Integer.parseInt(value));
         }
       }
-    }, NT_UPDATE_FLAGS);
+    }, NT_UPDATE_FLAGS);*/
+    psEye.setExposureManual(5);
+  }
+
+  private void setupShuffleboard() {
+    visionTab = Shuffleboard.getTab("Vision");
+    pipelineOutputEntry = visionTab.add("pipeline_output", "Disabled")
+            .withWidget(BuiltInWidgets.kTextView).getEntry();
   }
 
   private void setupPipelines() {
     // Setup pipeline_output option
 
-    NetworkTableEntry pipelineOutput = pipelinesTable.getEntry("pipeline_output");
-    pipelineOutput.addListener(notification -> {
+    pipelineOutputEntry.addListener(notification -> {
       if (!notification.value.isString()) {
         System.out.println("pipeline_output is not a string?");
         return;
@@ -158,7 +167,7 @@ public final class Main {
       String pipelineOutputKey = notification.value.getString();
 
       if (!notification.value.isValid() || pipelineOutputKey == null || Objects.equals(pipelineOutputKey.trim(), "")) {
-        pipelineOutput.setValue("Disabled");
+        pipelineOutputEntry.setValue("Disabled");
       }
 
       Pipelines pipelineFound = null;
@@ -185,11 +194,13 @@ public final class Main {
     // Setup network tables + setting entries for every pipeline
     for (Pipelines pipelineEnum : Pipelines.values()) {
       Pipeline pipeline = pipelineEnum.getInstance();
+      System.out.println("Setting up setting entries for " + pipeline.getName());
       NetworkTable pipelineTable = pipelinesTable.getSubTable(pipeline.getName());
       pipeline.setTable(pipelineTable);
       for (Setting setting : pipeline.getSettings()) {
         NetworkTableEntry entry = pipelineTable.getEntry(setting.getKey());
         setting.setupAutomaticEntry(entry);
+        System.out.println("Setup entry for " + setting.getKey());
       }
     }
 
@@ -197,11 +208,6 @@ public final class Main {
     VisionThread visionThread = new VisionThread(psEye, new MainPipeline(this, statisticsTable), MainPipeline::printStatistics);
     visionThread.start();
     System.out.println("PS Eye vision thread started");
-  }
-
-  private void setupShuffleboard() {
-    visionTab = Shuffleboard.getTab("Vision");
-
   }
 
   private void startPipelineOutput() {
@@ -213,6 +219,9 @@ public final class Main {
     // Cap source to 30FPS, not full 187 FPS is needed to show driver
     psEyeSource = new CvSource("PSEye Processed", VideoMode.PixelFormat.kMJPEG, PSEYE_WIDTH, PSEYE_HEIGHT, PSEYE_OUTPUT_FPS);
     psEyeServer.setSource(psEyeSource);
+
+    System.out.println("Added camera stream w/ pipeline output" + pipelineOutput.getInstance().getName());
+    visionTab.add(psEyeSource).withWidget(BuiltInWidgets.kCameraStream);
   }
 
   private void stopPipelineOutput() {

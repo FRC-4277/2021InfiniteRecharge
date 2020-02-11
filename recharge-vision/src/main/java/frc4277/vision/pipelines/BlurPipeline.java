@@ -20,7 +20,7 @@ public class BlurPipeline extends Pipeline {
     public void process(Mat mat, Context context) {
         double blurWidthPercent = this.blurWidthPercent.get();
         double blurHeightPercent = this.blurHeightPercent.get();
-        double blurWidth = context.width * blurHeightPercent;
+        double blurWidth = context.width * blurWidthPercent;
         double blurHeight = context.height * blurHeightPercent;
 
         if (blurWidth >= 1 || blurHeight >= 1) {

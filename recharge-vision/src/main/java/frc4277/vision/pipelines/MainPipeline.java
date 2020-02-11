@@ -45,6 +45,7 @@ public class MainPipeline implements VisionPipeline {
                 if (main.isPsEyeOutput() && Objects.equals(main.getPipelineOutput(), pipelineEnum)) {
                     // Must output this frame
                     main.addPipelineOutputFrame(mat);
+                    System.out.println("Added pipeline output to pipeline output for " + pipelineEnum.getInstance().getName());
                 }
             } catch (Exception e) {
                 System.out.println("Failed to run pipeline " + pipelineEnum.getInstance().getName());

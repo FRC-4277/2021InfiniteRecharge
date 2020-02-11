@@ -5,6 +5,8 @@ import edu.wpi.first.vision.VisionPipeline;
 import frc4277.vision.pipelines.setting.Setting;
 import org.opencv.core.Mat;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public abstract class Pipeline implements VisionPipeline {
@@ -34,7 +36,9 @@ public abstract class Pipeline implements VisionPipeline {
         process(mat, new Context(mat.width(), mat.height()));
     }
 
-    public abstract List<Setting> getSettings();
+    public List<Setting> getSettings() {
+        return Collections.emptyList();
+    }
 
     public static class Context {
         public int width;
