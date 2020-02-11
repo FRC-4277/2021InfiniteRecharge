@@ -48,7 +48,7 @@
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.nar
 *.ear
@@ -138,6 +138,7 @@ $RECYCLE.BIN/
 .gradle
 /build/
 /recharge-plugin/build/
+/recharge-vision/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting

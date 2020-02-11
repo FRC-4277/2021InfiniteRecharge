@@ -63,7 +63,7 @@ set CMD_LINE_ARGS=%*
 :execute
 @rem Setup the command line
 
-set CLASSPATH=%APP_HOME%\lib\recharge-vision.jar
+set CLASSPATH=%APP_HOME%\lib\recharge-vision-all.jar
 
 @rem Execute recharge-vision
 "%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %RECHARGE_VISION_OPTS%  -jar "%CLASSPATH%" %CMD_LINE_ARGS%

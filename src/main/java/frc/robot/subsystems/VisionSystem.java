@@ -22,13 +22,6 @@ public class VisionSystem extends SubsystemBase {
    * 
    */
   public VisionSystem(ShuffleboardTab tab) {
-    tab.add("PSEye")
-    .withWidget(BuiltInWidgets.kCameraStream)
-    .withPosition(3, 0)
-    .withSize(3, 3)
-    .withProperties(
-      Map.of("Show crosshair", true, "Show controls", true)
-    );
   }
 
   @Override
