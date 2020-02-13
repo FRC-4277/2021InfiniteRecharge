@@ -36,7 +36,7 @@ public abstract class Pipeline implements VisionPipeline {
         process(mat, new Context(mat.width(), mat.height()));
     }
 
-    public List<Setting> getSettings() {
+    public List<Setting<?>> getSettings() {
         return Collections.emptyList();
     }
 

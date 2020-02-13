@@ -1,5 +1,6 @@
 package frc4277.vision.pipelines;
 
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import frc4277.vision.pipelines.setting.Setting;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -8,8 +9,8 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 public class ErodeDilatePipeline extends Pipeline {
-    private Setting<Integer> closeWidth = new Setting<>("closeWidth", Integer.class, 3);
-    private Setting<Integer> closeHeight = new Setting<>("closeHeight", Integer.class, 3);
+    private Setting<Integer> closeWidth = new Setting<>("closeWidth", Integer.class, 3, BuiltInWidgets.kTextView);
+    private Setting<Integer> closeHeight = new Setting<>("closeHeight", Integer.class, 3, BuiltInWidgets.kTextView);
 
     public ErodeDilatePipeline() {
         super("ErodeDilate");
@@ -25,7 +26,7 @@ public class ErodeDilatePipeline extends Pipeline {
     }
 
     @Override
-    public List<Setting> getSettings() {
+    public List<Setting<?>> getSettings() {
         return List.of(closeWidth, closeHeight);
     }
 }

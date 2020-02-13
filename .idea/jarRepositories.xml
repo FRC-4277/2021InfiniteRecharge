@@ -61,5 +61,10 @@
       <option name="name" value="maven" />
       <option name="url" value="https://jitpack.io" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="WPIcb311d09-36e9-4143-a032-55bb2b94443b_0Release" />
+      <option name="name" value="WPIcb311d09-36e9-4143-a032-55bb2b94443b_0Release" />
+      <option name="url" value="https://repo1.maven.org/maven2/" />
+    </remote-repository>
   </component>
 </project>

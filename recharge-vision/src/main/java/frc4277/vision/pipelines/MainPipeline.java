@@ -45,7 +45,7 @@ public class MainPipeline implements VisionPipeline {
                 if (main.isPsEyeOutput() && Objects.equals(main.getPipelineOutput(), pipelineEnum)) {
                     // Must output this frame
                     main.addPipelineOutputFrame(mat);
-                    System.out.println("Added pipeline output to pipeline output for " + pipelineEnum.getInstance().getName());
+                    //System.out.println("Added pipeline output to pipeline output for " + pipelineEnum.getInstance().getName());
                 }
             } catch (Exception e) {
                 System.out.println("Failed to run pipeline " + pipelineEnum.getInstance().getName());
@@ -56,6 +56,9 @@ public class MainPipeline implements VisionPipeline {
             // End of pipeline, do statistic
             averagePipelinesMs.get(pipelineEnum).update((System.currentTimeMillis() - pipelineStartTime));
         }
+
+        // Release Mat
+        mat.release();
 
         // End, do statistics
         averageFrameMs.update((System.currentTimeMillis() - startTime));

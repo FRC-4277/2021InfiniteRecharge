@@ -1,7 +1,12 @@
 package frc4277.vision.pipelines.setting;
 
+import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import frc4277.vision.Constants;
+import frc4277.vision.pipelines.Pipeline;
 
 public class Setting<T> {
     private static final long MAXIMUM_CACHE_MS = 1000;
@@ -12,11 +17,17 @@ public class Setting<T> {
     private Class<? extends T> valueClass;
     private T value;
     private long lastUpdateTimestamp = -1;
+    private String widgetType;
 
-    public Setting(String key, Class<? extends T> valueClass, T defaultValue) {
+    public Setting(String key, Class<? extends T> valueClass, T defaultValue, String widgetType) {
         this.key = key;
         this.valueClass = valueClass;
         this.defaultValue = defaultValue;
+        this.widgetType = widgetType;
+    }
+
+    public Setting(String key, Class<? extends T> valueClass, T defaultValue, BuiltInWidgets builtInWidget) {
+        this(key, valueClass, defaultValue, builtInWidget.getWidgetName());
     }
 
     public String getKey() {
@@ -27,8 +38,14 @@ public class Setting<T> {
         return defaultValue;
     }
 
-    public void setupAutomaticEntry(NetworkTableEntry entry) {
-        this.entry = entry;
+    public void setupAutomaticEntry(Pipeline pipeline, NetworkTable pipelineTable, ShuffleboardTab visionTab) {
+        if (widgetType == null) {
+            // No widget
+            this.entry = pipelineTable.getEntry(key);
+        } else {
+            // Widget
+            this.entry = visionTab.add( pipeline.getName()+ "_" + key, defaultValue).withWidget(widgetType).getEntry();
+        }
         entry.addListener(notification -> {
             Object value = notification.value.getValue();
 

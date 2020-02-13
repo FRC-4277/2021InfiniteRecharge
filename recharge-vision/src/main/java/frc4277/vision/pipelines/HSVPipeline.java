@@ -1,5 +1,6 @@
 package frc4277.vision.pipelines;
 
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import frc4277.vision.pipelines.setting.Setting;
 import org.opencv.core.Core;
 import org.opencv.core.Mat;
@@ -9,12 +10,12 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 public class HSVPipeline extends Pipeline {
-    private Setting<Integer> hMin = new Setting<>("h_min", Integer.class, 50);
-    private Setting<Integer> hMax = new Setting<>("h_max", Integer.class, 180);
-    private Setting<Integer> sMin = new Setting<>("s_min", Integer.class, 0);
-    private Setting<Integer> sMax = new Setting<>("s_max", Integer.class, 255);
-    private Setting<Integer> vMin = new Setting<>("v_min", Integer.class, 50);
-    private Setting<Integer> vMax = new Setting<>("v_max", Integer.class, 255);
+    private Setting<Integer> hMin = new Setting<>("h_min", Integer.class, 50, BuiltInWidgets.kTextView);
+    private Setting<Integer> hMax = new Setting<>("h_max", Integer.class, 180, BuiltInWidgets.kTextView);
+    private Setting<Integer> sMin = new Setting<>("s_min", Integer.class, 0, BuiltInWidgets.kTextView);
+    private Setting<Integer> sMax = new Setting<>("s_max", Integer.class, 255, BuiltInWidgets.kTextView);
+    private Setting<Integer> vMin = new Setting<>("v_min", Integer.class, 50, BuiltInWidgets.kTextView);
+    private Setting<Integer> vMax = new Setting<>("v_max", Integer.class, 255, BuiltInWidgets.kTextView);
 
 
     HSVPipeline() {
@@ -37,7 +38,7 @@ public class HSVPipeline extends Pipeline {
     }
 
     @Override
-    public List<Setting> getSettings() {
+    public List<Setting<?>> getSettings() {
         return List.of(hMin, hMax, sMin, sMax, vMin, vMax);
     }
 }

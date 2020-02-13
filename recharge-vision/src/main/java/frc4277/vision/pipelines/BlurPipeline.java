@@ -1,5 +1,6 @@
 package frc4277.vision.pipelines;
 
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import frc4277.vision.pipelines.setting.Setting;
 import org.opencv.core.Mat;
 import org.opencv.core.Size;
@@ -8,8 +9,8 @@ import org.opencv.imgproc.Imgproc;
 import java.util.List;
 
 public class BlurPipeline extends Pipeline {
-    private Setting<Double> blurWidthPercent = new Setting<>("size", Double.class, 0.0);
-    private Setting<Double> blurHeightPercent = new Setting<>("size", Double.class, 0.0);
+    private Setting<Double> blurWidthPercent = new Setting<>("widthPercent", Double.class, 0.0, BuiltInWidgets.kTextView);
+    private Setting<Double> blurHeightPercent = new Setting<>("heightPercent", Double.class, 0.0, BuiltInWidgets.kTextView);
 
 
     BlurPipeline() {
@@ -29,7 +30,7 @@ public class BlurPipeline extends Pipeline {
     }
 
     @Override
-    public List<Setting> getSettings() {
+    public List<Setting<?>> getSettings() {
         return List.of(blurWidthPercent, blurHeightPercent);
     }
 }

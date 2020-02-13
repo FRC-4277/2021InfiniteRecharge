@@ -12,4 +12,8 @@ public class Constants {
     public static final int PSEYE_OUTPUT_FPS = 30;
 
     public static final int NT_UPDATE_FLAGS = EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate;
+
+    public static final double PSEYE_HORIZONTAL_FOV = 75.0;
+    public static final double PSEYE_VERTICAL_FOV = 45.0;//todo :calc?
+
 }
