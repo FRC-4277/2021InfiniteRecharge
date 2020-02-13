@@ -4,13 +4,7 @@ public enum Pipelines {
     BLUR(BlurPipeline.class, new BlurPipeline()),
     HSV(HSVPipeline.class, new HSVPipeline()),
     ERODE_DILATE(ErodeDilatePipeline.class, new ErodeDilatePipeline()),
-    CONTOUR(ContourPipeline.class, new ContourPipeline()),
-    FILTER_CONTOURS(FilterContoursPipeline.class, new FilterContoursPipeline());
-
-    static {
-        ((FilterContoursPipeline) FILTER_CONTOURS.getInstance())
-                .setContourPipeline((ContourPipeline) CONTOUR.getInstance());
-    }
+    CONTOUR(ContourPipeline.class, new ContourPipeline());
 
     private Class<? extends Pipeline> pipelineClass;
     private Pipeline instance;

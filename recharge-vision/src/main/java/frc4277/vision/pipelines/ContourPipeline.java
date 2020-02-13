@@ -23,7 +23,6 @@ public class ContourPipeline extends Pipeline {
     private Setting<Double> momentYRatioMax = new Setting<>("momentYRatioMax", Double.class, 999.0, BuiltInWidgets.kTextView);
     private NetworkTable resultsTable = Main.getInstance().getResultsTable();
 
-
     public ContourPipeline() {
         super("Contour");
     }
