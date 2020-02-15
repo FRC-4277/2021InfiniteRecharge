@@ -7,7 +7,10 @@
 
 package frc.robot;
 
+import edu.wpi.cscore.UsbCamera;
+import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import static edu.wpi.first.wpilibj.XboxController.Button.*;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -50,7 +53,8 @@ public class RobotContainer {
   // todo : uncomment when compressor added
 
   // Controllers
-  private XboxController xboxController = new XboxController(0);
+  private Joystick driveStick = new Joystick(0);
+  private XboxController xboxController = new XboxController(1);
 
   // ShuffleBoard
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
@@ -63,7 +67,7 @@ public class RobotContainer {
   private final Shooter shooter = new Shooter(settingsTab);
   private final Gate gate = new Gate();
 
-  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, xboxController);
+  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
@@ -94,7 +98,8 @@ public class RobotContainer {
 
     // ShuffleBoard
     setupDriverTab();
-    
+
+
     if (Constants.DriveTrain.USING_ENCODERS) {
       // Starting position Chooser
       SendableChooser<Pose2d> poseChooser = new SendableChooser<>();

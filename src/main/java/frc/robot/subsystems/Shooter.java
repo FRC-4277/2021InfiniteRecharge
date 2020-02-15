@@ -36,6 +36,7 @@ public class Shooter extends SubsystemBase {
   public Shooter(ShuffleboardTab settingsTab) {
     this.settingsTab = settingsTab;
     topMotor.configFactoryDefault();
+    topMotor.setInverted(TOP_MOTOR_INVERTED);
     bottomMotor.configFactoryDefault();
     bottomMotor.follow(topMotor);
     bottomMotor.setInverted(InvertType.OpposeMaster);

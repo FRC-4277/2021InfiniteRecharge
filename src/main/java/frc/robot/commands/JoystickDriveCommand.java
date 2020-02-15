@@ -7,19 +7,19 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
 public class JoystickDriveCommand extends CommandBase {
   private DriveTrain driveTrain;
-  private XboxController controller;
+  private Joystick controller;
 
   /**
    * Creates a new JoystickDriveCommand.
    */
-  public JoystickDriveCommand(DriveTrain driveTrain, XboxController controller) {
+  public JoystickDriveCommand(DriveTrain driveTrain, Joystick controller) {
     this.driveTrain = driveTrain;
     this.controller = controller;
     addRequirements(driveTrain);
@@ -30,7 +30,16 @@ public class JoystickDriveCommand extends CommandBase {
   @Override
   public void execute() {
     // y is inverted on Xbox Controller
-    driveTrain.joystickDrive(-controller.getY(Hand.kLeft), controller.getX(Hand.kRight), controller.getXButton());
+    double y = -controller.getY(Hand.kLeft);
+    double x = controller.getX(Hand.kRight);
+    double z = controller.getRawAxis(2);
+    x += z;
+    if (x > 1.0) {
+      x = 1.0;
+    } else if (x < 0) {
+      x = 0.0;
+    }
+    driveTrain.joystickDrive(y, x, controller.getRawButton(1));
   }
 
   // Returns true when the command should end.

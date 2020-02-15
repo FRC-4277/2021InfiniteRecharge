@@ -61,13 +61,13 @@ public final class Constants {
 
     public static class Intake {
         public static final int MOTOR_ID = 59;
-        public static final boolean MOTOR_INVERTED = false;
+        public static final boolean MOTOR_INVERTED = true;
     }
 
     public static class VerticalHopper {
         // Looking at the robot from the front
         public static final int LEFT_MOTOR_ID = 16;
-        public static final boolean LEFT_MOTOR_INVERTED = false;
+        public static final boolean LEFT_MOTOR_INVERTED = true;
         public static final int RIGHT_MOTOR_ID = 57;
 
     }
@@ -81,6 +81,7 @@ public final class Constants {
     public static class Shooter {
         public static final int TOP_MOTOR_ID = 30;
         public static final int BOTTOM_MOTOR_ID = 31;
+        public static final boolean TOP_MOTOR_INVERTED = true;
     }
 
     public static class Climber {
