@@ -8,20 +8,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.VerticalHopper;
 
-public class IntakeCommand extends CommandBase {
-  private Intake intake;
-  private VerticalHopper verticalHopper;
+public class AutoHopperMoveInCommand extends CommandBase {
+  private VerticalHopper hopper;
+  private long lastBallInTime = -1;
+  
   /**
-   * Creates a new IntakeCommand.
+   * Creates a new AutoHopperMoveInCommand.
    */
-  public IntakeCommand(Intake intake, VerticalHopper verticalHopper) {
-    this.intake = intake;
-    this.verticalHopper = verticalHopper;
-    addRequirements(intake);
+  public AutoHopperMoveInCommand(VerticalHopper hopper) {
+    this.hopper = hopper;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(hopper);
   }
 
   // Called when the command is initially scheduled.
@@ -32,17 +31,27 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (intake.intakeSensor.get()) {
-      intake.runIntake();
+    boolean ballPresentTop = !hopper.topBallSensor.get();
+    if (ballPresentTop) {
+      hopper.stopMoving();
+      return;
+    }
+
+    boolean ballPresent = !hopper.intakeSensor.get();
+    if (ballPresent) {
+      lastBallInTime = System.currentTimeMillis();
+    }
+    // false is ball found!
+    if (ballPresent && (System.currentTimeMillis() - lastBallInTime <= 100)) {
+      hopper.moveUp();
     } else {
-      intake.stopIntake();
+      hopper.stopMoving();
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
   }
 
   // Returns true when the command should end.

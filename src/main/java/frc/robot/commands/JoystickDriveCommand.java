@@ -36,7 +36,7 @@ public class JoystickDriveCommand extends CommandBase {
     double y = -controller.getY(Hand.kLeft);
     double x = controller.getX(Hand.kRight);
     double z = controller.getRawAxis(2);
-    if (z >= TURN_DEADBAND) {
+    if (Math.abs(z) >= TURN_DEADBAND) {
       x = z;
     }
     boolean quickTurn = controller.getRawButton(LogitechButton.TRIGGER);

@@ -8,20 +8,18 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.VerticalHopper;
 
-public class IntakeCommand extends CommandBase {
-  private Intake intake;
-  private VerticalHopper verticalHopper;
+public class StopHopperCommand extends CommandBase {
+  private VerticalHopper hopper;
+
   /**
-   * Creates a new IntakeCommand.
+   * Creates a new StopHopperCommand.
    */
-  public IntakeCommand(Intake intake, VerticalHopper verticalHopper) {
-    this.intake = intake;
-    this.verticalHopper = verticalHopper;
-    addRequirements(intake);
+  public StopHopperCommand(VerticalHopper hopper) {
+    this.hopper = hopper;
     // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(hopper);
   }
 
   // Called when the command is initially scheduled.
@@ -32,22 +30,17 @@ public class IntakeCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if (intake.intakeSensor.get()) {
-      intake.runIntake();
-    } else {
-      intake.stopIntake();
-    }
+    hopper.stopMoving();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }
