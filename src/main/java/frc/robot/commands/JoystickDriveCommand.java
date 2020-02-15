@@ -11,8 +11,11 @@ import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.util.LogitechButton;
 
 public class JoystickDriveCommand extends CommandBase {
+  private static final double TURN_DEADBAND = 0.1;
+
   private DriveTrain driveTrain;
   private Joystick controller;
 
@@ -33,13 +36,11 @@ public class JoystickDriveCommand extends CommandBase {
     double y = -controller.getY(Hand.kLeft);
     double x = controller.getX(Hand.kRight);
     double z = controller.getRawAxis(2);
-    x += z;
-    if (x > 1.0) {
-      x = 1.0;
-    } else if (x < 0) {
-      x = 0.0;
+    if (z >= TURN_DEADBAND) {
+      x = z;
     }
-    driveTrain.joystickDrive(y, x, controller.getRawButton(1));
+    boolean quickTurn = controller.getRawButton(LogitechButton.TRIGGER);
+    driveTrain.joystickDrive(y, x, quickTurn);
   }
 
   // Returns true when the command should end.

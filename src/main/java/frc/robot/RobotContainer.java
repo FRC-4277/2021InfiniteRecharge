@@ -21,20 +21,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.JoystickDriveCommand;
-import frc.robot.commands.MoveHopperDownCommand;
-import frc.robot.commands.MoveHopperUpCommand;
-import frc.robot.commands.ReverseIntakeCommand;
-import frc.robot.commands.ShooterBackwardsCommand;
-import frc.robot.commands.ShooterForwardCommand;
-import frc.robot.commands.ToggleGateCommand;
+import frc.robot.commands.*;
 import frc.robot.commands.autonomous.LazyRamseteCommand;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Gate;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.VerticalHopper;
+import frc.robot.subsystems.*;
+import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -65,7 +55,8 @@ public class RobotContainer {
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper();
   private final Shooter shooter = new Shooter(settingsTab);
-  private final Gate gate = new Gate();
+  //private final Gate gate = new Gate();
+  private final CameraSystem cameraSystem = new CameraSystem(driverTab);
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake);
@@ -74,8 +65,9 @@ public class RobotContainer {
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
-  private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
-  
+  //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
+  private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
+
   private SendableChooser<Command> chooser;
 
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
@@ -89,6 +81,8 @@ public class RobotContainer {
     SmartDashboard.putData(intake);
     SmartDashboard.putData(hopper);
     SmartDashboard.putData(shooter);
+    //SmartDashboard.putData(gate);
+    SmartDashboard.putData(cameraSystem);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -117,12 +111,12 @@ public class RobotContainer {
   }
 
   private void setupDriverTab() {
-    SendableRegistry.add(hopper.getSendable(), "VerticalHopper");
+    /*SendableRegistry.add(hopper.getSendable(), "VerticalHopper");
 
     driverTab.add(hopper.getSendable())
     .withWidget("VerticalHopper")
     .withPosition(0,0)
-    .withSize(3, 2);
+    .withSize(3, 2);*/
   }
 
   /**
@@ -132,6 +126,15 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    // === MAIN DRIVER - Logitech Extreme 3D Pro
+
+    // Note: Trigger (button 1) is used in JoystickDriveCommand for quick turn
+
+    JoystickButton pointerButton = new JoystickButton(driveStick, LogitechButton.POINTER);
+    pointerButton.whenPressed(toggleCameraCommand);
+
+    // === CO-PILOT - Xbox 360/One Controller
+
     XboxTrigger leftTrigger = new XboxTrigger(xboxController, Hand.kLeft);
     leftTrigger.whileActiveOnce(intakeCommand);
 
@@ -151,7 +154,7 @@ public class RobotContainer {
     bButton.whileActiveOnce(shooterBackwardsCommand);
 
     JoystickButton aButton = new JoystickButton(xboxController, kA.value);
-    aButton.whileActiveOnce(toggleGateCommand);
+    //aButton.whileActiveOnce(toggleGateCommand);
   }
 
   protected void switchToDriverView() {

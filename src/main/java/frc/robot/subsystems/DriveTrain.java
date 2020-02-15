@@ -135,7 +135,7 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public double ticksToRotations(int ticks) {
-    return ticks / ENCODER_TICKS_PER_ROTATION;
+    return ticks / (double) ENCODER_TICKS_PER_ROTATION;
   }
 
   public double rotationsToTicks(double rotations) {
@@ -221,12 +221,12 @@ public class DriveTrain extends SubsystemBase {
     odometry.resetPosition(pose, getHeading());
   }
 
-  public void joystickDrive(double x, double y, boolean quick) {
+  public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {
     //drive.arcadeDrive(x, y);
-    if (x <= .15) {
-      drive.curvatureDrive(x, y, true);
+    if (forwardSpeed <= .15) {
+      drive.curvatureDrive(forwardSpeed, rotation, true);
     } else {
-      drive.curvatureDrive(x, y, quick);
+      drive.curvatureDrive(forwardSpeed, rotation, quick);
     }
   }
 }
