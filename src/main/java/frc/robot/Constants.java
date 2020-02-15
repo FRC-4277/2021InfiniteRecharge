@@ -68,7 +68,7 @@ public final class Constants {
         // Looking at the robot from the front
         public static final int LEFT_MOTOR_ID = 16;
         public static final boolean LEFT_MOTOR_INVERTED = false;
-        public static final int RIGHT_MOTOR_ID = -1; //todo: change
+        public static final int RIGHT_MOTOR_ID = 57;
 
     }
 
