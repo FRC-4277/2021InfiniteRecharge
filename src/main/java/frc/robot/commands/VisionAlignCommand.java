@@ -15,7 +15,7 @@ import frc.robot.subsystems.VisionSystem;
 import frc.robot.util.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
-  public static final double ROTATE_P = 0.1d;
+  public static final double ROTATE_P = 0.04d;
   public static final double DEG_TOLERANCE = 1.0d;
   public static final double MIN_COMMAND = 0.05;
   public static final double SEEK_SPEED = 0.15;
@@ -46,9 +46,10 @@ public class VisionAlignCommand extends CommandBase {
 
     Optional<Target> targetOptional = visionSystem.getLimelight().getTarget();
     if (targetOptional.isPresent()) {
+      System.out.println("1");
       Target target = targetOptional.get();
       double xDeg = target.getX();
-      double xError = -xDeg;
+      double xError = xDeg;
       if (Math.abs(xError) <= DEG_TOLERANCE) {
         return;
       }
@@ -57,6 +58,7 @@ public class VisionAlignCommand extends CommandBase {
         steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
       }
     } else {
+      System.out.println("2");
       Optional<Target> lastTarget = visionSystem.getLimelight().getLastTarget();
       // Seek for target using lastTarget
       if (lastTarget.isEmpty()) {
@@ -66,6 +68,8 @@ public class VisionAlignCommand extends CommandBase {
       // Then we multiply that by 0.2
       steerAdjust = SEEK_SPEED * Math.signum(lastTarget.get().getX());
     }
+
+    System.out.println("3 steer:" + steerAdjust);
 
     driveTrain.rawTankDrive(steerAdjust, -steerAdjust);
   }
