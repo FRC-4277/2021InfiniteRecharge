@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.*;
 import frc.robot.commands.autonomous.LazyRamseteCommand;
 import frc.robot.subsystems.*;
+import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -57,6 +58,7 @@ public class RobotContainer {
   private final Shooter shooter = new Shooter(settingsTab);
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
+  private final VisionSystem visionSystem = new VisionSystem(driverTab);
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake);
@@ -67,6 +69,7 @@ public class RobotContainer {
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
   //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
+  private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
 
   private SendableChooser<Command> chooser;
 
@@ -117,6 +120,12 @@ public class RobotContainer {
     .withWidget("VerticalHopper")
     .withPosition(0,0)
     .withSize(3, 2);*/
+    GameTimer gameTimer = new GameTimer();
+    SendableRegistry.add(gameTimer, "GameTimer");
+    driverTab.add(gameTimer)
+    .withWidget("GameTimer")
+    .withPosition(7, 0)
+    .withSize(2, 1);
   }
 
   /**
@@ -154,7 +163,7 @@ public class RobotContainer {
     bButton.whileActiveOnce(shooterBackwardsCommand);
 
     JoystickButton aButton = new JoystickButton(xboxController, kA.value);
-    //aButton.whileActiveOnce(toggleGateCommand);
+    aButton.whileActiveOnce(visionAlignCommand);
   }
 
   protected void switchToDriverView() {

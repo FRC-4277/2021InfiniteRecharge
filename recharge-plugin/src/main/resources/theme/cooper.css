@@ -1,0 +1,9 @@
+@import "/edu/wpi/first/shuffleboard/app/light.css";
+
+.root {
+	-swatch-100: #ffc966;
+	-swatch-200: #ffc04c;
+	-swatch-300: #ffb732;
+	-swatch-400: #ffae19;
+	-swatch-500: #ffa500;
+}

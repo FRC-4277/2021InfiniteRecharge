@@ -28,3 +28,10 @@ task installPlugin(type: Copy) {
     description = "Builds the plugin JAR and installs it in the Shuffleboard plugins directory."
     group = "Shuffleboard Plugin"
 }
+
+task installTheme(type: Copy) {
+    from("src/main/resources/theme/cooper.css")
+    into("${System.getProperty("user.home")}/Shuffleboard/themes/cooper-theme/")
+    description = "Installs Theme"
+    group = "Shuffleboard Theme"
+}

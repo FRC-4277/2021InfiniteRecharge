@@ -59,6 +59,14 @@ public final class Constants {
         
     }
 
+    public static class Vision {
+        public static class Limelight {
+            public static double MOUNT_HEIGHT_M = Units.inchesToMeters(24); //todo: change
+            public static double MOUNT_ANGLE_RAD = Math.toRadians(30); // Mount angle, from horizon //todo: change
+            public static double PORT_CENTER_HEIGHT_M = Units.inchesToMeters(98.19);
+        }
+    }
+
     public static class Intake {
         public static final int MOTOR_ID = 59;
         public static final boolean MOTOR_INVERTED = true;

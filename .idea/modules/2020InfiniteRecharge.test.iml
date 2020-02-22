@@ -7,24 +7,14 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="2020InfiniteRecharge.main" />
-    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:3.1.409" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.wpilibj:wpilibj-java:2020.2.2" level="project" />
-    <orderEntry type="module-library">
-      <library name="Gradle: edu.wpi.first.ntcore:ntcore-java:2020.2.2">
-        <CLASSES>
-          <root url="jar://C:/Users/Public/wpilib/2020/maven/edu/wpi/first/ntcore/ntcore-java/2020.2.2/ntcore-java-2020.2.2.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES>
-          <root url="jar://C:/Users/Public/wpilib/2020/maven/edu/wpi/first/ntcore/ntcore-java/2020.2.2/ntcore-java-2020.2.2-sources.jar!/" />
-        </SOURCES>
-      </library>
-    </orderEntry>
-    <orderEntry type="library" name="Gradle: edu.wpi.first.wpiutil:wpiutil-java:2020.2.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:3.1.401" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.wpilibj:wpilibj-java:2020.3.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.ntcore:ntcore-java:2020.3.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.wpiutil:wpiutil-java:2020.3.2" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:3.4.7-2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.cscore:cscore-java:2020.2.2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.cameraserver:cameraserver-java:2020.2.2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.hal:hal-java:2020.2.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.cscore:cscore-java:2020.3.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.cameraserver:cameraserver-java:2020.3.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.hal:hal-java:2020.3.2" level="project" />
     <orderEntry type="library" name="Gradle: org.ejml:ejml-simple:0.38" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.10.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.10.0" level="project" />

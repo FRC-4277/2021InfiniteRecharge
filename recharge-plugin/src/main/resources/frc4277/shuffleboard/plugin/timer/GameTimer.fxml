@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+
+<BorderPane fx:id="root" minHeight="80" minWidth="200" xmlns="http://javafx.com/javafx/10.0.2-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frc4277.shuffleboard.plugin.timer.GameTimerWidget">
+   <center>
+      <TextFlow fx:id="textFlow" prefHeight="80.0" prefWidth="200.0" textAlignment="CENTER" />
+   </center>
+</BorderPane>

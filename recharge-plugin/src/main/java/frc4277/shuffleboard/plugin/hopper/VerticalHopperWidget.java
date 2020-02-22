@@ -47,7 +47,7 @@ public class VerticalHopperWidget extends SimpleAnnotatedWidget<VerticalHopper> 
 
         new Thread(() -> {
             Runnable update = this::draw;
-            while (true) {
+            while (!Thread.interrupted()) {
                 long time = System.currentTimeMillis();
                 if ((time - animationRequestTime) <= MAXIMUM_ANIMATION_REQUEST_AGE) {
                     try {

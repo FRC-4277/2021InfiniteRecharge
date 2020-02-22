@@ -229,4 +229,8 @@ public class DriveTrain extends SubsystemBase {
       drive.curvatureDrive(forwardSpeed, rotation, quick);
     }
   }
+
+  public void rawTankDrive(double leftSpeed, double rightSpeed) {
+    drive.tankDrive(leftSpeed, rightSpeed, false);
+  }
 }

@@ -39,9 +39,9 @@ public class CameraSystem extends SubsystemBase {
     setupCamera(camera1);
     setupCamera(camera2);
 
-    nameEntry = driverTab.add("nameEntry", camera1.getName())
+    nameEntry = driverTab.add("Camera", camera1.getName())
             .withWidget(BuiltInWidgets.kTextView)
-            .withPosition(4, 0)
+            .withPosition(6, 0)
             .withSize(1, 1)
             .getEntry();
 
@@ -51,7 +51,7 @@ public class CameraSystem extends SubsystemBase {
     this.driverTab.add(WIDGET_NAME, server.getSource())
             .withWidget(BuiltInWidgets.kCameraStream)
             .withPosition(0,0)
-            .withSize(4, 4);
+            .withSize(6, 6);
     // Set source of widget to use URI of switched camera, just in case!
     NetworkTableInstance.getDefault().getTable("Shuffleboard")
             .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
@@ -74,6 +74,7 @@ public class CameraSystem extends SubsystemBase {
   }
 
   public void switchCamera(boolean firstCamera) {
+    this.firstCamera = firstCamera;
     UsbCamera camera = firstCamera ? camera1 : camera2;
     server.setSource(camera);
     nameEntry.setString(camera.getName());
