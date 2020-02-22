@@ -13,7 +13,10 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -28,20 +31,31 @@ public class VerticalHopper extends SubsystemBase {
   private double speedRunning = 0.0;
   private VerticalHopperSendable sendable = new VerticalHopperSendable();
 
+  public DigitalInput topBallSensor = new DigitalInput(0);
+  public DigitalInput intakeSensor;
+
+  public ShuffleboardTab driverTab;
+
   /**
    * Creates a new VerticalHopper.
    */
-  public VerticalHopper() {
+  public VerticalHopper(DigitalInput intakeSensor, ShuffleboardTab driverTab) {
+    this.intakeSensor = intakeSensor;
+    this.driverTab = driverTab;
     leftMotor.configFactoryDefault();
     leftMotor.setInverted(LEFT_MOTOR_INVERTED);
     rightMotor.configFactoryDefault();
     rightMotor.follow(leftMotor);
     rightMotor.setInverted(InvertType.OpposeMaster);
+  
+    driverTab.addBoolean("Ramp Full", topBallSensor::get).withWidget(BuiltInWidgets.kBooleanBox)
+    .withPosition(4, 1).withSize(2, 2);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    //System.out.println(intakeSensor.get());
   }
 
   public void moveUp() {

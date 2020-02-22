@@ -54,14 +54,14 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
   private final Intake intake = new Intake();
-  private final VerticalHopper hopper = new VerticalHopper();
+  private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab);
   private final Shooter shooter = new Shooter(settingsTab);
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab);
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick);
-  private final IntakeCommand intakeCommand = new IntakeCommand(intake);
+  private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
@@ -70,6 +70,7 @@ public class RobotContainer {
   //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
+  private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
 
   private SendableChooser<Command> chooser;
 
@@ -92,6 +93,7 @@ public class RobotContainer {
 
     // Default Commands
     driveTrain.setDefaultCommand(driveCommand);
+    hopper.setDefaultCommand(autoHopperMoveInCommand);
 
     // ShuffleBoard
     setupDriverTab();
@@ -110,6 +112,10 @@ public class RobotContainer {
       // Autonomous Chooser
       chooser = new SendableChooser<>();
       chooser.addDefault("Simple 4m Autonomous Line (facing towards wall)", backwards4m);
+      chooser.addDefault("AUTO SHOOT", new ShootAutoCommand(hopper, shooter));
+
+      SmartDashboard.putData(chooser);
+
     }
   }
 

@@ -7,17 +7,18 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.Intake.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Intake extends SubsystemBase {
   private VictorSPX motor = new VictorSPX(MOTOR_ID);
-  private static final double INTAKE_SPEED = .75;
+  private static final double INTAKE_SPEED = 1;
   private static final double REVERSE_INTAKE_SPEED = -0.5;
+  public DigitalInput intakeSensor = new DigitalInput(INTAKE_SENSOR);
 
   /**
    * Creates a new Intake.
