@@ -13,6 +13,7 @@ public class Limelight {
     private NetworkTable table;
     private NetworkTableEntry tv, tx, ty, ta, ts, tl, ledMode, pipeline, stream;
     private List<Pipeline> knownPipelines;
+    private Target lastTarget = null;
 
 
     public Limelight(Pipeline... knownPipelines) {
@@ -38,12 +39,16 @@ public class Limelight {
         if (!exists) {
             return Optional.empty();
         }
-        return Optional.of(new Target(
+        return Optional.of(lastTarget = new Target(
                 tx.getDouble(0.0),
                 ty.getDouble(0.0),
                 ta.getDouble(0.0),
                 ts.getDouble(0.0),
                 tl.getDouble(0.0)));
+    }
+
+    public Optional<Target> getLastTarget() {
+        return Optional.ofNullable(lastTarget);
     }
 
     public LEDMode getLEDMode() {

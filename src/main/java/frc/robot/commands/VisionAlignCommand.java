@@ -18,6 +18,7 @@ public class VisionAlignCommand extends CommandBase {
   public static final double ROTATE_P = 0.1d;
   public static final double DEG_TOLERANCE = 1.0d;
   public static final double MIN_COMMAND = 0.05;
+  public static final double SEEK_SPEED = 0.15;
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
   
@@ -41,19 +42,29 @@ public class VisionAlignCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    double steerAdjust = 0;
+
     Optional<Target> targetOptional = visionSystem.getLimelight().getTarget();
-    if (targetOptional.isEmpty()) {
-      return;
-    }
-    Target target = targetOptional.get();
-    double xDeg = target.getX();
-    double xError = -xDeg;
-    if (Math.abs(xError) <= DEG_TOLERANCE) {
-      return;
-    }
-    double steerAdjust = xError * ROTATE_P;
-    if (Math.abs(steerAdjust) < MIN_COMMAND) {
-      steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
+    if (targetOptional.isPresent()) {
+      Target target = targetOptional.get();
+      double xDeg = target.getX();
+      double xError = -xDeg;
+      if (Math.abs(xError) <= DEG_TOLERANCE) {
+        return;
+      }
+      steerAdjust = xError * ROTATE_P;
+      if (Math.abs(steerAdjust) < MIN_COMMAND) {
+        steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
+      }
+    } else {
+      Optional<Target> lastTarget = visionSystem.getLimelight().getLastTarget();
+      // Seek for target using lastTarget
+      if (lastTarget.isEmpty()) {
+        return;
+      }
+      // From signum, it would be 1 if the target is to the right, -1 if the target is to the left
+      // Then we multiply that by 0.2
+      steerAdjust = SEEK_SPEED * Math.signum(lastTarget.get().getX());
     }
 
     driveTrain.rawTankDrive(steerAdjust, -steerAdjust);
