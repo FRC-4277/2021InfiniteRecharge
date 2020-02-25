@@ -15,9 +15,9 @@ import frc.robot.subsystems.VisionSystem;
 import frc.robot.util.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
-  public static final double ROTATE_P = 0.04d;
-  public static final double DEG_TOLERANCE = 1.0d;
-  public static final double MIN_COMMAND = 0.05;
+  public static final double ROTATE_P = 0.025d;
+  public static final double DEG_TOLERANCE = 1d;
+  public static final double MIN_COMMAND = 0.2;
   public static final double SEEK_SPEED = 0.15;
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
@@ -36,6 +36,9 @@ public class VisionAlignCommand extends CommandBase {
   @Override
   public void initialize() {
     visionSystem.setCalculateDistance(true);
+    for (int i = 0; i < 5; i++) {
+      visionSystem.usePortPipeline();
+    }
     // todo : track last target to implement seek
   }
 
@@ -78,6 +81,9 @@ public class VisionAlignCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     visionSystem.setCalculateDistance(false);
+    for (int i = 0; i < 5; i++) {
+      visionSystem.useDriverPipeline();
+    }
   }
 
   // Returns true when the command should end.

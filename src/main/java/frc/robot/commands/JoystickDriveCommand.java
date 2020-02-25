@@ -34,11 +34,12 @@ public class JoystickDriveCommand extends CommandBase {
   public void execute() {
     // y is inverted on Xbox Controller
     double y = -controller.getY(Hand.kLeft);
-    double x = controller.getX(Hand.kRight);
+    double x = controller.getRawAxis(2);
+    /*double x = controller.getX(Hand.kRight);
     double z = controller.getRawAxis(2);
     if (Math.abs(z) >= TURN_DEADBAND) {
       x = z;
-    }
+    }*/
     boolean quickTurn = controller.getRawButton(LogitechButton.TRIGGER);
     driveTrain.joystickDrive(y, x, quickTurn);
   }

@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.limelight.Limelight;
 import frc.robot.util.limelight.Pipeline;
+import frc.robot.util.limelight.StreamMode;
 import frc.robot.util.limelight.Target;
 import static frc.robot.Constants.Vision.Limelight.*;
 
@@ -26,7 +27,7 @@ public class VisionSystem extends SubsystemBase {
   private ShuffleboardTab driverTab;
   private ShuffleboardLayout layout;
   private Pipeline driverPipeline = new Pipeline("Driver", 0);
-  private Pipeline portPipeline = new Pipeline("Port", 0);
+  private Pipeline portPipeline = new Pipeline("Port", 1);
   private Limelight limelight;
 
   private boolean calculateDistance = false;
@@ -63,10 +64,22 @@ public class VisionSystem extends SubsystemBase {
             .withWidget(BuiltInWidgets.kTextView);
     this.layout.addString("Distance I", () -> String.format("%.2f in", Units.metersToInches(this.calculatedDistanceMeters)))
             .withWidget(BuiltInWidgets.kTextView);
+
+    useDriverPipeline();
   }
 
   public Limelight getLimelight() {
     return limelight;
+  }
+
+  public void usePortPipeline() {
+    limelight.setPipeline(portPipeline);
+    limelight.setStreamMode(StreamMode.PIP_MAIN);
+  }
+
+  public void useDriverPipeline() {
+    limelight.setPipeline(driverPipeline);
+    limelight.setStreamMode(StreamMode.PIP_SECONDARY);
   }
 
   private String getLimelightDisplayProperty(Function<Target, Double> function) {

@@ -49,7 +49,7 @@ public class VerticalHopper extends SubsystemBase {
     rightMotor.setInverted(InvertType.OpposeMaster);
   
     driverTab.addBoolean("Ramp Full", topBallSensor::get).withWidget(BuiltInWidgets.kBooleanBox)
-    .withPosition(4, 1).withSize(2, 2);
+    .withPosition(7, 0).withSize(2, 1);
   }
 
   @Override

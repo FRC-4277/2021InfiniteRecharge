@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.cscore.HttpCamera;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource.ConnectionStrategy;
@@ -24,8 +25,9 @@ public class CameraSystem extends SubsystemBase {
   private static final String SERVER_NAME = "Switched";
   private static final String WIDGET_NAME = "Driver Switching Camera";
   private ShuffleboardTab driverTab;
-  private UsbCamera camera1, camera2;
-  private boolean firstCamera = true;
+  private UsbCamera backCamera;
+  private HttpCamera limelightStream;
+  private boolean useLimelightStream = true;
   private MjpegServer server;
   private NetworkTableEntry nameEntry;
 
@@ -34,12 +36,12 @@ public class CameraSystem extends SubsystemBase {
    */
   public CameraSystem(ShuffleboardTab driverTab) {
     this.driverTab = driverTab;
-    camera1 = new UsbCamera("1", 0); //todo: name them?
-    camera2 = new UsbCamera("2", 1);
-    setupCamera(camera1);
-    setupCamera(camera2);
+    backCamera = CameraServer.getInstance().startAutomaticCapture("back", 0); //todo: name them?
+    setupCamera(backCamera);
+    //camera2 = new UsbCamera("2", 1);
+    //setupCamera(camera2);
 
-    nameEntry = driverTab.add("Camera", camera1.getName())
+    nameEntry = driverTab.add("Camera", "limelight")
             .withWidget(BuiltInWidgets.kTextView)
             .withPosition(6, 0)
             .withSize(1, 1)
@@ -48,16 +50,19 @@ public class CameraSystem extends SubsystemBase {
     // Make MjpegServer which uses dummy source
     server = CameraServer.getInstance().addSwitchedCamera(SERVER_NAME);
     // Add CameraServer widget to Shuffleboard with dummy source
+    limelightStream = new HttpCamera("limelight", "http://10.42.77.11:5800/stream.mjpg");
     this.driverTab.add(WIDGET_NAME, server.getSource())
             .withWidget(BuiltInWidgets.kCameraStream)
             .withPosition(0,0)
             .withSize(6, 6);
+    server.setSource(limelightStream);
     // Set source of widget to use URI of switched camera, just in case!
-    NetworkTableInstance.getDefault().getTable("Shuffleboard")
+    /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
             .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
-            .setString("camera_server://" + SERVER_NAME);
-    // Allow edit of widget to change camera
-    nameEntry.addListener(notification -> {
+            //.setString("camera_server://" + SERVER_NAME);
+            .setString("10.42.77.11:5800");*/
+            // Allow edit of widget to change camera
+    /*nameEntry.addListener(notification -> {
       String value;
       if (notification.value.isString() && ((value = notification.value.getString()) != null)) {
         if (Objects.equals(lowercase(camera1.getName()), value)) {
@@ -66,23 +71,39 @@ public class CameraSystem extends SubsystemBase {
           switchCamera(false);
         }
       }
-    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);
+    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kNew | EntryListenerFlags.kUpdate);*/
   }
 
   private void setupCamera(UsbCamera camera) {
     camera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
   }
 
-  public void switchCamera(boolean firstCamera) {
-    this.firstCamera = firstCamera;
+  public void switchCamera(boolean useLimelightStream) {
+    this.useLimelightStream = useLimelightStream;
+    if (useLimelightStream) {
+      /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
+            .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
+            //.setString("camera_server://" + SERVER_NAME);
+            .setString("camera_server://limelight");*/
+      server.setSource(limelightStream);
+      nameEntry.setString("limelight");
+    } else {
+      /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
+            .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
+            //.setString("camera_server://" + SERVER_NAME);
+            .setString("camera_server://back");*/
+      server.setSource(backCamera);
+      nameEntry.setString("back");
+    }
+    /*this.firstCamera = firstCamera;
     UsbCamera camera = firstCamera ? camera1 : camera2;
     server.setSource(camera);
-    nameEntry.setString(camera.getName());
+    nameEntry.setString(camera.getName());*/
     //driverTab.add("Driver Switching Camera", server.getSource()).withPosition(0, 0).withSize(4, 4);
   }
 
   public void toggleCamera() {
-    switchCamera(!firstCamera);
+    switchCamera(!useLimelightStream);
   }
 
   public String lowercase(String string) {
