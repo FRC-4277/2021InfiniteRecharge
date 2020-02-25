@@ -35,7 +35,7 @@ public class Limelight {
     }
 
     public Optional<Target> getTarget() {
-        boolean exists = tv.getDouble(0.0) >= 0.0;
+        boolean exists = tv.getDouble(0.0) > 0.0;
         if (!exists) {
             return Optional.empty();
         }

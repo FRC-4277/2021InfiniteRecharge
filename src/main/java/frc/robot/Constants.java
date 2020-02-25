@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
@@ -89,9 +90,19 @@ public final class Constants {
     }
 
     public static class Shooter {
-        public static final int TOP_MOTOR_ID = 30;
-        public static final int BOTTOM_MOTOR_ID = 31;
-        public static final boolean TOP_MOTOR_INVERTED = true;
+        public static final int LEFT_MOTOR_ID = 30;
+        public static final int RIGHT_MOTOR_ID = 31;
+        public static final boolean LEFT_MOTOR_INVERTED = true;
+        public static final int TICKS_PER_REV = 4096;
+        public static class Characteristics {
+            public static final double P = 0.0;
+            public static final double I = 0.0;
+            public static final double D = 0.0;
+            public static final double MAX_BATTERY_V = 12;
+            public static final double ksVolts = 0.1;
+            public static final double kvVoltSecondsPerMeter = 2.2;
+            public static final double RPM_THRESHOLD = 200;
+        }
     }
 
     public static class Climber {
@@ -105,5 +116,8 @@ public final class Constants {
 
     public static class ColorWheel {
         public static final int MOTOR_ID = 20;
+        public static final boolean MOTOR_INVERTED = false;
+        public static final I2C.Port COLOR_SENSOR_PORT = I2C.Port.kOnboard;
+        public static final double DEFAULT_SPEED = 0.3;
     }
 }
