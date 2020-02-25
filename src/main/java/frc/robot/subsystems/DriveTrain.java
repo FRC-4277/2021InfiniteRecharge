@@ -49,7 +49,6 @@ public class DriveTrain extends SubsystemBase {
   private AHRS navX = new AHRS();
 
   private DifferentialDrive drive = new DifferentialDrive(leftGroup, rightGroup);
-  private DifferentialDriveOdometry odometry;
 
   /**
    * Creates a new DriveTrain.
@@ -89,138 +88,13 @@ public class DriveTrain extends SubsystemBase {
     SmartDashboard.putData(frontRightMotor);
     SmartDashboard.putData(backLeftMotor);
     SmartDashboard.putData(backRightMotor);*/
-    if (USING_ENCODERS) {
-      resetEncoders();
-      zeroGyro();
-      odometry = new DifferentialDriveOdometry(getHeading());
-    }
   }
 
   @Override
   public void periodic() {
-    if (USING_ENCODERS) {
-      odometry.update(getHeading(), getLeftDistanceMeters(), getRightDistanceMeters());
-    }
-  }
 
-  public void resetEncoders() {
-    backLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    backRightMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    backLeftMotor.setSensorPhase(LEFT_BACK_SENSOR_PHASE);
-    backRightMotor.setSensorPhase(RIGHT_BACK_SENSOR_PHASE);
-    backLeftMotor.setSelectedSensorPosition(0);
-    backRightMotor.setSelectedSensorPosition(0);
   }
-
-  public void zeroGyro() {
-    navX.reset();
-  }
-
-  /**
-   * @return -180..180
-   */
-  public float getYaw() {
-    return navX.getYaw();
-  }
-
-  /**
-   * @return Continuous angle
-   */
-  public double getAngle() {
-    return navX.getAngle();
-  }
-
-  public Rotation2d getHeading() {
-    return Rotation2d.fromDegrees(getYaw());
-  }
-
-  public double ticksToRotations(int ticks) {
-    return ticks / (double) ENCODER_TICKS_PER_ROTATION;
-  }
-
-  public double rotationsToTicks(double rotations) {
-    return rotations * ENCODER_TICKS_PER_ROTATION;
-  }
-
-  public double ticksToMeters(int ticks) {
-    return ticksToRotations(ticks) * WHEEL_CIRCUMFERENCE_METERS;
-  }
-
-  public double metersToTicks(double meters) {
-    double rotations = meters / WHEEL_CIRCUMFERENCE_METERS;
-    return rotationsToTicks(meters);
-  }
-
-  public double getLeftDistanceMeters() {
-    return ticksToRotations(backLeftMotor.getSelectedSensorPosition());
-  }
-
-  public double getRightDistanceMeters() {
-    return ticksToRotations(backRightMotor.getSelectedSensorPosition());
-  }
-
-  public Pose2d getPose() {
-    return odometry.getPoseMeters();
-  }
-
-  public TrajectoryConfig getTrajectoryConfig() {
-    return new TrajectoryConfig(
-      MAX_SPEED_METERS_PER_SECOND,
-      MAX_ACCELERATION_METERS_PER_SECOND_SQUARED
-    ).setKinematics(KINEMATICS).addConstraint(VOLTAGE_CONSTRAINT);
-  }
-
-  public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    return new DifferentialDriveWheelSpeeds(
-      ticksToRotations(backLeftMotor.getSelectedSensorVelocity()), 
-    ticksToRotations(backRightMotor.getSelectedSensorVelocity()));
-  }
-
-  public Trajectory generateStraightTrajectory(Pose2d startPose, double meters) {
-    return TrajectoryGenerator.generateTrajectory(
-      startPose,
-      List.of(
-        // One interior waypoint halfway through
-        new Translation2d(meters / 2, 0)
-      ),
-      new Pose2d(meters, 0, startPose.getRotation()),
-      getTrajectoryConfig()   
-      );
-  }
-
-  public Command getRamsete(Trajectory trajectory) {
-    return new RamseteCommand(
-      trajectory, 
-      this::getPose,
-      new RamseteController(kRamseteB, kRamseteZeta),
-      KINEMATICS,
-      new BiConsumer<Double,Double>(){
-        @Override
-        public void accept(Double leftMetersPerSecond, Double rightMetersPerSecond) {
-          setWheelVelocities(leftMetersPerSecond, rightMetersPerSecond);
-        }
-      },
-      this
-    );
-  }
-
-  public int metersPerSecondToTicksPer100ms(double metersPerSecond) {
-    double ticksPerSecond = metersToTicks(metersPerSecond);
-    return (int) Math.round(ticksPerSecond / 10);
-  }
-
-  public void setWheelVelocities(double leftMetersPerSecond, double rightMetersPerSecond) {
-    int leftTicksPer100ms = metersPerSecondToTicksPer100ms(leftMetersPerSecond);
-    int rightTicksPer100ms = metersPerSecondToTicksPer100ms(rightMetersPerSecond);
-    backLeftMotor.set(ControlMode.Velocity, leftTicksPer100ms);
-    backRightMotor.set(ControlMode.Velocity, rightTicksPer100ms);
-  }
-
-  public void resetOdometry(Pose2d pose) {
-    resetEncoders();
-    odometry.resetPosition(pose, getHeading());
-  }
-
+  
   public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {
     //drive.arcadeDrive(x, y);
     if (forwardSpeed <= .15) {

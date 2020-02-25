@@ -51,8 +51,6 @@ public class VisionSystem extends SubsystemBase {
       )
     );
 
-    this.layout.addNumber("Pipeline", () -> this.limelight.getPipelineId())
-            .withWidget(BuiltInWidgets.kTextView);
     this.layout.addBoolean("Target", () -> this.limelight.getTarget().isPresent())
     .withWidget(BuiltInWidgets.kBooleanBox);
     this.layout.addString("X Angle", () -> this.getLimelightDisplayProperty(Target::getX))

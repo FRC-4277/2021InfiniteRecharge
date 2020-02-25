@@ -22,15 +22,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.*;
-import frc.robot.commands.autonomous.LazyRamseteCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-
-import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -50,12 +47,14 @@ public class RobotContainer {
   // ShuffleBoard
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
+  private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
 
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab);
-  private final Shooter shooter = new Shooter(settingsTab);
+  private final Shooter shooter = new Shooter(settingsTab, driverTab);
+  private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab);
@@ -85,6 +84,7 @@ public class RobotContainer {
     SmartDashboard.putData(intake);
     SmartDashboard.putData(hopper);
     SmartDashboard.putData(shooter);
+    SmartDashboard.putData(colorWheel);
     //SmartDashboard.putData(gate);
     SmartDashboard.putData(cameraSystem);
 
@@ -99,7 +99,7 @@ public class RobotContainer {
     setupDriverTab();
 
 
-    if (Constants.DriveTrain.USING_ENCODERS) {
+    /*if (Constants.DriveTrain.USING_ENCODERS) {
       // Starting position Chooser
       SendableChooser<Pose2d> poseChooser = new SendableChooser<>();
       poseChooser.addDefault("Facing Towards Wall, lined up w/ triangle", new Pose2d(1.0366, -3.7382, Rotation2d.fromDegrees(-180)));
@@ -116,7 +116,7 @@ public class RobotContainer {
 
       SmartDashboard.putData(chooser);
 
-    }
+    }*/
   }
 
   private void setupDriverTab() {
@@ -177,7 +177,7 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    driveTrain.zeroGyro();
+    //driveTrain.zeroGyro();
     // Reset Pose2d
   }
 
