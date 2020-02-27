@@ -7,6 +7,7 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
@@ -28,7 +29,6 @@ public final class Constants {
         public static final int BACK_LEFT = 60;
         public static final int BACK_RIGHT = 44;
 
-        public static final boolean USING_ENCODERS = false;
         // todo : add from characterization data @
         public static final double KS_VOLTS = 0.22; // @
         public static final double KS_VOLT_SECONDS_PER_METER = 1.98; // @
@@ -40,10 +40,10 @@ public final class Constants {
                 new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER),
                  KINEMATICS, 10); //10V max to account for battery sag
         public static final double MAX_SPEED_METERS_PER_SECOND = 3; //todo : change @
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; //todo : change @
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; //todo : change @, not as important due to voltage constraint
         // RAMSETE constants
-        public static final double kRamseteB = 2; // ?
-        public static final double kRamseteZeta = 0.7; // ?
+        public static final double kRamseteB = 2; // default, should be good
+        public static final double kRamseteZeta = 0.7; // default, should be good
         // Encoders (on back)
         public static final boolean LEFT_BACK_SENSOR_PHASE = false;
         public static final boolean RIGHT_BACK_SENSOR_PHASE = false;
@@ -55,9 +55,14 @@ public final class Constants {
         public static final double DRIVE_P = 0.1; // @
         public static final double DRIVE_I = 0.1; // @
         public static final double DRIVE_D = 0.1; // @
-        public static final double DRIVE_F = 0.1; // @
-        public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = 10 * ENCODER_TICKS_PER_ROTATION; // 10rpm
-        
+        public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = (int) (.1d * ENCODER_TICKS_PER_ROTATION); // .1 rotation tolerance
+        // Drive velocity sampling settings
+        public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32
+        public static final VelocityMeasPeriod VELOCITY_MEAS_PERIOD = VelocityMeasPeriod.Period_5Ms;
+        public static final int STATUS_2_FEEDBACK_MS = 10; // 20ms default
+        public static final int STATUS_3_QUADRATURE_MS = 20; // 160ms default
+
+        public static final int MAX_BATTERY_V = 12;
     }
 
     public static class Vision {

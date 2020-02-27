@@ -45,6 +45,7 @@ public class RobotContainer {
   private XboxController xboxController = new XboxController(1);
 
   // ShuffleBoard
+  private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
   private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
@@ -71,7 +72,8 @@ public class RobotContainer {
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
 
-  private SendableChooser<Command> chooser;
+  private SendableChooser<Command> autoChooser;
+  private SendableChooser<Pose2d> startingPositionChooser;
 
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
@@ -98,25 +100,15 @@ public class RobotContainer {
     // ShuffleBoard
     setupDriverTab();
 
+    autoChooser = new SendableChooser<>();
+    SendableRegistry.setName(autoChooser, "Autonomous Command");
+    autoChooser.setDefaultOption("Nothing", null);
+    autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
-    /*if (Constants.DriveTrain.USING_ENCODERS) {
-      // Starting position Chooser
-      SendableChooser<Pose2d> poseChooser = new SendableChooser<>();
-      poseChooser.addDefault("Facing Towards Wall, lined up w/ triangle", new Pose2d(1.0366, -3.7382, Rotation2d.fromDegrees(-180)));
-
-      Supplier<Pose2d> poseSupplier = poseChooser::getSelected;
-
-      // Backwards 4m command
-      Command backwards4m = new LazyRamseteCommand(driveTrain, () -> driveTrain.generateStraightTrajectory(poseSupplier.get(), -4));
-
-      // Autonomous Chooser
-      chooser = new SendableChooser<>();
-      chooser.addDefault("Simple 4m Autonomous Line (facing towards wall)", backwards4m);
-      chooser.addDefault("AUTO SHOOT", new ShootAutoCommand(hopper, shooter));
-
-      SmartDashboard.putData(chooser);
-
-    }*/
+    startingPositionChooser = new SendableChooser<>();
+    SendableRegistry.setName(startingPositionChooser, "Starting Position");
+    startingPositionChooser.setDefaultOption("?", null);
+    autonomousTab.add(startingPositionChooser).withPosition(2, 0).withSize(2, 1);
   }
 
   private void setupDriverTab() {
@@ -177,8 +169,9 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    //driveTrain.zeroGyro();
-    // Reset Pose2d
+    driveTrain.resetEncoders();
+    driveTrain.zeroHeading();
+    System.out.println("DriveTrain's encoders & heading are reset.");
   }
 
   /**
@@ -188,7 +181,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return (chooser == null ? null : chooser.getSelected());
+    return (autoChooser == null ? null : autoChooser.getSelected());
     //return m_autoCommand;
   }
 }
