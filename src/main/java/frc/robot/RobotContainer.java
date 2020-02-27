@@ -66,6 +66,7 @@ public class RobotContainer {
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
+  private final ShooterHoldVelocityCommand shooterHoldVelocityCommand = new ShooterHoldVelocityCommand(shooter);
   //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
@@ -163,7 +164,7 @@ public class RobotContainer {
     rightBumper.whileActiveOnce(moveHopperDownCommand);
 
     JoystickButton xButton = new JoystickButton(xboxController, kX.value);
-    xButton.whileActiveOnce(shooterForwardCommand);
+    xButton.whileActiveOnce(shooterHoldVelocityCommand);
 
     JoystickButton bButton = new JoystickButton(xboxController, kB.value);
     bButton.whileActiveOnce(shooterBackwardsCommand);

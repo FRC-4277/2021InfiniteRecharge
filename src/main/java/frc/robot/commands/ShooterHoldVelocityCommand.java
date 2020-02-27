@@ -18,6 +18,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
    * Creates a new RampShooterToRPMCommand.
    */
   public ShooterHoldVelocityCommand(Shooter shooter) {
+    this.shooter = shooter;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
   }

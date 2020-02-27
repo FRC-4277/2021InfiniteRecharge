@@ -7,10 +7,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.Shooter.RIGHT_MOTOR_ID;
-import static frc.robot.Constants.Shooter.TICKS_PER_REV;
-import static frc.robot.Constants.Shooter.LEFT_MOTOR_ID;
-import static frc.robot.Constants.Shooter.LEFT_MOTOR_INVERTED;
+import static frc.robot.Constants.Shooter.*;
 import static frc.robot.Constants.Shooter.Characteristics.*;
 import java.util.Map;
 
@@ -40,7 +37,7 @@ public class Shooter extends SubsystemBase {
   private NetworkTableEntry shooterDesiredRPMEntry;
   private NetworkTableEntry shooterReachedRPMEntry;
 
-  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerMeter);
+  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerRotation);
 
   /**
    * Creates a new Shooter.
@@ -49,8 +46,10 @@ public class Shooter extends SubsystemBase {
     this.settingsTab = settingsTab;
     leftMotor.configFactoryDefault();
     leftMotor.setInverted(LEFT_MOTOR_INVERTED);
+    leftMotor.setSensorPhase(LEFT_SENSOR_PHASE);
     rightMotor.configFactoryDefault();
-    rightMotor.setInverted(InvertType.OpposeMaster);
+    rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
+    rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
 
     leftMotor.config_kP(0, P);
     leftMotor.config_kI(0, I);
