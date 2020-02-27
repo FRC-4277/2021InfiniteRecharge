@@ -104,7 +104,7 @@ public final class Constants {
             public static final double MAX_BATTERY_V = 12;
             public static final double ksVolts = 0.211;
             public static final double kvVoltSecondsPerRotation = 0.163;
-            public static final double RPM_THRESHOLD = 200;
+            public static final double RPM_THRESHOLD = 10;
         }
     }
 
