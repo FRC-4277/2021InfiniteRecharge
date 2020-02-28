@@ -13,18 +13,22 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.LogitechButton;
 
+import java.util.function.Supplier;
+
 public class JoystickDriveCommand extends CommandBase {
   private static final double TURN_DEADBAND = 0.1;
 
   private DriveTrain driveTrain;
   private Joystick controller;
+  private Supplier<Boolean> invertControls;
 
   /**
    * Creates a new JoystickDriveCommand.
    */
-  public JoystickDriveCommand(DriveTrain driveTrain, Joystick controller) {
+  public JoystickDriveCommand(DriveTrain driveTrain, Joystick controller, Supplier<Boolean> invertControls) {
     this.driveTrain = driveTrain;
     this.controller = controller;
+    this.invertControls = invertControls;
     addRequirements(driveTrain);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -33,13 +37,18 @@ public class JoystickDriveCommand extends CommandBase {
   @Override
   public void execute() {
     // y is inverted on Xbox Controller
-    double y = -controller.getY(Hand.kLeft);
-    double x = controller.getRawAxis(2);
+    double y = -controller.getY(Hand.kLeft); // Forward/backwards (axis inverted)
+    double x = controller.getRawAxis(2); // Logitech Twist
     /*double x = controller.getX(Hand.kRight);
     double z = controller.getRawAxis(2);
     if (Math.abs(z) >= TURN_DEADBAND) {
       x = z;
     }*/
+
+    if (invertControls.get()) {
+      y *= -1;
+    }
+
     boolean quickTurn = controller.getRawButton(LogitechButton.TRIGGER);
     driveTrain.joystickDrive(y, x, quickTurn);
   }

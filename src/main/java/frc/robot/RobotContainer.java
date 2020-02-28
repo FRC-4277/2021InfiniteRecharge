@@ -21,6 +21,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
@@ -28,6 +29,8 @@ import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.util.function.Supplier;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -42,6 +45,7 @@ public class RobotContainer {
 
   // Controllers
   private Joystick driveStick = new Joystick(0);
+  private Supplier<Boolean> invertControls = () -> driveStick.getRawAxis(4) <= .5; // Throttle is negative = invert
   private XboxController xboxController = new XboxController(1);
 
   // ShuffleBoard
@@ -60,7 +64,7 @@ public class RobotContainer {
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab);
 
-  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick);
+  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick, invertControls);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
@@ -139,6 +143,12 @@ public class RobotContainer {
 
     JoystickButton pointerButton = new JoystickButton(driveStick, LogitechButton.POINTER);
     pointerButton.whenPressed(toggleCameraCommand);
+
+    Trigger invertControlsThrottle = new Trigger(invertControls::get);
+    // Automatically switch camera when drive is inverted/normal
+    invertControlsThrottle.whenActive(new UseShooterCameraCommand(cameraSystem));
+    invertControlsThrottle.whenInactive(new UseIntakeCameraCommand(cameraSystem));
+
 
     // === CO-PILOT - Xbox 360/One Controller
 

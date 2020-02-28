@@ -85,21 +85,31 @@ public class CameraSystem extends SubsystemBase {
             .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
             //.setString("camera_server://" + SERVER_NAME);
             .setString("camera_server://limelight");*/
-      server.setSource(limelightStream);
-      nameEntry.setString("limelight");
+      switchToShooter();
     } else {
       /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
             .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
             //.setString("camera_server://" + SERVER_NAME);
             .setString("camera_server://back");*/
-      server.setSource(backCamera);
-      nameEntry.setString("back");
+      switchToIntake();
     }
     /*this.firstCamera = firstCamera;
     UsbCamera camera = firstCamera ? camera1 : camera2;
     server.setSource(camera);
     nameEntry.setString(camera.getName());*/
     //driverTab.add("Driver Switching Camera", server.getSource()).withPosition(0, 0).withSize(4, 4);
+  }
+
+  public void switchToShooter() {
+    this.useLimelightStream = true;
+    server.setSource(limelightStream);
+    nameEntry.setString("limelight");
+  }
+
+  public void switchToIntake() {
+    this.useLimelightStream = false;
+    server.setSource(backCamera);
+    nameEntry.setString("back");
   }
 
   public void toggleCamera() {
