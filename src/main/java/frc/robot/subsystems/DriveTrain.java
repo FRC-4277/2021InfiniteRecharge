@@ -89,8 +89,8 @@ public class DriveTrain extends SubsystemBase {
     talonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     talonSRX.configAllowableClosedloopError(0, DRIVE_VELOCITY_ERROR_TOLERANCE, 0);
     talonSRX.config_kP(0, DRIVE_P);
-    talonSRX.config_kP(0, DRIVE_I);
-    talonSRX.config_kP(0, DRIVE_D);
+    talonSRX.config_kI(0, DRIVE_I);
+    talonSRX.config_kD(0, DRIVE_D);
     talonSRX.configVelocityMeasurementWindow(ROLLING_VELOCITY_SAMPLES);
     talonSRX.configVelocityMeasurementPeriod(VELOCITY_MEAS_PERIOD);
     talonSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_2_FEEDBACK_MS);
@@ -122,7 +122,7 @@ public class DriveTrain extends SubsystemBase {
 
   public double metersToTicks(double meters) {
     double rotations = meters / WHEEL_CIRCUMFERENCE_METERS;
-    return rotationsToTicks(meters);
+    return rotationsToTicks(rotations);
   }
 
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
@@ -218,18 +218,16 @@ public class DriveTrain extends SubsystemBase {
 
 
                 double dt = currentTime - prevTime;
-                if (dt <= 0) {
-                  dt = 0.01;
-                }
+                boolean dtIsPositive = dt > 0;
 
-                double leftAcceleration = (leftMetersPerSecond - prevLeftMPS) / dt;
+                double leftAcceleration = dtIsPositive ? (leftMetersPerSecond - prevLeftMPS) / dt : 0;
                 double leftFeedforwardVolts = motorFeedforward.calculate(leftMetersPerSecond, leftAcceleration);
                 double leftFeedforward = leftFeedforwardVolts / MAX_BATTERY_V;
                 double leftTicksPerSecond = metersToTicks(leftMetersPerSecond);
                 double leftTicksPerDs = leftTicksPerSecond / 10;
                 backLeftMotor.set(ControlMode.Velocity, leftTicksPerDs, DemandType.ArbitraryFeedForward, leftFeedforward);
 
-                double rightAcceleration = (rightMetersPerSecond - prevRightMPS) / dt;
+                double rightAcceleration = dtIsPositive ? (rightMetersPerSecond - prevRightMPS) / dt : 0;
                 double rightFeedforwardVolts = motorFeedforward.calculate(rightMetersPerSecond, rightAcceleration);
                 double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V;
                 double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
