@@ -320,6 +320,15 @@ public class ColorWheel extends SubsystemBase {
         return null;
       }
       Color color = result.color;
+      
+      // Attempt to find via reference, most likely works
+      for (WheelColor wheelColor : WheelColor.values()) {
+        if (wheelColor.color == color) {
+          return wheelColor;
+        }
+      }
+
+      // Attempt to find via RGB values
       double red = color.red;
       double green = color.green;
       double blue = color.blue;
@@ -330,6 +339,7 @@ public class ColorWheel extends SubsystemBase {
           return wheelColor;
         }
       }
+      
       return null;
     }
   }
