@@ -8,9 +8,11 @@ import java.util.StringJoiner;
 
 public class GameTimer extends ComplexData<GameTimer> {
     private double matchTime;
+    private boolean autonomous;
 
-    public GameTimer(double matchTime) {
+    public GameTimer(double matchTime, boolean autonomous) {
         this.matchTime = matchTime;
+        this.autonomous = autonomous;
     }
 
     public double getMatchTime() {
@@ -21,9 +23,19 @@ public class GameTimer extends ComplexData<GameTimer> {
         this.matchTime = matchTime;
     }
 
+    public boolean isAutonomous() {
+        return autonomous;
+    }
+
+    public void setAutonomous(boolean autonomous) {
+        this.autonomous = autonomous;
+    }
+
     @Override
     public Map<String, Object> asMap() {
-        return Map.of("matchTime", matchTime);
+        return Map.of(
+            "matchTime", matchTime,
+            "autonomous", autonomous);
     }
 
     @Override

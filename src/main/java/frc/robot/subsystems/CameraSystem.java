@@ -12,14 +12,10 @@ import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
-import java.util.Objects;
 
 public class CameraSystem extends SubsystemBase {
   private static final String SERVER_NAME = "Switched";
@@ -36,16 +32,17 @@ public class CameraSystem extends SubsystemBase {
    */
   public CameraSystem(ShuffleboardTab driverTab) {
     this.driverTab = driverTab;
+
+    nameEntry = driverTab.add("Camera", "limelight")
+    .withWidget(BuiltInWidgets.kTextView)
+    .withPosition(6, 0)
+    .withSize(1, 1)
+    .getEntry();
+
     backCamera = CameraServer.getInstance().startAutomaticCapture("back", 0); //todo: name them?
     setupCamera(backCamera);
     //camera2 = new UsbCamera("2", 1);
     //setupCamera(camera2);
-
-    nameEntry = driverTab.add("Camera", "limelight")
-            .withWidget(BuiltInWidgets.kTextView)
-            .withPosition(6, 0)
-            .withSize(1, 1)
-            .getEntry();
 
     // Make MjpegServer which uses dummy source
     server = CameraServer.getInstance().addSwitchedCamera(SERVER_NAME);

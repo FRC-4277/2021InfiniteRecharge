@@ -10,16 +10,24 @@ package frc.robot.util;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import frc.robot.RobotContainer;
 
 /**
  * Add your docs here.
  */
 public class GameTimer implements Sendable {
 
+    private RobotContainer container;
+
+    public GameTimer(RobotContainer container) {
+        this.container = container;
+    }
+
     @Override
     public void initSendable(SendableBuilder builder) {
         builder.setSmartDashboardType("GameTimer");
         builder.addDoubleProperty("matchTime", Timer::getMatchTime, null);
+        builder.addBooleanProperty("autonomous", container::isInAutonomous, null);
     }
 
 }
