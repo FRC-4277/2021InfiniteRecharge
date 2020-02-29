@@ -31,6 +31,7 @@ public class CalibrateWheelColorCommand extends CommandBase {
   @Override
   public void execute() {
     colorWheel.updateFilter();
+    colorWheel.getProximity();
   }
 
   // Called once the command ends or is interrupted.

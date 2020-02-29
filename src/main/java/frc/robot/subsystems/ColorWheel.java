@@ -10,7 +10,11 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.ColorMatch;
+import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
+
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -24,11 +28,16 @@ import java.util.function.Function;
 import static frc.robot.Constants.ColorWheel.*;
 
 public class ColorWheel extends SubsystemBase {
+  private static final int FILTER_SIZE = 5;
   private WPI_TalonSRX motor = new WPI_TalonSRX(MOTOR_ID);
   private ColorSensorV3 colorSensor = new ColorSensorV3(COLOR_SENSOR_PORT);
   private ColorMatch colorMatch = new ColorMatch();
-  private ModeFilter modeFilter = new ModeFilter(5); // 5 * 20ms = maximum 100ms delay
+  private ModeFilter modeFilter = new ModeFilter(FILTER_SIZE); // 5 * 20ms = maximum 100ms delay
   private ShuffleboardTab tab;
+  private NetworkTableEntry positionStatusEntry, rotationStatusEntry;
+  private Color lastColor;
+  private ColorMatchResult lastResult;
+  private int lastProximity;
 
   /**
    * Creates a new ColorWheel.
@@ -39,6 +48,8 @@ public class ColorWheel extends SubsystemBase {
     motor.configFactoryDefault();
     motor.setInverted(MOTOR_INVERTED);
 
+    colorMatch.setConfidenceThreshold(0.0); //todo : increase if needed
+
     for (WheelColor wheelColor : WheelColor.values()) {
       colorMatch.addColorMatch(wheelColor.getColor());
     }
@@ -48,6 +59,34 @@ public class ColorWheel extends SubsystemBase {
     tab.add(new RotationWheelCommand(this)).withPosition(4, 0).withSize(2, 1);
     tab.add(new SpinWheelClockwiseCommand(this)).withPosition(0, 1).withSize(2, 1);
     tab.add(new SpinWheelCounterclockwiseCommand(this)).withPosition(2, 1).withSize(2, 1);
+
+    positionStatusEntry = tab.add("Position Status", "N/A")
+    .withWidget(BuiltInWidgets.kTextView)
+    .withPosition(6, 0)
+    .withSize(2, 1)
+    .getEntry();
+    rotationStatusEntry = tab.add("Rotation Status", "N/A")
+    .withWidget(BuiltInWidgets.kTextView)
+    .withPosition(6, 1)
+    .withSize(2, 1)
+    .getEntry();
+
+    tab.addNumber("Proximity", () -> lastProximity)
+    .withWidget(BuiltInWidgets.kTextView)
+    .withPosition(6, 2)
+    .withSize(1, 1);
+
+    tab.add("Filter Size", FILTER_SIZE)
+    .withWidget(BuiltInWidgets.kTextView)
+    .withPosition(5, 2)
+    .withSize(1, 1)
+    .getEntry()
+    .addListener((notification) -> {
+      if (notification.value.isDouble()) {
+        modeFilter.reset();
+        modeFilter.size = Double.valueOf(notification.value.getDouble()).intValue();
+      }
+    }, EntryListenerFlags.kUpdate);
 
     tab.addString("Last Colors", () -> {
       List<WheelColor> lastColors = modeFilter.getLast();
@@ -85,14 +124,29 @@ public class ColorWheel extends SubsystemBase {
     })
     .withPosition(3, 2)
     .withSize(1, 1);
+    tab.addString("Confidence Level", () -> 
+    (lastResult == null ? "N/A" : Double.toString(lastResult.confidence)))
+    .withPosition(4, 2)
+    .withSize(1, 1);
   }
 
   private double getColorValue(Function<Color, Double> colorFunction) {
-    Color detected = getDetectedColor();
-    if (detected != null){
-      colorFunction.apply(detected);
+    if (lastColor != null){
+      return colorFunction.apply(lastColor);
     }
     return -1;
+  }
+
+  public int getProximity() {
+    return lastProximity = colorSensor.getProximity();
+  }
+
+  public void setPositionStatus(String status) {
+    positionStatusEntry.setString(status);
+  }
+
+  public void setRotationStatus(String status) {
+    rotationStatusEntry.setString(status);
   }
 
   public Color getDetectedColor() {
@@ -108,8 +162,16 @@ public class ColorWheel extends SubsystemBase {
   }
 
   public void updateFilter() {
-    Color detectedColor = getDetectedColor();
-    WheelColor wheelColor = WheelColor.fromColor(detectedColor);
+    Color detectedColor = lastColor = getDetectedColor();
+    ColorMatchResult result = lastResult = colorMatch.matchColor(detectedColor);
+    if (result == null) {
+      return;
+    }
+    WheelColor wheelColor = WheelColor.fromResult(result);
+    if (wheelColor == null) {
+      return;
+    }
+    // todo : add a filter status field?
     modeFilter.update(wheelColor);
   }
 
@@ -242,6 +304,7 @@ public class ColorWheel extends SubsystemBase {
     GREEN(ColorMatch.makeColor(0.197, 0.561, 0.240)),
     YELLOW(ColorMatch.makeColor(0.361, 0.524, 0.113));
 
+    private static double EPSILON = 0.001;
     private Color color;
 
     WheelColor(Color color) {
@@ -252,9 +315,18 @@ public class ColorWheel extends SubsystemBase {
       return color;
     }
 
-    public static WheelColor fromColor(Color color) {
+    public static WheelColor fromResult(ColorMatchResult result) {
+      if (result == null) {
+        return null;
+      }
+      Color color = result.color;
+      double red = color.red;
+      double green = color.green;
+      double blue = color.blue;
       for (WheelColor wheelColor : WheelColor.values()) {
-        if (wheelColor.getColor().equals(color)) {
+        Color wheelColorColor = wheelColor.getColor();
+        if ((Math.abs(wheelColorColor.red - red) <= EPSILON) && (Math.abs(wheelColorColor.green - green) <= EPSILON) &&
+        (Math.abs(wheelColorColor.blue - blue) <= EPSILON)) {
           return wheelColor;
         }
       }

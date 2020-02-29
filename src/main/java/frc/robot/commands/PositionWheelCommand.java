@@ -32,6 +32,7 @@ public class PositionWheelCommand extends CommandBase {
     this.targetColor = null;
     this.clockwise = null;
     colorWheel.resetFilter();
+    colorWheel.setPositionStatus("init");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -42,10 +43,14 @@ public class PositionWheelCommand extends CommandBase {
       return;
     }
 
+    colorWheel.setPositionStatus("???Waiting for saturation???");
+
+    colorWheel.updateFilter();
     if (!colorWheel.isFilterSaturated()) {
-      colorWheel.updateFilter();
       return;
     }
+
+    colorWheel.setPositionStatus("???Waiting for FMS Color???");
 
     if (targetColor == null) {
       targetColor = colorWheel.getFMSTargetColor();
@@ -56,14 +61,17 @@ public class PositionWheelCommand extends CommandBase {
     }
 
     ColorWheel.WheelColor currentColor = colorWheel.getFilteredColor();
+    
     if (currentColor == targetColor) {
       colorWheel.stopWheel();
+      colorWheel.setPositionStatus("!!!!FINISHED!!!!");
       finished = true;
     } else {
       // Must keep spinning
       if (clockwise == null) {
         clockwise = colorWheel.shouldSpinClockwise(currentColor, targetColor);
       }
+      colorWheel.setPositionStatus((clockwise ? "CW" : "CCW") + ", T = " + targetColor + ", C = " + currentColor);
       if (clockwise) {
         colorWheel.spinClockwise();
       } else {
