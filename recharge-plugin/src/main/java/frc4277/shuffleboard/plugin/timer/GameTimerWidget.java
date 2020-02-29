@@ -72,6 +72,15 @@ public class GameTimerWidget extends SimpleAnnotatedWidget<GameTimer> {
             // In seconds (decimal)
             double matchTime = newValue.getMatchTime();
 
+            // Make it a countdown timer
+            if (newValue.isAutonomous()) {
+                matchTime = 15 - matchTime;
+            } else {
+                matchTime = 135 - matchTime;
+            }
+
+            matchTime = Math.max(matchTime, 0); // Make the minimum 0:00
+
             int minutes = Double.valueOf(Math.floor(matchTime / 60)).intValue();
             matchTime -= minutes * 60;
 

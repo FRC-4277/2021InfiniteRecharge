@@ -15,11 +15,11 @@ public class GameTimerType extends ComplexDataType<GameTimer> {
 
     @Override
     public Function<Map<String, Object>, GameTimer> fromMap() {
-        return map -> new GameTimer(Maps.getOrDefault(map, "matchTime", 0.0));
+        return map -> new GameTimer(Maps.getOrDefault(map, "matchTime", 0.0), Maps.getOrDefault(map, "autonomous", true));
     }
 
     @Override
     public GameTimer getDefaultValue() {
-        return new GameTimer(0.0);
+        return new GameTimer(0.0, true);
     }
 }

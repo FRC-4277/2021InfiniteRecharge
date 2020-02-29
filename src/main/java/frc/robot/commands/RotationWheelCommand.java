@@ -34,6 +34,7 @@ public class RotationWheelCommand extends CommandBase {
     this.lastColor = null;
     this.colorChanges = 0;
     colorWheel.resetFilter();
+    colorWheel.setRotationStatus("init");
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -44,21 +45,27 @@ public class RotationWheelCommand extends CommandBase {
       return;
     }
 
+    colorWheel.setRotationStatus("???Waiting for saturation???");
+
+    colorWheel.updateFilter();
     if (!colorWheel.isFilterSaturated()) {
-      colorWheel.updateFilter();
       return;
     }
+
     ColorWheel.WheelColor color = colorWheel.getFilteredColor();
     if (color != lastColor) {
       colorChanges++;
       this.lastColor = color;
     }
 
+    colorWheel.setRotationStatus("CW, status: " + colorChanges + " / " + TARGET_COLOR_CHANGES);
+
     if (colorChanges < TARGET_COLOR_CHANGES) {
       colorWheel.spinClockwise();
     } else {
       // DONE!
       colorWheel.stopWheel();
+      colorWheel.setRotationStatus("!!!!FINISHED!!!!");
       finished = true;
     }
   }

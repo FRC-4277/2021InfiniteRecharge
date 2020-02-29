@@ -28,6 +28,7 @@ import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 
 import java.util.function.Supplier;
+import java.util.Map;
 
 import static edu.wpi.first.wpilibj.XboxController.Button.*;
 
@@ -52,6 +53,7 @@ public class RobotContainer {
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
   private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
+  private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
 
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain();
@@ -73,11 +75,15 @@ public class RobotContainer {
   private final ShooterHoldVelocityCommand shooterHoldVelocityCommand = new ShooterHoldVelocityCommand(shooter);
   //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
+  private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
+  private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
 
   private SendableChooser<Command> autoChooser;
   private SendableChooser<Pose2d> startingPositionChooser;
+
+  private boolean inAutonomous = true;
 
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
@@ -115,6 +121,9 @@ public class RobotContainer {
     SendableRegistry.setName(startingPositionChooser, "Starting Position");
     startingPositionChooser.setDefaultOption("?", null);
     autonomousTab.add(startingPositionChooser).withPosition(2, 0).withSize(2, 1);
+
+    // Testing
+    testTab.add(toggleCameraCommand);
   }
 
   private void setupDriverTab() {
@@ -124,10 +133,11 @@ public class RobotContainer {
     .withWidget("VerticalHopper")
     .withPosition(0,0)
     .withSize(3, 2);*/
-    GameTimer gameTimer = new GameTimer();
+    GameTimer gameTimer = new GameTimer(this);
     SendableRegistry.add(gameTimer, "GameTimer");
     driverTab.add(gameTimer)
     .withWidget("GameTimer")
+    .withProperties(Map.of("Font Color", "black"))
     .withPosition(7, 0)
     .withSize(2, 1);
   }
@@ -148,8 +158,8 @@ public class RobotContainer {
 
     Trigger invertControlsThrottle = new Trigger(invertControls::get);
     // Automatically switch camera when drive is inverted/normal
-    invertControlsThrottle.whenActive(new UseShooterCameraCommand(cameraSystem));
-    invertControlsThrottle.whenInactive(new UseIntakeCameraCommand(cameraSystem));
+    invertControlsThrottle.whenActive(useShooterCameraCommand);
+    invertControlsThrottle.whenInactive(useIntakeCameraCommand);
 
 
     // === CO-PILOT - Xbox 360/One Controller
@@ -176,14 +186,33 @@ public class RobotContainer {
     aButton.whileActiveOnce(visionAlignCommand);
   }
 
-  protected void switchToDriverView() {
+  private void switchToDriverView() {
     Shuffleboard.selectTab("Driver");
+    inAutonomous = false;
   }
 
-  public void autonomousInit() {
+  protected void teleopInit() {
+    switchToDriverView();
+
+    // Initial state for inverted controls
+    if (invertControls.get()) {
+      // Inverted, the shooter is now the front
+      useShooterCameraCommand.schedule();
+    } else {
+      // Not inverted, the intake is the front
+      useIntakeCameraCommand.schedule();
+    }
+  }
+
+  protected void autonomousInit() {
+    inAutonomous = true;
     driveTrain.resetEncoders();
     driveTrain.zeroHeading();
     System.out.println("DriveTrain's encoders & heading are reset.");
+  }
+
+  public boolean isInAutonomous() {
+    return inAutonomous;
   }
 
   /**
