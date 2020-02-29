@@ -7,27 +7,29 @@
 
 package frc.robot;
 
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import static edu.wpi.first.wpilibj.XboxController.Button.*;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+
+import java.util.function.Supplier;
+
+import static edu.wpi.first.wpilibj.XboxController.Button.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -42,9 +44,11 @@ public class RobotContainer {
 
   // Controllers
   private Joystick driveStick = new Joystick(0);
+  private Supplier<Boolean> invertControls = () -> driveStick.getRawAxis(4) <= .5; // Throttle is negative = invert
   private XboxController xboxController = new XboxController(1);
 
   // ShuffleBoard
+  private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
   private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
@@ -59,7 +63,7 @@ public class RobotContainer {
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab);
 
-  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick);
+  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick, invertControls);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
@@ -72,7 +76,8 @@ public class RobotContainer {
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
 
-  private SendableChooser<Command> chooser;
+  private SendableChooser<Command> autoChooser;
+  private SendableChooser<Pose2d> startingPositionChooser;
 
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
@@ -99,25 +104,17 @@ public class RobotContainer {
     // ShuffleBoard
     setupDriverTab();
 
+    autoChooser = new SendableChooser<>();
+    SendableRegistry.setName(autoChooser, "Autonomous Command");
+    autoChooser.setDefaultOption("Nothing", null);
+    autoChooser.setDefaultOption("Forward To Switch",
+            driveTrain.generateRamseteCommand(driveTrain.generateTrajectory("Forward To Switch")));
+    autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
-    /*if (Constants.DriveTrain.USING_ENCODERS) {
-      // Starting position Chooser
-      SendableChooser<Pose2d> poseChooser = new SendableChooser<>();
-      poseChooser.addDefault("Facing Towards Wall, lined up w/ triangle", new Pose2d(1.0366, -3.7382, Rotation2d.fromDegrees(-180)));
-
-      Supplier<Pose2d> poseSupplier = poseChooser::getSelected;
-
-      // Backwards 4m command
-      Command backwards4m = new LazyRamseteCommand(driveTrain, () -> driveTrain.generateStraightTrajectory(poseSupplier.get(), -4));
-
-      // Autonomous Chooser
-      chooser = new SendableChooser<>();
-      chooser.addDefault("Simple 4m Autonomous Line (facing towards wall)", backwards4m);
-      chooser.addDefault("AUTO SHOOT", new ShootAutoCommand(hopper, shooter));
-
-      SmartDashboard.putData(chooser);
-
-    }*/
+    startingPositionChooser = new SendableChooser<>();
+    SendableRegistry.setName(startingPositionChooser, "Starting Position");
+    startingPositionChooser.setDefaultOption("?", null);
+    autonomousTab.add(startingPositionChooser).withPosition(2, 0).withSize(2, 1);
   }
 
   private void setupDriverTab() {
@@ -149,6 +146,12 @@ public class RobotContainer {
     JoystickButton pointerButton = new JoystickButton(driveStick, LogitechButton.POINTER);
     pointerButton.whenPressed(toggleCameraCommand);
 
+    Trigger invertControlsThrottle = new Trigger(invertControls::get);
+    // Automatically switch camera when drive is inverted/normal
+    invertControlsThrottle.whenActive(new UseShooterCameraCommand(cameraSystem));
+    invertControlsThrottle.whenInactive(new UseIntakeCameraCommand(cameraSystem));
+
+
     // === CO-PILOT - Xbox 360/One Controller
 
     XboxTrigger leftTrigger = new XboxTrigger(xboxController, Hand.kLeft);
@@ -178,8 +181,9 @@ public class RobotContainer {
   }
 
   public void autonomousInit() {
-    //driveTrain.zeroGyro();
-    // Reset Pose2d
+    driveTrain.resetEncoders();
+    driveTrain.zeroHeading();
+    System.out.println("DriveTrain's encoders & heading are reset.");
   }
 
   /**
@@ -189,7 +193,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return (chooser == null ? null : chooser.getSelected());
+    return (autoChooser == null ? null : autoChooser.getSelected());
     //return m_autoCommand;
   }
 }

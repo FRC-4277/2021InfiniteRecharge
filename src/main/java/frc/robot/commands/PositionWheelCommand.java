@@ -14,6 +14,7 @@ public class PositionWheelCommand extends CommandBase {
   private ColorWheel colorWheel;
   private boolean finished = false;
   private ColorWheel.WheelColor targetColor = null;
+  private Boolean clockwise = null;
 
   /**
    * Creates a new PositionWheelCommand.
@@ -29,6 +30,7 @@ public class PositionWheelCommand extends CommandBase {
   public void initialize() {
     this.finished = false;
     this.targetColor = null;
+    this.clockwise = null;
     colorWheel.resetFilter();
   }
 
@@ -59,7 +61,10 @@ public class PositionWheelCommand extends CommandBase {
       finished = true;
     } else {
       // Must keep spinning
-      if (colorWheel.shouldSpinClockwise(currentColor, targetColor)) {
+      if (clockwise == null) {
+        clockwise = colorWheel.shouldSpinClockwise(currentColor, targetColor);
+      }
+      if (clockwise) {
         colorWheel.spinClockwise();
       } else {
         colorWheel.spinCounterclockwise();

@@ -33,7 +33,8 @@ public class Shooter extends SubsystemBase {
   private TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
 
   private NetworkTableEntry shooterSpeedEntry;
-  private NetworkTableEntry shooterRPMEntry;
+  private NetworkTableEntry shooterLeftRPMEntry;
+  private NetworkTableEntry shooterRightRPMEntry;
   private NetworkTableEntry shooterDesiredRPMEntry;
   private NetworkTableEntry shooterReachedRPMEntry;
 
@@ -78,8 +79,13 @@ public class Shooter extends SubsystemBase {
     .withProperties(Map.of("min", 0, "max", 1))
     .getEntry();
 
-    shooterRPMEntry = layout
-    .add("RPM", -1)
+    shooterLeftRPMEntry = layout
+    .add("Left RPM", -1)
+    .withWidget(BuiltInWidgets.kTextView)
+    .getEntry();
+
+    shooterRightRPMEntry = layout
+    .add("Right RPM", -1)
     .withWidget(BuiltInWidgets.kTextView)
     .getEntry();
 
@@ -89,7 +95,7 @@ public class Shooter extends SubsystemBase {
     .getEntry();
 
     shooterReachedRPMEntry = layout
-    .add("Reached RPM", false)
+    .add("Has Reached", false)
     .withWidget(BuiltInWidgets.kBooleanBox)
     .getEntry();
   }
@@ -118,6 +124,14 @@ public class Shooter extends SubsystemBase {
 
   public int getVelocityRPM() {
     return ticksPerDsToRPM(getVelocity());
+  }
+
+  public int getLeftRPM() {
+    return ticksPerDsToRPM(leftMotor.getSelectedSensorVelocity());
+  }
+
+  public int getRightRPM() {
+    return ticksPerDsToRPM(rightMotor.getSelectedSensorVelocity());
   }
 
   public boolean hasReachedRPM(int rpm) {
@@ -159,6 +173,7 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    shooterRPMEntry.setDouble(getVelocityRPM());
+    shooterLeftRPMEntry.setDouble(getLeftRPM());
+    shooterRightRPMEntry.setDouble(getRightRPM());
   }
 }
