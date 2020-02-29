@@ -14,6 +14,8 @@ import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -24,9 +26,12 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.function.BiConsumer;
 
 import static frc.robot.Constants.DriveTrain.*;
@@ -189,6 +194,17 @@ public class DriveTrain extends SubsystemBase {
     drive.tankDrive(leftSpeed, rightSpeed, false);
   }
 
+  public Trajectory generateTrajectory(String pathFileName) {
+    String path = "paths/" + pathFileName + ".wpilib.json";
+    try {
+      Path trajectoryPath = Filesystem.getDeployDirectory().toPath().resolve(path);
+      return TrajectoryUtil.fromPathweaverJson(trajectoryPath);
+    } catch (IOException e) {
+      DriverStation.reportError("Unable to open trajectory: " + path, e.getStackTrace());
+    }
+    return null;
+  }
+
   public RamseteCommand generateRamseteCommand(Trajectory trajectory) {
     return new RamseteCommand(
             trajectory,
@@ -233,6 +249,8 @@ public class DriveTrain extends SubsystemBase {
                 double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
                 double rightTicksPerDs = rightTicksPerSecond / 10;
                 backRightMotor.set(ControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
+
+                System.out.println("SK: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 
                 prevLeftMPS = leftMetersPerSecond;
                 prevRightMPS = rightMetersPerSecond;

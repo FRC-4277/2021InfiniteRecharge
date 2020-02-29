@@ -7,30 +7,29 @@
 
 package frc.robot;
 
-import edu.wpi.cscore.UsbCamera;
-import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
-import static edu.wpi.first.wpilibj.XboxController.Button.*;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 import java.util.function.Supplier;
+
+import static edu.wpi.first.wpilibj.XboxController.Button.*;
 
 /**
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -107,6 +106,8 @@ public class RobotContainer {
     autoChooser = new SendableChooser<>();
     SendableRegistry.setName(autoChooser, "Autonomous Command");
     autoChooser.setDefaultOption("Nothing", null);
+    autoChooser.setDefaultOption("Forward To Switch",
+            driveTrain.generateRamseteCommand(driveTrain.generateTrajectory("Forward To Switch")));
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
     startingPositionChooser = new SendableChooser<>();
