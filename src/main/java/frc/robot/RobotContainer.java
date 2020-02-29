@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -19,9 +20,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
+import frc.robot.commands.autonomous.AimShootBackAutoCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
@@ -56,7 +59,7 @@ public class RobotContainer {
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
 
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain driveTrain = new DriveTrain();
+  private final DriveTrain driveTrain = new DriveTrain(testTab);
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
@@ -72,12 +75,12 @@ public class RobotContainer {
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
-  private final ShooterHoldVelocityCommand shooterHoldVelocityCommand = new ShooterHoldVelocityCommand(shooter);
+  private final ShooterHoldVelocityCommand shooterHoldVelocityCommand = new ShooterHoldVelocityCommand(shooter, true);
   //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
   private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
-  private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem);
+  private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem, true);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
 
   private SendableChooser<Command> autoChooser;
@@ -110,16 +113,20 @@ public class RobotContainer {
     // ShuffleBoard
     setupDriverTab();
 
+    // Paths
+    RamseteCommand toSwitchPath = driveTrain.generateRamseteCommand(driveTrain.generateTrajectory("Forward To Switch"));
+
     autoChooser = new SendableChooser<>();
     SendableRegistry.setName(autoChooser, "Autonomous Command");
     autoChooser.setDefaultOption("Nothing", null);
-    autoChooser.setDefaultOption("Forward To Switch",
-            driveTrain.generateRamseteCommand(driveTrain.generateTrajectory("Forward To Switch")));
+    autoChooser.addOption("Forward To Switch", toSwitchPath);
+    autoChooser.addOption("Aim, Shoot, Move To Switch", 
+    new AimShootBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000, toSwitchPath));
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
     startingPositionChooser = new SendableChooser<>();
     SendableRegistry.setName(startingPositionChooser, "Starting Position");
-    startingPositionChooser.setDefaultOption("?", null);
+    startingPositionChooser.setDefaultOption("Facing Switch", new Pose2d(0, 0, new Rotation2d(0)));
     autonomousTab.add(startingPositionChooser).withPosition(2, 0).withSize(2, 1);
 
     // Testing
@@ -200,6 +207,7 @@ public class RobotContainer {
       useShooterCameraCommand.schedule();
     } else {
       // Not inverted, the intake is the front
+
       useIntakeCameraCommand.schedule();
     }
   }

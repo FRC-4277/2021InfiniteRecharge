@@ -8,53 +8,46 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.VerticalHopper;
+import frc.robot.subsystems.DriveTrain;
 
-public class IntakeCommand extends CommandBase {
-  private Intake intake;
-  private VerticalHopper verticalHopper;
-  private static int intakeMinStopTimeMs = 400;
-  private boolean ballIntaking = false;
-  private Long ballIntakeTime = 0L;
+public class RotateToCommand extends CommandBase {
+  private static final double MIN_POWER = 0.25;
+  private DriveTrain driveTrain;
+  private double targetHeading;
+
   /**
-   * Creates a new IntakeCommand.
+   * Creates a new RotateToCommand.
    */
-  public IntakeCommand(Intake intake, VerticalHopper verticalHopper) {
-    this.intake = intake;
-    this.verticalHopper = verticalHopper;
-    addRequirements(intake);
+  public RotateToCommand(DriveTrain driveTrain, double targetHeading) {
+    this.driveTrain = driveTrain;
+    addRequirements(driveTrain);
     // Use addRequirements() here to declare subsystem dependencies.
+    this.targetHeading = targetHeading;
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    this.ballIntaking = false;
-    this.ballIntakeTime = 0L;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    boolean intakeBallPresent = !intake.intakeSensor.get();
-    if (intakeBallPresent && !ballIntaking) {
-      ballIntaking = true;
+    double currentHeading = driveTrain.getHeading();
+    double error = targetHeading - currentHeading;
+    // If error is positive, we must spin counterclockwise
+    // If turning power is positive, we turn clockwise, so invert
+    double turningPower = -error;
+    turningPower *= 0.015; //P loop
+    if (Math.abs(turningPower) < MIN_POWER) {
+      turningPower = Math.copySign(MIN_POWER, turningPower);
     }
-    if (ballIntaking && (System.currentTimeMillis() - ballIntakeTime >= intakeMinStopTimeMs)) {
-      ballIntaking = false;
-    }
-    if (!ballIntaking) {
-      intake.runIntake();
-    } else {
-      intake.stopIntake();
-    }
+    driveTrain.rawTankDrive(turningPower, -turningPower);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    intake.stopIntake();
   }
 
   // Returns true when the command should end.

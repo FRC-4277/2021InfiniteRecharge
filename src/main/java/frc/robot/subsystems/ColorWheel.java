@@ -48,7 +48,7 @@ public class ColorWheel extends SubsystemBase {
     motor.configFactoryDefault();
     motor.setInverted(MOTOR_INVERTED);
 
-    colorMatch.setConfidenceThreshold(0.0); //todo : increase if needed
+    colorMatch.setConfidenceThreshold(0.96); //todo : increase if needed
 
     for (WheelColor wheelColor : WheelColor.values()) {
       colorMatch.addColorMatch(wheelColor.getColor());
@@ -299,10 +299,10 @@ public class ColorWheel extends SubsystemBase {
   }
 
   public enum WheelColor {
-    BLUE(ColorMatch.makeColor(0.143, 0.427, 0.429)),
-    RED(ColorMatch.makeColor(0.561, 0.232, 0.114)),
-    GREEN(ColorMatch.makeColor(0.197, 0.561, 0.240)),
-    YELLOW(ColorMatch.makeColor(0.361, 0.524, 0.113));
+    BLUE(ColorMatch.makeColor(/*0.143, 0.427, 0.429*/0.126, 0.423, 0.449)),
+    RED(ColorMatch.makeColor(/*0.561, 0.232, 0.114*/.497,.358,.144)),
+    GREEN(ColorMatch.makeColor(/*0.197, 0.561, 0.240*/.172,.573,.253)),
+    YELLOW(ColorMatch.makeColor(/*0.361, 0.524, 0.113*/.316,.560,.123));
 
     private static double EPSILON = 0.001;
     private Color color;

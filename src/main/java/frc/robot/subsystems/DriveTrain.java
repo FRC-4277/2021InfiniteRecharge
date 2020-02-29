@@ -25,10 +25,14 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.RotateToCommand;
+import frc.robot.commands.ZeroNavXCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -53,10 +57,14 @@ public class DriveTrain extends SubsystemBase {
   private SimpleMotorFeedforward motorFeedforward
           = new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER);
 
+  private double yawOffset = 0;
+  private ShuffleboardTab testTab;
+
   /**
    * Creates a new DriveTrain.
    */
-  public DriveTrain() {
+  public DriveTrain(ShuffleboardTab testTab) {
+    this.testTab = testTab;
 
     // Reset TalonSRX config
     frontLeftMotor.configFactoryDefault();
@@ -88,6 +96,11 @@ public class DriveTrain extends SubsystemBase {
 
     resetEncoders();
     odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
+  
+    testTab.addNumber("NavX Adjusted Yaw", () -> getHeading())
+    .withWidget(BuiltInWidgets.kTextView);
+    testTab.add(new ZeroNavXCommand(this));
+    testTab.add(new RotateToCommand(this, 90));
   }
 
   private void configureEncoderTalon(TalonSRX talonSRX) {
@@ -161,15 +174,26 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public void zeroHeading() {
+    zeroHeading(0);
+  }
+
+  public void zeroHeading(int heading) {
     navX.reset();
+    yawOffset = heading;
   }
 
   /**
-   *
+   * Inverts NavX yaw as Odometry takes CCW as positive
    * @return -180..180
    */
   public double getHeading() {
-    return navX.getYaw();
+    double heading = -navX.getYaw() + yawOffset;
+    if (heading > 180) {
+      heading -=180;
+    } else if (heading < -180) {
+      heading += 180;
+    }
+    return heading;
   }
 
   public double getTurnRate() {
@@ -241,14 +265,22 @@ public class DriveTrain extends SubsystemBase {
                 double leftFeedforward = leftFeedforwardVolts / MAX_BATTERY_V;
                 double leftTicksPerSecond = metersToTicks(leftMetersPerSecond);
                 double leftTicksPerDs = leftTicksPerSecond / 10;
-                backLeftMotor.set(ControlMode.Velocity, leftTicksPerDs, DemandType.ArbitraryFeedForward, leftFeedforward);
+                if (!HAS_ENCODERS) {
+                  backLeftMotor.set(leftFeedforward);
+                } else {
+                  backLeftMotor.set(ControlMode.Velocity, leftTicksPerDs, DemandType.ArbitraryFeedForward, leftFeedforward);
+                }
 
                 double rightAcceleration = dtIsPositive ? (rightMetersPerSecond - prevRightMPS) / dt : 0;
                 double rightFeedforwardVolts = motorFeedforward.calculate(rightMetersPerSecond, rightAcceleration);
                 double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V;
                 double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
                 double rightTicksPerDs = rightTicksPerSecond / 10;
-                backRightMotor.set(ControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
+                if (!HAS_ENCODERS) {
+                  backRightMotor.set(rightFeedforward);
+                } else {
+                  backRightMotor.set(ControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
+                }
 
                 System.out.println("SK: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 

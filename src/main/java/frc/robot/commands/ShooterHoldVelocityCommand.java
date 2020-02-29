@@ -12,13 +12,21 @@ import frc.robot.subsystems.Shooter;
 
 public class ShooterHoldVelocityCommand extends CommandBase {
   private Shooter shooter;
+  private Integer rpm = -1;
   private int loopsReachedRPM = 0;
+  private boolean runForever, finished;
+
+  public ShooterHoldVelocityCommand(Shooter shooter, boolean runForever) {
+    this(shooter, runForever, -1);
+  }
 
   /**
    * Creates a new RampShooterToRPMCommand.
    */
-  public ShooterHoldVelocityCommand(Shooter shooter) {
+  public ShooterHoldVelocityCommand(Shooter shooter, boolean runForever, int rpm) {
     this.shooter = shooter;
+    this.runForever = runForever;
+    this.rpm = rpm;
     addRequirements(shooter);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -33,7 +41,12 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   @Override
   public void execute() {
     // TODO : Change to use vision
-    int desiredRPM = shooter.getDriverDesiredRPM();
+    int desiredRPM;
+    if (rpm == -1) {
+      desiredRPM = shooter.getDriverDesiredRPM();
+    } else {
+      desiredRPM = rpm;
+    }
     shooter.holdVelocityRPM(desiredRPM);
     if (shooter.hasReachedRPM(desiredRPM)) {
       loopsReachedRPM++;
@@ -42,6 +55,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     }
     if (loopsReachedRPM >= 5) {
       shooter.setReachedRPMDisplay(true);
+      finished = true;
     }
   }
 
@@ -55,6 +69,10 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (runForever) {
+      return false;
+    } else {
+      return finished;
+    }
   }
 }

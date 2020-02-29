@@ -21,15 +21,17 @@ public class VisionAlignCommand extends CommandBase {
   public static final double SEEK_SPEED = 0.15;
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
+  private boolean runForever, finished;
   
   /**
    * Creates a new VisionAlignCommand.
    */
-  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem) {
+  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever) {
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
     addRequirements(driveTrain, visionSystem);
     // Use addRequirements() here to declare subsystem dependencies.
+    this.runForever = runForever;
   }
 
   // Called when the command is initially scheduled.
@@ -39,6 +41,7 @@ public class VisionAlignCommand extends CommandBase {
     for (int i = 0; i < 5; i++) {
       visionSystem.usePortPipeline();
     }
+    this.finished = false;
     // todo : track last target to implement seek
   }
 
@@ -49,11 +52,11 @@ public class VisionAlignCommand extends CommandBase {
 
     Optional<Target> targetOptional = visionSystem.getLimelight().getTarget();
     if (targetOptional.isPresent()) {
-      System.out.println("1");
       Target target = targetOptional.get();
       double xDeg = target.getX();
       double xError = xDeg;
       if (Math.abs(xError) <= DEG_TOLERANCE) {
+        finished = true;
         return;
       }
       steerAdjust = xError * ROTATE_P;
@@ -61,7 +64,7 @@ public class VisionAlignCommand extends CommandBase {
         steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
       }
     } else {
-      System.out.println("2");
+      System.out.println("No Limelight Target");
       Optional<Target> lastTarget = visionSystem.getLimelight().getLastTarget();
       // Seek for target using lastTarget
       if (lastTarget.isEmpty()) {
@@ -89,6 +92,10 @@ public class VisionAlignCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    if (runForever) {
+      return false;
+    } else {
+      return finished;
+    }
   }
 }

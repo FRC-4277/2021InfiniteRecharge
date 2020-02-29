@@ -21,7 +21,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class VerticalHopper extends SubsystemBase {
-  public static final double UP_SPEED = 0.5;
+  public static final double UP_SPEED = 0.7;
   public static final double DOWN_SPEED = -0.5;
   private VictorSPX leftMotor = new VictorSPX(LEFT_MOTOR_ID);
   private VictorSPX rightMotor = new VictorSPX(RIGHT_MOTOR_ID);

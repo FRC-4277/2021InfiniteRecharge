@@ -63,6 +63,7 @@ public final class Constants {
         public static final int STATUS_3_QUADRATURE_MS = 20; // 160ms default
 
         public static final int MAX_BATTERY_V = 12;
+        public static final boolean HAS_ENCODERS = false;
     }
 
     public static class Vision {
@@ -113,12 +114,12 @@ public final class Constants {
         }
     }
 
-    public static class Climber {
+    public static class Winch {
         public static final int MAIN_MOTOR_ID = 17;
-        public static final int SECONDARY_MOTOR_ID = 18;
+        //public static final int SECONDARY_MOTOR_ID = 18;
     }
 
-    public static class HookDeploy {
+    public static class Elevator {
         public static final int MOTOR_ID = 19;
     }
 

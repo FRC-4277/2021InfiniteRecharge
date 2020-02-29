@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ColorWheel;
 
 public class RotationWheelCommand extends CommandBase {
-  private static final int TARGET_COLOR_CHANGES = 14; // 3.5 rotations, each having 4 colors
+  private static final int TARGET_COLOR_CHANGES = 28; // 3.5 rotations, each having 8 colors
   private ColorWheel colorWheel;
 
   private boolean finished = false;
