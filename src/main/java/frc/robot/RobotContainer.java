@@ -44,7 +44,7 @@ public class RobotContainer {
 
   // Controllers
   private Joystick driveStick = new Joystick(0);
-  private Supplier<Boolean> invertControls = () -> driveStick.getRawAxis(4) <= .5; // Throttle is negative = invert
+  private Supplier<Boolean> invertControls = () -> driveStick.getRawAxis(3) <= .5; // Throttle is negative = invert
   private XboxController xboxController = new XboxController(1);
 
   // ShuffleBoard
