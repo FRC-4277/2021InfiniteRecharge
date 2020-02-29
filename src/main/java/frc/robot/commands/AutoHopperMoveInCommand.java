@@ -12,8 +12,11 @@ import frc.robot.subsystems.VerticalHopper;
 
 public class AutoHopperMoveInCommand extends CommandBase {
   private VerticalHopper hopper;
-  private long lastBallInTime = -1;
-  
+  private boolean pulsing = false;
+  private Long lastBallInTime = null;
+  private boolean waitingBetween = false;
+  private Long startOfWaitTime = null;
+
   /**
    * Creates a new AutoHopperMoveInCommand.
    */
@@ -26,6 +29,8 @@ public class AutoHopperMoveInCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.pulsing = false;
+    this.lastBallInTime = null;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -38,14 +43,28 @@ public class AutoHopperMoveInCommand extends CommandBase {
     }
 
     boolean ballPresent = !hopper.intakeSensor.get();
-    if (ballPresent) {
-      lastBallInTime = System.currentTimeMillis();
+    if (ballPresent && !pulsing) {
+      this.pulsing = true;
+      this.lastBallInTime = System.currentTimeMillis();
     }
     // false is ball found!
-    if (ballPresent && (System.currentTimeMillis() - lastBallInTime <= 100)) {
+    if (ballPresent && pulsing && (System.currentTimeMillis() - this.lastBallInTime <= 500)) {
       hopper.moveUp();
     } else {
       hopper.stopMoving();
+      if (pulsing) {
+        this.waitingBetween = true;
+      }
+    }
+
+    if (waitingBetween && startOfWaitTime == null) {
+      startOfWaitTime = System.currentTimeMillis();
+    }
+
+    if (waitingBetween && (startOfWaitTime != null && (System.currentTimeMillis() - startOfWaitTime >= 400))) {
+      this.pulsing = false;
+      this.lastBallInTime = null;
+      this.waitingBetween = false;
     }
   }
 

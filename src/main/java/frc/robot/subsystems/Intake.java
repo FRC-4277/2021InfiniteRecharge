@@ -16,7 +16,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 public class Intake extends SubsystemBase {
   private VictorSPX motor = new VictorSPX(MOTOR_ID);
-  private static final double INTAKE_SPEED = 1;
+  private static final double INTAKE_SPEED = .9;
   private static final double REVERSE_INTAKE_SPEED = -0.5;
   public DigitalInput intakeSensor = new DigitalInput(INTAKE_SENSOR);
 
