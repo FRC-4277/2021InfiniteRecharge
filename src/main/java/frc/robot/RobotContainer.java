@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -124,14 +125,16 @@ public class RobotContainer {
     setupDriverTab();
 
     // Paths
-    RamseteCommand toSwitchPath = driveTrain.generateRamseteCommandFromFile("Forward To Switch");
+    Trajectory toSwitchTrajectory = driveTrain.generateTrajectory("Forward To Switch");
+    toSwitchTrajectory = driveTrain.translateToOrigin(toSwitchTrajectory);
+    RamseteCommand toSwitch = driveTrain.generateRamseteCommand(toSwitchTrajectory);
 
     autoChooser = new SendableChooser<>();
     SendableRegistry.setName(autoChooser, "Autonomous Command");
     autoChooser.setDefaultOption("Nothing", null);
-    autoChooser.addOption("Forward To Switch", toSwitchPath);
+    autoChooser.addOption("Forward To Switch", toSwitch);
     autoChooser.addOption("Aim, Shoot, Move To Switch", 
-    new AimShootBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000, toSwitchPath));
+    new AimShootBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000, toSwitch));
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
     resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
