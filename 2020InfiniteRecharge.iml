@@ -6,6 +6,11 @@
       <src_folder value="file://$MODULE_DIR$/src/main/java" expected_position="0" />
     </src_description>
   </component>
+  <component name="FacetManager">
+    <facet type="FRC_FACET" name="FRC">
+      <configuration />
+    </facet>
+  </component>
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">

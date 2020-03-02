@@ -7,21 +7,23 @@
 
 package frc.robot;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.autonomous.AimShootBackAutoCommand;
@@ -67,6 +69,8 @@ public class RobotContainer {
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab);
+  private final Winch winch = new Winch();
+  private final HookElevator hookElevator = new HookElevator();
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick, invertControls);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
@@ -82,9 +86,12 @@ public class RobotContainer {
   private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem, true);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
+  private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
+  private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
+  private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
 
   private SendableChooser<Command> autoChooser;
-  private SendableChooser<Pose2d> startingPositionChooser;
+  private NetworkTableEntry resetOdometryOnAuto;
 
   private boolean inAutonomous = true;
 
@@ -102,6 +109,9 @@ public class RobotContainer {
     SmartDashboard.putData(colorWheel);
     //SmartDashboard.putData(gate);
     SmartDashboard.putData(cameraSystem);
+    SmartDashboard.putData(visionSystem);
+    SmartDashboard.putData(winch);
+    SmartDashboard.putData(hookElevator);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -114,7 +124,7 @@ public class RobotContainer {
     setupDriverTab();
 
     // Paths
-    RamseteCommand toSwitchPath = driveTrain.generateRamseteCommand(driveTrain.generateTrajectory("Forward To Switch"));
+    RamseteCommand toSwitchPath = driveTrain.generateRamseteCommandFromFile("Forward To Switch");
 
     autoChooser = new SendableChooser<>();
     SendableRegistry.setName(autoChooser, "Autonomous Command");
@@ -124,10 +134,9 @@ public class RobotContainer {
     new AimShootBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000, toSwitchPath));
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
-    startingPositionChooser = new SendableChooser<>();
-    SendableRegistry.setName(startingPositionChooser, "Starting Position");
-    startingPositionChooser.setDefaultOption("Facing Switch", new Pose2d(0, 0, new Rotation2d(0)));
-    autonomousTab.add(startingPositionChooser).withPosition(2, 0).withSize(2, 1);
+    resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
+    .withWidget(BuiltInWidgets.kToggleSwitch)
+    .getEntry();
 
     // Testing
     testTab.add(toggleCameraCommand);
@@ -191,6 +200,17 @@ public class RobotContainer {
 
     JoystickButton aButton = new JoystickButton(xboxController, kA.value);
     aButton.whileActiveOnce(visionAlignCommand);
+
+    POVButton upPOVButton = new POVButton(xboxController, 0);
+    upPOVButton.whileActiveOnce(winchClimbCommand);
+
+    POVButton downPOVButton = new POVButton(xboxController, 180);
+
+    POVButton leftPOVButton = new POVButton(xboxController, 270);
+    leftPOVButton.whileActiveOnce(hookDownCommand);
+
+    POVButton rightPOVButton = new POVButton(xboxController, 90);
+    rightPOVButton.whileActiveOnce(hookUpCommand);
   }
 
   private void switchToDriverView() {
@@ -214,9 +234,12 @@ public class RobotContainer {
 
   protected void autonomousInit() {
     inAutonomous = true;
-    driveTrain.resetEncoders();
-    driveTrain.zeroHeading();
-    System.out.println("DriveTrain's encoders & heading are reset.");
+    if (resetOdometryOnAuto.getBoolean(true)) {
+      driveTrain.resetEncoders();
+      driveTrain.zeroHeading();
+      driveTrain.resetOdometry();
+      System.out.println("DriveTrain's encoders & heading are reset.");
+    }
   }
 
   public boolean isInAutonomous() {

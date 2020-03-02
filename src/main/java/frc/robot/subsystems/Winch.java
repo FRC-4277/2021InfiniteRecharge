@@ -7,20 +7,38 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.Winch.*;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Winch extends SubsystemBase {
+  private static final double DEFAULT_CLIMB_SPEED = 0.75;
   private TalonSRX motor = new TalonSRX(MAIN_MOTOR_ID);
 
   /**
    * Creates a new Winch.
    */
   public Winch() {
-
+    motor.configFactoryDefault();
+    motor.setNeutralMode(NeutralMode.Brake);
   }
+
+  public void climb() {
+    climb(DEFAULT_CLIMB_SPEED);
+  }
+
+  public void climb(double speed) {
+    speed = Math.abs(speed); // Make sure we never go backwards as the gearbox has a ratchet
+    motor.set(ControlMode.PercentOutput, speed);
+  }
+
+  public void stop() {
+    motor.set(ControlMode.PercentOutput, 0);
+  }
+
 
   @Override
   public void periodic() {

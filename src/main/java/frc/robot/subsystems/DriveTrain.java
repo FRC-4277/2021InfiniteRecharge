@@ -153,9 +153,13 @@ public class DriveTrain extends SubsystemBase {
     return new DifferentialDriveWheelSpeeds(leftMetersPerSecond, rightMetersPerSecond);
   }
 
-  public void resetOdometry(Pose2d pose) {
+  public void resetOdometry() {
+    resetOdometry(new Pose2d(0, 0, new Rotation2d(0)));
+  }
+
+  public void resetOdometry(Pose2d translationPose) {
     resetEncoders();
-    odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
+    odometry.resetPosition(translationPose, Rotation2d.fromDegrees(getHeading()));
   }
 
   public double getLeftDistanceM() {
@@ -218,6 +222,11 @@ public class DriveTrain extends SubsystemBase {
     drive.tankDrive(leftSpeed, rightSpeed, false);
   }
 
+
+  public RamseteCommand generateRamseteCommandFromFile(String pathFileName) {
+    return generateRamseteCommand(generateTrajectory(pathFileName));
+  }
+
   public Trajectory generateTrajectory(String pathFileName) {
     String path = "paths/" + pathFileName + ".wpilib.json";
     try {
@@ -227,6 +236,10 @@ public class DriveTrain extends SubsystemBase {
       DriverStation.reportError("Unable to open trajectory: " + path, e.getStackTrace());
     }
     return null;
+  }
+
+  public Trajectory translateToOrigin(Trajectory trajectory) {
+    return trajectory.relativeTo(trajectory.getInitialPose());
   }
 
   public RamseteCommand generateRamseteCommand(Trajectory trajectory) {

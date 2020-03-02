@@ -119,7 +119,7 @@ public final class Constants {
         //public static final int SECONDARY_MOTOR_ID = 18;
     }
 
-    public static class Elevator {
+    public static class HookElevator {
         public static final int MOTOR_ID = 19;
     }
 

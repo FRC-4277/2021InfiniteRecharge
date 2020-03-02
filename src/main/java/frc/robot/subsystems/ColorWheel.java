@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
@@ -47,6 +48,7 @@ public class ColorWheel extends SubsystemBase {
     this.tab = colorWheelTab;
     motor.configFactoryDefault();
     motor.setInverted(MOTOR_INVERTED);
+    motor.setNeutralMode(NeutralMode.Brake);
 
     colorMatch.setConfidenceThreshold(0.96); //todo : increase if needed
 
@@ -171,7 +173,6 @@ public class ColorWheel extends SubsystemBase {
     if (wheelColor == null) {
       return;
     }
-    // todo : add a filter status field?
     modeFilter.update(wheelColor);
   }
 
@@ -209,7 +210,7 @@ public class ColorWheel extends SubsystemBase {
     {
       switch (gameData.charAt(0))
       {
-        case 'B':
+        case 'B': //todo: OFFSET COLORS DEPENDING ON POSITION
           return WheelColor.BLUE;
         case 'G':
           return WheelColor.GREEN;

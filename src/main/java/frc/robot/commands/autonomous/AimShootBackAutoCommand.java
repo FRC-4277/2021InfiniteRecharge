@@ -39,11 +39,15 @@ public class AimShootBackAutoCommand extends SequentialCommandGroup {
       new ParallelCommandGroup(
         new ShooterHoldVelocityCommand(shooter, true, rpm),
         new MoveHopperUpCommand(verticalHopper)
-      ).withTimeout(5.0),
-      new StopShooterCommand(shooter),
-      new StopHopperCommand(verticalHopper),
-      new RotateToCommand(driveTrain, 0),
-      moveBackPath
+      ).withTimeout(6.0),
+      new ParallelCommandGroup(
+        new StopShooterCommand(shooter),
+        new StopHopperCommand(verticalHopper),
+        new SequentialCommandGroup(
+          new RotateToCommand(driveTrain, 0).withTimeout(2.0),
+          moveBackPath
+        )
+      )
     );
   }
 }
