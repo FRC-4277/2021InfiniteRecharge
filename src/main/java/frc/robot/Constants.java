@@ -116,6 +116,7 @@ public final class Constants {
 
     public static class Winch {
         public static final int MAIN_MOTOR_ID = 17;
+        public static final boolean MOTOR_INVERTED = true;
         //public static final int SECONDARY_MOTOR_ID = 18;
     }
 

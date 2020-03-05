@@ -15,7 +15,7 @@ import static frc.robot.Constants.Winch.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 public class Winch extends SubsystemBase {
-  private static final double DEFAULT_CLIMB_SPEED = 0.75;
+  private static final double DEFAULT_CLIMB_SPEED = 0.9;
   private TalonSRX motor = new TalonSRX(MAIN_MOTOR_ID);
 
   /**
@@ -24,6 +24,7 @@ public class Winch extends SubsystemBase {
   public Winch() {
     motor.configFactoryDefault();
     motor.setNeutralMode(NeutralMode.Brake);
+    motor.setInverted(MOTOR_INVERTED);
   }
 
   public void climb() {

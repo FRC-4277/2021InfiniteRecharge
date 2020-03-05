@@ -11,14 +11,21 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.limelight.Limelight;
 import frc.robot.util.limelight.Pipeline;
 import frc.robot.util.limelight.StreamMode;
 import frc.robot.util.limelight.Target;
+import io.github.pseudoresonance.pixy2api.Pixy2;
+import io.github.pseudoresonance.pixy2api.Pixy2CCC;
+import io.github.pseudoresonance.pixy2api.Pixy2CCC.Block;
+import io.github.pseudoresonance.pixy2api.links.SPILink;
+
 import static frc.robot.Constants.Vision.Limelight.*;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
@@ -32,6 +39,7 @@ public class VisionSystem extends SubsystemBase {
 
   private boolean calculateDistance = false;
   private double calculatedDistanceMeters = 0.0;
+  private Pixy2 pixy2;
 
   /**
    * Creates a new VisionSystem.
@@ -64,6 +72,11 @@ public class VisionSystem extends SubsystemBase {
             .withWidget(BuiltInWidgets.kTextView);
 
     useDriverPipeline();
+
+    this.pixy2 = Pixy2.createInstance(new SPILink());
+    SmartDashboard.putNumber("Pixy2 Status", pixy2.init());
+    pixy2.setLamp((byte) 0, (byte) 0);
+    pixy2.setLED(200, 30, 255);
   }
 
   public Limelight getLimelight() {
@@ -92,6 +105,22 @@ public class VisionSystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     calculateDistanceIfNeeded();
+    int blockCount = pixy2.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG_ALL, 25);
+    SmartDashboard.putNumber("Block Count", blockCount);
+    ArrayList<Block> blocks = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
+		Block largestBlock = null;
+		for (Block block : blocks) { // Loops through all blocks and finds the widest one
+			if (largestBlock == null) {
+				largestBlock = block;
+			} else if (block.getWidth() > largestBlock.getWidth()) {
+				largestBlock = block;
+			}
+		}
+    if (largestBlock != null) {
+      SmartDashboard.putString("X Value", Integer.toString(largestBlock.getX()));
+    } else {
+      SmartDashboard.putString("X Value", "null");
+    }
   }
 
   public void setCalculateDistance(boolean calculateDistance) {

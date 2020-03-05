@@ -23,11 +23,14 @@ import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -36,6 +39,7 @@ import frc.robot.commands.ZeroNavXCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import static frc.robot.Constants.DriveTrain.*;
@@ -295,7 +299,7 @@ public class DriveTrain extends SubsystemBase {
                   backRightMotor.set(ControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
                 }
 
-                System.out.println("SK: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
+                System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 
                 prevLeftMPS = leftMetersPerSecond;
                 prevRightMPS = rightMetersPerSecond;
@@ -306,5 +310,19 @@ public class DriveTrain extends SubsystemBase {
             },
             this
     );
+  }
+
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel) {
+    var trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAccel);
+
+    var middle = new Translation2d(((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
+    ((start.getTranslation().getY() + end.getTranslation().getY()) / 2));
+    
+    return TrajectoryGenerator.generateTrajectory(start, List.of(middle), end, trajectoryConfig);
+  }
+
+  public Trajectory generateXTrajectory(Pose2d start, double x, double maxVelocity, double maxAccel) {
+    Pose2d end = new Pose2d(start.getTranslation().getX() + x, start.getTranslation().getY(), start.getRotation());
+    return generateTrajectory(start, end, maxVelocity, maxAccel);
   }
 }
