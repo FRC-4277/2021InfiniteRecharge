@@ -15,13 +15,16 @@ import frc.robot.subsystems.VisionSystem;
 import frc.robot.util.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
-  public static final double ROTATE_P = 0.025d;
-  public static final double DEG_TOLERANCE = 1d;
-  public static final double MIN_COMMAND = 0.2;
-  public static final double SEEK_SPEED = 0.15;
+  private static final double ROTATE_P = 0.025d;
+  private static final double DEG_TOLERANCE = 2d;
+  private static final double MIN_COMMAND = 0.2;
+  private static final double SEEK_SPEED = 0.15;
+  private static final double CORRECT_LOOPS_NEEDED = 5;
+
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
-  private boolean runForever, finished;
+  private boolean runForever;
+  private int correctLoops;
   
   /**
    * Creates a new VisionAlignCommand.
@@ -41,7 +44,7 @@ public class VisionAlignCommand extends CommandBase {
     for (int i = 0; i < 5; i++) {
       visionSystem.usePortPipeline();
     }
-    this.finished = false;
+    this.correctLoops = 0;
     // todo : track last target to implement seek
   }
 
@@ -54,9 +57,11 @@ public class VisionAlignCommand extends CommandBase {
     if (targetOptional.isPresent()) {
       Target target = targetOptional.get();
       double xDeg = target.getX();
-      double xError = xDeg;
+      double xError = xDeg; // Degrees, Positive is CCW
       if (Math.abs(xError) <= DEG_TOLERANCE) {
-        finished = true;
+        if (!runForever) {
+          correctLoops++;
+        }
         return;
       }
       steerAdjust = xError * ROTATE_P;
@@ -74,8 +79,6 @@ public class VisionAlignCommand extends CommandBase {
       // Then we multiply that by 0.2
       steerAdjust = SEEK_SPEED * Math.signum(lastTarget.get().getX());
     }
-
-    System.out.println("3 steer:" + steerAdjust);
 
     driveTrain.rawTankDrive(steerAdjust, -steerAdjust);
   }
@@ -95,7 +98,7 @@ public class VisionAlignCommand extends CommandBase {
     if (runForever) {
       return false;
     } else {
-      return finished;
+      return correctLoops >= CORRECT_LOOPS_NEEDED;
     }
   }
 }

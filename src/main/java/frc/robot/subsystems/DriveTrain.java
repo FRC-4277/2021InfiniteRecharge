@@ -39,6 +39,7 @@ import frc.robot.commands.ZeroNavXCommand;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -105,6 +106,10 @@ public class DriveTrain extends SubsystemBase {
     .withWidget(BuiltInWidgets.kTextView);
     testTab.add(new ZeroNavXCommand(this));
     testTab.add(new RotateToCommand(this, 90));
+  }
+
+  public DifferentialDriveOdometry getOdometry() {
+    return odometry;
   }
 
   private void configureEncoderTalon(TalonSRX talonSRX) {
@@ -226,6 +231,7 @@ public class DriveTrain extends SubsystemBase {
     drive.tankDrive(leftSpeed, rightSpeed, false);
   }
 
+  // === TRAJECTORY GENERATION AND FOLLOWING ===
 
   public RamseteCommand generateRamseteCommandFromFile(String pathFileName) {
     return generateRamseteCommand(generateTrajectory(pathFileName));
@@ -312,17 +318,39 @@ public class DriveTrain extends SubsystemBase {
     );
   }
 
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel) {
-    var trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAccel);
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel, boolean genMiddle) {
+    var trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAccel)
+            .setKinematics(KINEMATICS)
+            .addConstraint(VOLTAGE_CONSTRAINT);
 
-    var middle = new Translation2d(((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
-    ((start.getTranslation().getY() + end.getTranslation().getY()) / 2));
+    List<Translation2d> interiorWaypoints = new ArrayList<>();
+    if (genMiddle) {
+      var middle = new Translation2d(((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
+              ((start.getTranslation().getY() + end.getTranslation().getY()) / 2));
+      interiorWaypoints.add(middle);
+    }
     
-    return TrajectoryGenerator.generateTrajectory(start, List.of(middle), end, trajectoryConfig);
+    return TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, trajectoryConfig);
   }
 
-  public Trajectory generateXTrajectory(Pose2d start, double x, double maxVelocity, double maxAccel) {
-    Pose2d end = new Pose2d(start.getTranslation().getX() + x, start.getTranslation().getY(), start.getRotation());
-    return generateTrajectory(start, end, maxVelocity, maxAccel);
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean genMiddle) {
+    return generateTrajectory(start, end, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, genMiddle);
+  }
+
+  /**
+   *
+   * @param start Starting pose
+   * @param xMeters Meters to move (positive is right on field [PathWeaver view])
+   * @param maxVelocity Maximum velocity
+   * @param maxAccel Maximum acceleration
+   * @return Trajectory generated under constraints
+   */
+  public Trajectory generateXTrajectory(Pose2d start, double xMeters, double maxVelocity, double maxAccel) {
+    Pose2d end = new Pose2d(start.getTranslation().getX() + xMeters, start.getTranslation().getY(), start.getRotation());
+    return generateTrajectory(start, end, maxVelocity, maxAccel, true);
+  }
+
+  public Trajectory generateXTrajectory(Pose2d start, double xMeters) {
+    return generateXTrajectory(start, xMeters, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
   }
 }

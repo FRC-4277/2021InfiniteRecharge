@@ -13,21 +13,21 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
-import frc.robot.commands.autonomous.AimShootBackAutoCommand;
+import frc.robot.commands.autonomous.AimShootMoveBackAutoCommand;
+import frc.robot.commands.autonomous.AimShootPickupShootAutoCommand;
+import frc.robot.commands.autonomous.LazyRamseteCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
@@ -124,22 +124,47 @@ public class RobotContainer {
     // ShuffleBoard
     setupDriverTab();
 
-    // Paths
-    Trajectory toSwitchTrajectory = driveTrain.generateTrajectory("Forward To Switch");
-    toSwitchTrajectory = driveTrain.translateToOrigin(toSwitchTrajectory);
-    RamseteCommand toSwitch = driveTrain.generateRamseteCommand(toSwitchTrajectory);
+    // Autonomous chooser
+    // TODO : AUTOMATIC RPM FOR AUTONOMOUS
 
     autoChooser = new SendableChooser<>();
     SendableRegistry.setName(autoChooser, "Autonomous Command");
+    // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
-    autoChooser.addOption("Forward To Switch", toSwitch);
-    autoChooser.addOption("Aim, Shoot, Move To Switch", 
-    new AimShootBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000, toSwitch));
+
+    // = Move Off Line
+    autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
+      Pose2d currentPose = driveTrain.getPose();
+      // Move 1.7 meters to the right [PathWeaver view]
+      return driveTrain.generateXTrajectory(currentPose, 1.7);
+    }));
+
+    // = Aim, Shoot, Move Off Line
+    autoChooser.addOption("Aim, Shoot, Move Off Line",
+      new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000));
+
+    // = Aim, Shoot, Pickup Trench, Shoot
+    autoChooser.addOption("Aim, Shoot, Pickup Trench, Shoot",
+      new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake,
+  3000));
+
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
     resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
     .withWidget(BuiltInWidgets.kToggleSwitch)
     .getEntry();
+    autonomousTab.addString("Odometry X", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getX());
+    });
+    autonomousTab.addString("Odometry Y", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getY());
+    });
+    autonomousTab.addString("Odometry Degrees", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
+    });
 
     // Testing
     testTab.add(toggleCameraCommand);

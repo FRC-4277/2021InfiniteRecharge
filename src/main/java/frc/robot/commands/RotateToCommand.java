@@ -12,8 +12,11 @@ import frc.robot.subsystems.DriveTrain;
 
 public class RotateToCommand extends CommandBase {
   private static final double MIN_POWER = 0.25;
+  private static final double DEG_TOLERANCE = 5;
+  private static final int CORRECT_LOOPS_NEEDED = 5;
   private DriveTrain driveTrain;
   private double targetHeading;
+  private int correctLoops;
 
   /**
    * Creates a new RotateToCommand.
@@ -28,6 +31,7 @@ public class RotateToCommand extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    this.correctLoops = 0;
   }
 
   // Called every time the scheduler runs while the command is scheduled.
@@ -42,6 +46,13 @@ public class RotateToCommand extends CommandBase {
     if (Math.abs(turningPower) < MIN_POWER) {
       turningPower = Math.copySign(MIN_POWER, turningPower);
     }
+
+    if (Math.abs(error) <= DEG_TOLERANCE) {
+      correctLoops++;
+    } else {
+      correctLoops = 0;
+    }
+
     driveTrain.rawTankDrive(turningPower, -turningPower);
   }
 
@@ -53,6 +64,6 @@ public class RotateToCommand extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return correctLoops >= CORRECT_LOOPS_NEEDED;
   }
 }

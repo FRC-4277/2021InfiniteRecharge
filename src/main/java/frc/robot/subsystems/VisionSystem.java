@@ -23,6 +23,8 @@ import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.Block;
 import io.github.pseudoresonance.pixy2api.links.SPILink;
 
+import javax.swing.text.html.Option;
+
 import static frc.robot.Constants.Vision.Limelight.*;
 
 import java.util.ArrayList;
@@ -40,6 +42,8 @@ public class VisionSystem extends SubsystemBase {
   private boolean calculateDistance = false;
   private double calculatedDistanceMeters = 0.0;
   private Pixy2 pixy2;
+  private boolean usingPixy = false;
+  private Block largestBlock = null;
 
   /**
    * Creates a new VisionSystem.
@@ -105,22 +109,33 @@ public class VisionSystem extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     calculateDistanceIfNeeded();
-    int blockCount = pixy2.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG_ALL, 25);
-    SmartDashboard.putNumber("Block Count", blockCount);
-    ArrayList<Block> blocks = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
-		Block largestBlock = null;
-		for (Block block : blocks) { // Loops through all blocks and finds the widest one
-			if (largestBlock == null) {
-				largestBlock = block;
-			} else if (block.getWidth() > largestBlock.getWidth()) {
-				largestBlock = block;
-			}
-		}
-    if (largestBlock != null) {
-      SmartDashboard.putString("X Value", Integer.toString(largestBlock.getX()));
-    } else {
-      SmartDashboard.putString("X Value", "null");
+
+    if (usingPixy) {
+      int blockCount = pixy2.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG_ALL, 25);
+      SmartDashboard.putNumber("Block Count", blockCount);
+      ArrayList<Block> blocks = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
+      largestBlock = null;
+      for (Block block : blocks) { // Loops through all blocks and finds the widest one
+        if (largestBlock == null) {
+          largestBlock = block;
+        } else if (block.getWidth() > largestBlock.getWidth()) {
+          largestBlock = block;
+        }
+      }
+      if (largestBlock != null) {
+        SmartDashboard.putString("X Value", Integer.toString(largestBlock.getX()));
+      } else {
+        SmartDashboard.putString("X Value", "null");
+      }
     }
+  }
+
+  public void setUsingPixy(boolean usingPixy) {
+    this.usingPixy = usingPixy;
+  }
+
+  public Optional<Block> getLargestBlock() {
+    return Optional.ofNullable(largestBlock);
   }
 
   public void setCalculateDistance(boolean calculateDistance) {
