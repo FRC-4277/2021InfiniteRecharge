@@ -22,10 +22,8 @@ import io.github.pseudoresonance.pixy2api.Pixy2;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.Block;
 import io.github.pseudoresonance.pixy2api.links.SPILink;
-
-import javax.swing.text.html.Option;
-
 import static frc.robot.Constants.Vision.Limelight.*;
+import frc.robot.Constants.Vision.Pixy2Constants;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -81,6 +79,7 @@ public class VisionSystem extends SubsystemBase {
     SmartDashboard.putNumber("Pixy2 Status", pixy2.init());
     pixy2.setLamp((byte) 0, (byte) 0);
     pixy2.setLED(200, 30, 255);
+    this.usingPixy = true;
   }
 
   public Limelight getLimelight() {
@@ -135,7 +134,20 @@ public class VisionSystem extends SubsystemBase {
   }
 
   public Optional<Block> getLargestBlock() {
+    this.usingPixy = true;
     return Optional.ofNullable(largestBlock);
+  }
+
+  public Optional<Double> getBallTargetDegrees() {
+    Optional<Block> blockOptional = getLargestBlock();
+    if (blockOptional.isPresent()) {
+      Block block = blockOptional.get();
+      double x = block.getX();
+      double xFromCenter = (x - (Pixy2Constants.MAX_X  / 2));
+      return Optional.of((xFromCenter / Pixy2Constants.MAX_X) * Pixy2Constants.HORIZONTAL_FOV_DEG);
+    } else {
+      return Optional.empty();
+    }
   }
 
   public void setCalculateDistance(boolean calculateDistance) {

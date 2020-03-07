@@ -16,8 +16,6 @@ import java.util.Optional;
 
 public class TrenchRunAutoCommand extends CommandBase {
   private static final double MAXIMUM_DISTANCE_RIGHT_M = 8.54 - 3.16;
-  private static final double PIXY2_HORIZONTAL_FOV_DEG = 60;
-  private static final double PIXY2_MAX_X = 315;
   private static final double STRAIGHT_MOVEMENT_SPEED = 0.4;
   private static final double TURN_P = 0.025d;
   private static final double TURN_DEG_TOLERANCE = 5;
@@ -55,18 +53,8 @@ public class TrenchRunAutoCommand extends CommandBase {
       return;
     }
 
-    Optional<Pixy2CCC.Block> targetOptional = visionSystem.getLargestBlock();
-    double headingError; // Degrees, Positive is CCW
-    if (targetOptional.isPresent()) {
-      // We see a power cell
-      Pixy2CCC.Block block = targetOptional.get();
-      double x = block.getX();
-      double xFromCenter = (x - (PIXY2_MAX_X  / 2));
-      headingError = (xFromCenter / PIXY2_MAX_X) * PIXY2_HORIZONTAL_FOV_DEG;
-    } else {
-      // We see no power cells
-      headingError = 0;
-    }
+    Optional<Double> targetOptional = visionSystem.getBallTargetDegrees();
+    double headingError = targetOptional.orElse(0.0); // Degrees, Positive is CCW
 
     double leftSpeed = STRAIGHT_MOVEMENT_SPEED;
     double rightSpeed = STRAIGHT_MOVEMENT_SPEED;

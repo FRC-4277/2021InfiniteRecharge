@@ -239,6 +239,8 @@ public class RobotContainer {
 
     POVButton rightPOVButton = new POVButton(xboxController, 90);
     rightPOVButton.whileActiveOnce(hookUpCommand);
+
+    //todo : bind ball intake align to button
   }
 
   private void switchToDriverView() {

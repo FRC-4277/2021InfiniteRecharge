@@ -72,6 +72,10 @@ public final class Constants {
             public static double MOUNT_ANGLE_RAD = Math.toRadians(16); // Mount angle, from horizon //todo: change
             public static double PORT_CENTER_HEIGHT_M = Units.inchesToMeters(98.19);
         }
+        public static class Pixy2Constants {
+            public static final double HORIZONTAL_FOV_DEG = 60;
+            public static final double MAX_X = 315;
+        }
     }
 
     public static class Intake {
