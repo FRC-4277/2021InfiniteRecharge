@@ -9,12 +9,12 @@ import java.util.function.Supplier;
 
 public class LazyRamseteCommand extends CommandBase {
     private DriveTrain driveTrain;
-    private Supplier<Trajectory> trajectoryConsumer;
+    private Supplier<Trajectory> trajectorySupplier;
     private RamseteCommand ramseteCommand;
 
-    public LazyRamseteCommand(DriveTrain driveTrain, Supplier<Trajectory> trajectoryConsumer) {
+    public LazyRamseteCommand(DriveTrain driveTrain, Supplier<Trajectory> trajectorySupplier) {
         this.driveTrain = driveTrain;
-        this.trajectoryConsumer = trajectoryConsumer;
+        this.trajectorySupplier = trajectorySupplier;
         addRequirements(driveTrain);
     }
 
@@ -26,7 +26,7 @@ public class LazyRamseteCommand extends CommandBase {
     @Override
     public void execute() {
         if (ramseteCommand == null) {
-            ramseteCommand = driveTrain.generateRamseteCommand(trajectoryConsumer.get(), false);
+            ramseteCommand = driveTrain.generateRamseteCommand(trajectorySupplier.get(), false);
             ramseteCommand.initialize();
             return;
         }
