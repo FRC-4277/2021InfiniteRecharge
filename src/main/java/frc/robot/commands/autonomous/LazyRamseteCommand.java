@@ -26,7 +26,7 @@ public class LazyRamseteCommand extends CommandBase {
     @Override
     public void execute() {
         if (ramseteCommand == null) {
-            ramseteCommand = driveTrain.generateRamseteCommand(trajectoryConsumer.get());
+            ramseteCommand = driveTrain.generateRamseteCommand(trajectoryConsumer.get(), false);
             ramseteCommand.initialize();
             return;
         }

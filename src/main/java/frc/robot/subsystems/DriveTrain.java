@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
@@ -253,6 +254,11 @@ public class DriveTrain extends SubsystemBase {
   }
 
   public RamseteCommand generateRamseteCommand(Trajectory trajectory) {
+    return generateRamseteCommand(trajectory, true);
+  }
+
+  public RamseteCommand generateRamseteCommand(Trajectory trajectory, boolean dependOnDrive) {
+    Subsystem[] requirements = dependOnDrive ? new Subsystem[]{this} : new Subsystem[]{};
     return new RamseteCommand(
             trajectory,
             this::getPose,
@@ -314,7 +320,7 @@ public class DriveTrain extends SubsystemBase {
                 drive.feed(); //So watchdog won't kill it
               }
             },
-            this
+            requirements
     );
   }
 
