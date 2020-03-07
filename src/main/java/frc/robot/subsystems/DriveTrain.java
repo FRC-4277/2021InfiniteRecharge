@@ -270,12 +270,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   
   public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {
     joystickUsed = true;
-    //drive.arcadeDrive(x, y);
-    if (forwardSpeed <= .15) {
-      drive.curvatureDrive(forwardSpeed, rotation, true);
-    } else {
-      drive.curvatureDrive(forwardSpeed, rotation, quick);
-    }
+    drive.curvatureDrive(forwardSpeed, rotation, quick);
   }
 
   /**
