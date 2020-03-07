@@ -8,44 +8,59 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.VisionSystem;
+import frc.robot.util.limelight.Target;
+
+import java.util.Optional;
 
 public class ShooterHoldVelocityCommand extends CommandBase {
   private Shooter shooter;
+  private VisionSystem visionSystem;
+  private RPMSource rpmSource;
   private Integer rpm = -1;
   private int loopsReachedRPM = 0;
   private boolean runForever, finished;
 
-  public ShooterHoldVelocityCommand(Shooter shooter, boolean runForever) {
-    this(shooter, runForever, -1);
+  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, RPMSource rpmSource) {
+    this.shooter = shooter;
+    this.visionSystem = visionSystem;
+    this.rpmSource = rpmSource;
+    this.rpm = -1;
   }
 
-  /**
-   * Creates a new RampShooterToRPMCommand.
-   */
-  public ShooterHoldVelocityCommand(Shooter shooter, boolean runForever, int rpm) {
+  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, Integer rpm) {
     this.shooter = shooter;
-    this.runForever = runForever;
+    this.visionSystem = visionSystem;
+    this.rpmSource = RPMSource.CONSTANT;
     this.rpm = rpm;
-    addRequirements(shooter);
-    // Use addRequirements() here to declare subsystem dependencies.
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
     shooter.setReachedRPMDisplay(false);
+    visionSystem.setCalculateDistance(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    // TODO : Change to use vision
     int desiredRPM;
-    if (rpm == -1) {
-      desiredRPM = shooter.getDriverDesiredRPM();
-    } else {
-      desiredRPM = rpm;
+    switch(rpmSource) {
+      case CONSTANT:
+        desiredRPM = rpm;
+        break;
+      case DRIVER_PROVIDED:
+        desiredRPM = shooter.getDriverDesiredRPM();
+        break;
+      case VISION:
+        double meters = visionSystem.getCalculatedDistanceMeters();
+        desiredRPM = Constants.Shooter.METERS_TO_RPM_FUNCTION.apply(meters);
+        break;
+      default:
+        return;
     }
     shooter.holdVelocityRPM(desiredRPM);
     if (shooter.hasReachedRPM(desiredRPM)) {
@@ -64,6 +79,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   public void end(boolean interrupted) {
     shooter.stopShooter();
     shooter.setReachedRPMDisplay(false);
+    visionSystem.setCalculateDistance(false);
   }
 
   // Returns true when the command should end.
@@ -74,5 +90,11 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     } else {
       return finished;
     }
+  }
+
+  public enum RPMSource {
+    CONSTANT,
+    DRIVER_PROVIDED,
+    VISION
   }
 }

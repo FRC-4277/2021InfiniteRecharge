@@ -14,6 +14,8 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
 
+import java.util.function.Function;
+
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
  * constants.  This class should not be used for any other purpose.  All constants should be
@@ -116,6 +118,9 @@ public final class Constants {
             public static final double kvVoltSecondsPerRotation = 0.163;
             public static final double RPM_THRESHOLD = 10;
         }
+        public static final Function<Double, Integer> METERS_TO_RPM_FUNCTION = meters -> {
+            return (int) Math.round(meters * 247); // todo: Empirically find a formula
+        };
     }
 
     public static class Winch {

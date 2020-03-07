@@ -84,7 +84,8 @@ public class RobotContainer {
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
-  private final ShooterHoldVelocityCommand shooterHoldVelocityCommand = new ShooterHoldVelocityCommand(shooter, true);
+  private final ShooterHoldVelocityCommand shooterHoldVelocityViaVisionCommand =
+          new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION);
   //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
@@ -128,10 +129,15 @@ public class RobotContainer {
 
     // ShuffleBoard
     setupDriverTab();
+    setupAutonomousTab();
+    setupTestingTab();
+  }
 
-    // Autonomous chooser
-    // TODO : AUTOMATIC RPM FOR AUTONOMOUS
+  private void setupTestingTab() {
+    testTab.add(toggleCameraCommand);
+  }
 
+  private void setupAutonomousTab() {
     autoChooser = new SendableChooser<>();
     SendableRegistry.setName(autoChooser, "Autonomous Command");
     // = Do Nothing
@@ -146,18 +152,17 @@ public class RobotContainer {
 
     // = Aim, Shoot, Move Off Line
     autoChooser.addOption("Aim, Shoot, Move Off Line",
-      new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper, 3000));
+            new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper));
 
     // = Aim, Shoot, Pickup Trench, Shoot
     autoChooser.addOption("Aim, Shoot, Pickup Trench, Shoot",
-      new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake,
-  3000));
+            new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));
 
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
     resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
-    .withWidget(BuiltInWidgets.kToggleSwitch)
-    .getEntry();
+            .withWidget(BuiltInWidgets.kToggleSwitch)
+            .getEntry();
     autonomousTab.addString("Odometry X", () -> {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
       return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getX());
@@ -170,9 +175,6 @@ public class RobotContainer {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
       return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
     });
-
-    // Testing
-    testTab.add(toggleCameraCommand);
   }
 
   private void setupDriverTab() {
@@ -226,7 +228,7 @@ public class RobotContainer {
     rightBumper.whileActiveOnce(moveHopperDownCommand);
 
     JoystickButton xButton = new JoystickButton(xboxController, kX.value);
-    xButton.whileActiveOnce(shooterHoldVelocityCommand);
+    xButton.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 
     JoystickButton bButton = new JoystickButton(xboxController, kB.value);
     bButton.whileActiveOnce(shooterBackwardsCommand);
@@ -256,13 +258,12 @@ public class RobotContainer {
   protected void teleopInit() {
     switchToDriverView();
 
-    // Initial state for inverted controls
+    // Initial camera state for inverted controls
     if (invertControls.get()) {
       // Inverted, the shooter is now the front
       useShooterCameraCommand.schedule();
     } else {
       // Not inverted, the intake is the front
-
       useIntakeCameraCommand.schedule();
     }
   }
@@ -270,6 +271,7 @@ public class RobotContainer {
   protected void autonomousInit() {
     inAutonomous = true;
     if (resetOdometryOnAuto.getBoolean(true)) {
+      System.out.println("Resetting encoders, heading, and odometry");
       driveTrain.resetEncoders();
       driveTrain.zeroHeading();
       driveTrain.resetOdometry();

@@ -151,6 +151,10 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     }
   }
 
+  public double getCalculatedDistanceMeters() {
+    return calculatedDistanceMeters;
+  }
+
   public void setCalculateDistance(boolean calculateDistance) {
     this.calculateDistance = calculateDistance;
   }
@@ -160,6 +164,10 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
       return;
     }
     Optional<Target> targetOptional = limelight.getTarget();
+
+    if (targetOptional.isEmpty()) {
+      targetOptional = limelight.getLastTarget();
+    }
 
     if (targetOptional.isPresent()) {
       Target target = targetOptional.get();

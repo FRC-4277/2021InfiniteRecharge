@@ -7,21 +7,10 @@
 
 package frc.robot.commands.autonomous;
 
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.MoveHopperUpCommand;
-import frc.robot.commands.RotateToCommand;
-import frc.robot.commands.ShooterHoldVelocityCommand;
-import frc.robot.commands.StopHopperCommand;
-import frc.robot.commands.StopShooterCommand;
-import frc.robot.commands.VisionAlignCommand;
+import frc.robot.commands.*;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.VerticalHopper;
@@ -33,18 +22,21 @@ import frc.robot.subsystems.VisionSystem;
 public class AimShootMoveBackAutoCommand extends SequentialCommandGroup {
   private static final double TO_SWITCH_DISTANCE_M = 1.7;
 
+  // TODO: Have a backup for if the vision system can't find the target
+
   /**
    * Creates a new AimShootBackAutoCommand.
    */
   public AimShootMoveBackAutoCommand(DriveTrain driveTrain, VisionSystem visionSystem,
-                                     Shooter shooter, VerticalHopper verticalHopper, int rpm) {
+                                     Shooter shooter, VerticalHopper verticalHopper) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
       new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
-      new ShooterHoldVelocityCommand(shooter, false, rpm).withTimeout(3.0),
+      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION)
+              .withTimeout(3.0),
       new ParallelCommandGroup(
-        new ShooterHoldVelocityCommand(shooter, true, rpm),
+        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION),
         new MoveHopperUpCommand(verticalHopper)
       ).withTimeout(6.0),
       new ParallelCommandGroup(

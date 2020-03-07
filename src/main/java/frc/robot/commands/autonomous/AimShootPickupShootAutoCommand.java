@@ -9,44 +9,32 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
-import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.AutoHopperMoveInCommand;
-import frc.robot.commands.IdleHopperCommand;
-import frc.robot.commands.IntakeCommand;
-import frc.robot.commands.MoveHopperUpCommand;
-import frc.robot.commands.RotateToCommand;
-import frc.robot.commands.ShooterHoldVelocityCommand;
-import frc.robot.commands.StopHopperCommand;
-import frc.robot.commands.StopShooterCommand;
-import frc.robot.commands.VisionAlignCommand;
-import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.Intake;
-import frc.robot.subsystems.Shooter;
-import frc.robot.subsystems.VerticalHopper;
-import frc.robot.subsystems.VisionSystem;
-
-import java.util.function.Supplier;
+import frc.robot.commands.*;
+import frc.robot.subsystems.*;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
+
+  // TODO: Have a backup for if the vision system can't find the target
+
   /**
    * Creates a new AimShootPickupShootAutoCommand.
    */
   public AimShootPickupShootAutoCommand(DriveTrain driveTrain, VisionSystem visionSystem,
-  Shooter shooter, VerticalHopper verticalHopper, Intake intake, int rpm) {
+                                        Shooter shooter, VerticalHopper verticalHopper, Intake intake) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
       new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
-      new ShooterHoldVelocityCommand(shooter, false, rpm).withTimeout(3.0),
+      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION)
+              .withTimeout(3.0),
       new ParallelCommandGroup(
-        new ShooterHoldVelocityCommand(shooter, true, rpm),
+        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION),
         new MoveHopperUpCommand(verticalHopper)
       ).withTimeout(4.0),
       new RotateToCommand(driveTrain, 0).withTimeout(2.0),
@@ -68,9 +56,10 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
         })
       ),
       new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
-      new ShooterHoldVelocityCommand(shooter, false, rpm).withTimeout(3.0),
+      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION)
+              .withTimeout(3.0),
       new ParallelCommandGroup(
-        new ShooterHoldVelocityCommand(shooter, true, rpm),
+        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION),
         new MoveHopperUpCommand(verticalHopper)
       ).withTimeout(4.0),
       new RotateToCommand(driveTrain, 0).withTimeout(5.0)
