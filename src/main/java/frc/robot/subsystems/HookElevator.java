@@ -5,14 +5,18 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+
+import java.util.List;
+
 import static frc.robot.Constants.HookElevator.*;
 
-public class HookElevator extends SubsystemBase {
+public class HookElevator extends SubsystemBase implements VerifiableSystem {
     private static final double DEFAULT_SPEED = 0.75;
     private TalonSRX motor = new TalonSRX(MOTOR_ID);
 
     public HookElevator() {
         motor.configFactoryDefault();
+        motor.setInverted(MOTOR_INVERTED);
         motor.setNeutralMode(NeutralMode.Brake);
     }
 
@@ -41,6 +45,11 @@ public class HookElevator extends SubsystemBase {
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+    }
+
+    @Override
+    public List<Verification> getVerifications(VerificationSystem system) {
+        return null;
     }
 }
 

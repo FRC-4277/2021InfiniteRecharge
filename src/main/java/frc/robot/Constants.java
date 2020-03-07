@@ -126,6 +126,7 @@ public final class Constants {
 
     public static class HookElevator {
         public static final int MOTOR_ID = 19;
+        public static final boolean MOTOR_INVERTED = true;
     }
 
     public static class ColorWheel {
