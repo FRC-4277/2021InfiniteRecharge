@@ -20,7 +20,9 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class VerticalHopper extends SubsystemBase {
+import java.util.List;
+
+public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   public static final double UP_SPEED = 1.0;
   public static final double DOWN_SPEED = -0.5;
   private VictorSPX leftMotor = new VictorSPX(LEFT_MOTOR_ID);
@@ -72,6 +74,11 @@ public class VerticalHopper extends SubsystemBase {
 
   public VerticalHopperSendable getSendable() {
     return sendable;
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
   }
 
   public class VerticalHopperSendable implements Sendable {

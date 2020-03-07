@@ -26,11 +26,12 @@ import static frc.robot.Constants.Vision.Limelight.*;
 import frc.robot.Constants.Vision.Pixy2Constants;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class VisionSystem extends SubsystemBase {
+public class VisionSystem extends SubsystemBase implements VerifiableSystem {
   private ShuffleboardTab driverTab;
   private ShuffleboardLayout layout;
   private Pipeline driverPipeline = new Pipeline("Driver", 0);
@@ -166,5 +167,10 @@ public class VisionSystem extends SubsystemBase {
       double yAngleRad = Math.toRadians(yAngleDeg);
       this.calculatedDistanceMeters = (PORT_CENTER_HEIGHT_M - MOUNT_HEIGHT_M) / Math.tan(MOUNT_ANGLE_RAD + yAngleRad);
     }
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
   }
 }

@@ -9,6 +9,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.Shooter.*;
 import static frc.robot.Constants.Shooter.Characteristics.*;
+
+import java.util.List;
 import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -24,7 +26,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class Shooter extends SubsystemBase {
+public class Shooter extends SubsystemBase implements VerifiableSystem {
   //public static final double FORWARDS_SPEED = 0.5;
   //public static final double BACKWARDS_SPEED = -0.5; 
   
@@ -175,5 +177,10 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run
     shooterLeftRPMEntry.setDouble(getLeftRPM());
     shooterRightRPMEntry.setDouble(getRightRPM());
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
   }
 }

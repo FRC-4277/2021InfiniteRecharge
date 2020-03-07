@@ -17,7 +17,9 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-public class CameraSystem extends SubsystemBase {
+import java.util.List;
+
+public class CameraSystem extends SubsystemBase implements VerifiableSystem {
   private static final String SERVER_NAME = "Switched";
   private static final String WIDGET_NAME = "Driver Switching Camera";
   private ShuffleboardTab driverTab;
@@ -75,6 +77,10 @@ public class CameraSystem extends SubsystemBase {
     camera.setConnectionStrategy(ConnectionStrategy.kKeepOpen);
   }
 
+  /**
+   * Switches displayed camera in the Driver tab
+   * @param useLimelightStream <code>true</code> for Limelight PIP, <code>false</code> for using intake
+   */
   public void switchCamera(boolean useLimelightStream) {
     this.useLimelightStream = useLimelightStream;
     if (useLimelightStream) {
@@ -97,31 +103,45 @@ public class CameraSystem extends SubsystemBase {
     //driverTab.add("Driver Switching Camera", server.getSource()).withPosition(0, 0).withSize(4, 4);
   }
 
+  /**
+   * Switches stream to the Limelight PIP, which is on the shooter side of the bot
+   */
   public void switchToShooter() {
     this.useLimelightStream = true;
     server.setSource(limelightStream);
     nameEntry.setString("limelight");
   }
 
+  /**
+   * Switches stream to the intake camera, which is on the intake (front) side of the bot
+   */
   public void switchToIntake() {
     this.useLimelightStream = false;
     server.setSource(backCamera);
     nameEntry.setString("back");
   }
 
+  /**
+   * Toggle stream (Limelight PIP to Intake or Intake to Limelight PIP).
+   */
   public void toggleCamera() {
     switchCamera(!useLimelightStream);
   }
 
-  public String lowercase(String string) {
+  /*public String lowercase(String string) {
     if (string == null) {
       return null;
     }
     return string.toLowerCase();
-  }
+  }*/
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
   }
 }

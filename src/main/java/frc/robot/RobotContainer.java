@@ -60,6 +60,7 @@ public class RobotContainer {
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
   private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
+  private final ShuffleboardTab verificationTab = Shuffleboard.getTab("Verification");
 
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain(testTab);
@@ -72,6 +73,9 @@ public class RobotContainer {
   private final VisionSystem visionSystem = new VisionSystem(driverTab);
   private final Winch winch = new Winch();
   private final HookElevator hookElevator = new HookElevator();
+  private final VerificationSystem verificationSystem = new VerificationSystem(
+          driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
+          verificationTab);
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick, invertControls);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
@@ -113,6 +117,7 @@ public class RobotContainer {
     SmartDashboard.putData(visionSystem);
     SmartDashboard.putData(winch);
     SmartDashboard.putData(hookElevator);
+    SmartDashboard.putData(verificationSystem);
 
     // Configure the button bindings
     configureButtonBindings();

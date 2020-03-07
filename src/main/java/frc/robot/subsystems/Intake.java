@@ -14,7 +14,9 @@ import static frc.robot.Constants.Intake.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
-public class Intake extends SubsystemBase {
+import java.util.List;
+
+public class Intake extends SubsystemBase implements VerifiableSystem {
   private VictorSPX motor = new VictorSPX(MOTOR_ID);
   private static final double INTAKE_SPEED = .5;
   private static final double REVERSE_INTAKE_SPEED = -0.5;
@@ -43,5 +45,10 @@ public class Intake extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
   }
 }

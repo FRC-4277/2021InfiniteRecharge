@@ -28,7 +28,7 @@ import java.util.function.Function;
 
 import static frc.robot.Constants.ColorWheel.*;
 
-public class ColorWheel extends SubsystemBase {
+public class ColorWheel extends SubsystemBase implements VerifiableSystem {
   private static final int FILTER_SIZE = 5;
   private WPI_TalonSRX motor = new WPI_TalonSRX(MOTOR_ID);
   private ColorSensorV3 colorSensor = new ColorSensorV3(COLOR_SENSOR_PORT);
@@ -139,30 +139,56 @@ public class ColorWheel extends SubsystemBase {
     return -1;
   }
 
+  /**
+   * Retrieve the proximity from the color sensor
+   * @return Distance reading from 0..2047 inclusive
+   */
   public int getProximity() {
     return lastProximity = colorSensor.getProximity();
   }
 
+  /**
+   * Change string displayed to the driver for position command
+   * @param status Text to display
+   */
   public void setPositionStatus(String status) {
     positionStatusEntry.setString(status);
   }
 
+  /**
+   * Change string displayed to driver for rotation command
+   * @param status Text to display
+   */
   public void setRotationStatus(String status) {
     rotationStatusEntry.setString(status);
   }
 
+  /**
+   * Get raw color detected by sensor
+   * @return Color detected, in WPI class that has R, G, and B
+   */
   public Color getDetectedColor() {
     return colorSensor.getColor();
   }
 
+  /**
+   * Get the result of the mode filter
+   * @return the current color, after filtering
+   */
   public WheelColor getFilteredColor() {
     return modeFilter.getMode();
   }
 
+  /**
+   * Reset the mode filter, clearing last remembered colors
+   */
   public void resetFilter() {
     modeFilter.reset();
   }
 
+  /**
+   * Update the mode filter with reading from color sensor
+   */
   public void updateFilter() {
     Color detectedColor = lastColor = getDetectedColor();
     ColorMatchResult result = lastResult = colorMatch.matchColor(detectedColor);
@@ -176,6 +202,10 @@ public class ColorWheel extends SubsystemBase {
     modeFilter.update(wheelColor);
   }
 
+  /**
+   * Check if the filter has filled all of its last remembered colors. Useful when first using the filter.
+   * @return whether the filter is full
+   */
   public boolean isFilterSaturated() {
     return modeFilter.isSaturated();
   }
@@ -184,26 +214,47 @@ public class ColorWheel extends SubsystemBase {
     motor.set(ControlMode.PercentOutput, speed);
   }
 
+  /**
+   * Rotate the wheel clockwise
+   * @param speed Rate to spin at
+   */
   public void spinClockwise(double speed) {
     spin(Math.abs(speed));
   }
 
+  /**
+   * Rotate the wheel clockwise at default speed clockwise
+   */
   public void spinClockwise() {
     spinClockwise(DEFAULT_SPEED);
   }
 
+  /**
+   * Rotate the wheel counterclockwise
+   * @param speed Rate to spin at
+   */
   public void spinCounterclockwise(double speed) {
     spin(-Math.abs(speed));
   }
 
+  /**
+   * Rotate the wheel at default speed counterclockwise
+   */
   public void spinCounterclockwise() {
     spinCounterclockwise(DEFAULT_SPEED);
   }
 
+  /**
+   * Stop spinning the wheel, brake mode should activate
+   */
   public void stopWheel() {
     spin(0.0);
   }
 
+  /**
+   * Retrieve and parse color from FMS
+   * @return the target color
+   */
   public WheelColor getFMSTargetColor() {
     String gameData = DriverStation.getInstance().getGameSpecificMessage();
     if(gameData.length() > 0)
@@ -230,7 +281,16 @@ public class ColorWheel extends SubsystemBase {
     // This method will be called once per scheduler run
   }
 
-  // Algorithm to figure out to go left or right
+  /**
+   * Algorithm to determine whether spinning CW or CCW is quicker
+   *
+   * If the target color is directly clockwise, spin clockwise, otherwise spin counterclockwise.
+   * For colors that are further away than not directly next to the current color, the direction doesn't matter,
+   * and it defaults to counterclockwise.
+   * @param currentColor Color sensor currently reads
+   * @param targetColor Desired color to spin to
+   * @return Quickest direction to spin to the target color
+   */
   public boolean shouldSpinClockwise(ColorWheel.WheelColor currentColor, ColorWheel.WheelColor targetColor) {
     List<WheelColor> colorsInClockwise =
             Arrays.asList(WheelColor.RED, WheelColor.YELLOW, WheelColor.BLUE, WheelColor.GREEN);
@@ -246,6 +306,14 @@ public class ColorWheel extends SubsystemBase {
     return targetIsDirectlyClockwise;
   }
 
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
+  }
+
+  /**
+   * Filter to find the mode of last n items
+   */
   public static class ModeFilter {
     private LinkedList<WheelColor> lastColors;
     private Map<WheelColor, Integer> frequencyMap;
@@ -299,6 +367,9 @@ public class ColorWheel extends SubsystemBase {
     }
   }
 
+  /**
+   * Color on the control panel wheel
+   */
   public enum WheelColor {
     BLUE(ColorMatch.makeColor(/*0.143, 0.427, 0.429*/0.126, 0.423, 0.449)),
     RED(ColorMatch.makeColor(/*0.561, 0.232, 0.114*/.497,.358,.144)),

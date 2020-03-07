@@ -7,10 +7,7 @@
 
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
@@ -37,17 +34,19 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
+import frc.robot.util.TalonSRXChecker;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Supplier;
 
 import static frc.robot.Constants.DriveTrain.*;
 
 
-public class DriveTrain extends SubsystemBase {
+public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private WPI_TalonSRX frontLeftMotor = new WPI_TalonSRX(FRONT_LEFT);
   private WPI_TalonSRX frontRightMotor = new WPI_TalonSRX(FRONT_RIGHT);
   private WPI_TalonSRX backLeftMotor = new WPI_TalonSRX(BACK_LEFT);
@@ -65,6 +64,7 @@ public class DriveTrain extends SubsystemBase {
 
   private double yawOffset = 0;
   private ShuffleboardTab testTab;
+  private boolean joystickUsed = false;
 
   /**
    * Creates a new DriveTrain.
@@ -125,6 +125,9 @@ public class DriveTrain extends SubsystemBase {
     talonSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, STATUS_3_QUADRATURE_MS);
   }
 
+  /**
+   * Zero all encoders
+   */
   public void resetEncoders() {
     backLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     backRightMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
@@ -132,6 +135,10 @@ public class DriveTrain extends SubsystemBase {
     backRightMotor.setSelectedSensorPosition(0);
   }
 
+  /**
+   * Get current pose from odometry
+   * @return Pose representing position and rotation on field
+   */
   public Pose2d getPose() {
     return odometry.getPoseMeters();
   }
@@ -153,6 +160,10 @@ public class DriveTrain extends SubsystemBase {
     return rotationsToTicks(rotations);
   }
 
+  /**
+   * Get current wheel speeds, using encoder velocity values
+   * @return Wheel speeds in m/s
+   */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
     int leftTicksPerDs = backLeftMotor.getSelectedSensorVelocity();
     double leftMetersPerSecond = ticksToMeters(leftTicksPerDs * 10);
@@ -163,34 +174,68 @@ public class DriveTrain extends SubsystemBase {
     return new DifferentialDriveWheelSpeeds(leftMetersPerSecond, rightMetersPerSecond);
   }
 
+  /**
+   * Reset odometry pose to 0, 0 facing 0 degrees. Also resets encoders.
+   */
   public void resetOdometry() {
     resetOdometry(new Pose2d(0, 0, new Rotation2d(0)));
   }
 
+  /**
+   * Reset odometry to desired pose, while resetting encoders.
+   * @param translationPose Desired state of odometry
+   */
   public void resetOdometry(Pose2d translationPose) {
     resetEncoders();
     odometry.resetPosition(translationPose, Rotation2d.fromDegrees(getHeading()));
   }
 
+  private int getLeftPosition() {
+    return backLeftMotor.getSelectedSensorPosition();
+  }
+
+  private int getRightPosition() {
+    return backRightMotor.getSelectedSensorPosition();
+  }
+
+  /**
+   * Get distance travelled by the left side
+   * @return Distance in meters
+   */
   public double getLeftDistanceM() {
     int leftTicks = backLeftMotor.getSelectedSensorPosition();
     return ticksToMeters(leftTicks);
   }
 
+  /**
+   * Get distance travelled by the right side
+   * @return Distance in meters
+   */
   public double getRightDistanceM() {
     int rightTicks = backRightMotor.getSelectedSensorPosition();
     return ticksToMeters(rightTicks);
   }
 
 
+  /**
+   * Get average distance travelled by both sides
+   * @return Average distance travelled by both sides
+   */
   public double getAverageEncoderDistanceM() {
     return (getLeftDistanceM() + getRightDistanceM()) / 2.0; // average of both sides
   }
 
+  /**
+   * Zero the gyroscope to 0
+   */
   public void zeroHeading() {
     zeroHeading(0);
   }
 
+  /**
+   * Zero the gyroscope to specified offset
+   * @param heading Desired heading for gyro to read at
+   */
   public void zeroHeading(int heading) {
     navX.reset();
     yawOffset = heading;
@@ -210,6 +255,10 @@ public class DriveTrain extends SubsystemBase {
     return heading;
   }
 
+  /**
+   * Retrieve rate of rotation
+   * @return Rate of rotation in deg/s
+   */
   public double getTurnRate() {
     return navX.getRate();
   }
@@ -220,6 +269,7 @@ public class DriveTrain extends SubsystemBase {
   }
   
   public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {
+    joystickUsed = true;
     //drive.arcadeDrive(x, y);
     if (forwardSpeed <= .15) {
       drive.curvatureDrive(forwardSpeed, rotation, true);
@@ -228,16 +278,31 @@ public class DriveTrain extends SubsystemBase {
     }
   }
 
+  /**
+   * Drive drive train by specifying percent output for each side
+   * @param leftSpeed Left speed in percent output
+   * @param rightSpeed Right speed in percent output
+   */
   public void rawTankDrive(double leftSpeed, double rightSpeed) {
     drive.tankDrive(leftSpeed, rightSpeed, false);
   }
 
   // === TRAJECTORY GENERATION AND FOLLOWING ===
 
+  /**
+   * Generate a ramsete command from a file
+   * @param pathFileName Specify the {THIS} in src/main/deploy/paths.{THIS}.wpilib.json.
+   * @return Ramsete command that follows trajectory loaded from file
+   */
   public RamseteCommand generateRamseteCommandFromFile(String pathFileName) {
     return generateRamseteCommand(generateTrajectory(pathFileName));
   }
 
+  /**
+   * Generate trajectory from file
+   * @param pathFileName Specify the {THIS} in src/main/deploy/paths.{THIS}.wpilib.json.
+   * @return Trajectory from loaded file
+   */
   public Trajectory generateTrajectory(String pathFileName) {
     String path = "paths/" + pathFileName + ".wpilib.json";
     try {
@@ -249,14 +314,30 @@ public class DriveTrain extends SubsystemBase {
     return null;
   }
 
+  /**
+   * Translate a trajectory so that its first state is at 0,0 facing 0 degrees
+   * @param trajectory Trajectory to translate
+   * @return Translated trajectory
+   */
   public Trajectory translateToOrigin(Trajectory trajectory) {
     return trajectory.relativeTo(trajectory.getInitialPose());
   }
 
+  /**
+   * Translate a ramsete command that depends on this subsystem
+   * @param trajectory Trajectory to use
+   * @return Ramsete command that follows the trajectory
+   */
   public RamseteCommand generateRamseteCommand(Trajectory trajectory) {
     return generateRamseteCommand(trajectory, true);
   }
 
+  /**
+   * Translate a ramsete command, specifying whether or not it depends on this subsystem (useful in complex groups).
+   * @param trajectory Trajectory to use
+   * @param dependOnDrive Whether or not this subsystem is a dependency of the generated command
+   * @return Ramsete command that follows the trajectory
+   */
   public RamseteCommand generateRamseteCommand(Trajectory trajectory, boolean dependOnDrive) {
     Subsystem[] requirements = dependOnDrive ? new Subsystem[]{this} : new Subsystem[]{};
     return new RamseteCommand(
@@ -324,11 +405,34 @@ public class DriveTrain extends SubsystemBase {
     );
   }
 
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel, boolean genMiddle) {
+  /**
+   * Generate trajectory from start, end, interior waypoints and other constraints.
+   * @param start Starting pose
+   * @param end Ending pose
+   * @param interiorWaypoints Interior positions of path
+   * @param maxVelocity Maximum velocity in m/s
+   * @param maxAccel Maximum acceleration in m/s^2
+   * @return
+   */
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, List<Translation2d> interiorWaypoints, double maxVelocity,
+                                       double maxAccel) {
     var trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAccel)
             .setKinematics(KINEMATICS)
             .addConstraint(VOLTAGE_CONSTRAINT);
 
+    return TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, trajectoryConfig);
+  }
+
+  /**
+   * Generate trajectory from only a start, an end, and other constraints.
+   * @param start Starting pose
+   * @param end Ending pose
+   * @param maxVelocity maximum velocity in m/s
+   * @param maxAccel Maximum acceleration in m/s^2
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @return
+   */
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel, boolean genMiddle) {
     List<Translation2d> interiorWaypoints = new ArrayList<>();
     if (genMiddle) {
       var middle = new Translation2d(((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
@@ -336,15 +440,22 @@ public class DriveTrain extends SubsystemBase {
       interiorWaypoints.add(middle);
     }
     
-    return TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, trajectoryConfig);
+    return generateTrajectory(start, end, interiorWaypoints, maxVelocity, maxAccel);
   }
 
+  /**
+   * Generate trajectory from a start and an end using default constraints.
+   * @param start Starting pose
+   * @param end Ending pose
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @return Trajectory generated
+   */
   public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean genMiddle) {
     return generateTrajectory(start, end, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, genMiddle);
   }
 
   /**
-   *
+   * Generate trajectory that moves robot only in x direction, with specified constraints.
    * @param start Starting pose
    * @param xMeters Meters to move (positive is right on field [PathWeaver view])
    * @param maxVelocity Maximum velocity
@@ -356,7 +467,36 @@ public class DriveTrain extends SubsystemBase {
     return generateTrajectory(start, end, maxVelocity, maxAccel, true);
   }
 
+  /**
+   * Generate trajectory that moves robot only in x direction, with default constraints.
+   * @param start Starting pose
+   * @param xMeters Meters to move (positive is right on field [PathWeaver view])
+   * @return Trajectory generated
+   */
   public Trajectory generateXTrajectory(Pose2d start, double xMeters) {
     return generateXTrajectory(start, xMeters, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return List.of(
+      new Verification("Joystick Drive", () -> joystickUsed),
+      new Verification("Faults", () ->
+              TalonSRXChecker.check("Front Left", frontLeftMotor, system) &&
+              TalonSRXChecker.check("Front Right", frontRightMotor, system) &&
+              TalonSRXChecker.check("Back Left", backLeftMotor, system) &&
+              TalonSRXChecker.check("Back Right", backRightMotor, system)),
+      new Verification("Encoders", () -> {
+        if (getLeftPosition() <= 100) {
+          system.error("L. drive encoder pos less than 100");
+          return false;
+        } else if (getRightPosition() <= 100) {
+          system.error("R. drive encoder pos less than 100");
+          return false;
+        }
+        return true;
+      }),
+      new Verification("NavX", () -> navX.isConnected())
+    );
   }
 }

@@ -14,7 +14,9 @@ import static frc.robot.Constants.Winch.*;
 
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
-public class Winch extends SubsystemBase {
+import java.util.List;
+
+public class Winch extends SubsystemBase implements VerifiableSystem {
   private static final double DEFAULT_CLIMB_SPEED = 0.9;
   private TalonSRX motor = new TalonSRX(MAIN_MOTOR_ID);
 
@@ -44,5 +46,10 @@ public class Winch extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  @Override
+  public List<Verification> getVerifications(VerificationSystem system) {
+    return null;
   }
 }
