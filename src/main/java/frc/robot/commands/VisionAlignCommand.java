@@ -15,9 +15,9 @@ import frc.robot.subsystems.VisionSystem;
 import frc.robot.util.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
-  private static final double ROTATE_P = 0.025d;
+  private static final double ROTATE_P = 0.2d;
   private static final double DEG_TOLERANCE = 2d;
-  private static final double MIN_COMMAND = 0.2;
+  private static final double MIN_COMMAND = 0.35;
   private static final double SEEK_SPEED = 0.15;
   private static final double CORRECT_LOOPS_NEEDED = 5;
 

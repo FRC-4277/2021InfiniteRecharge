@@ -47,8 +47,8 @@ public final class Constants {
         public static final double kRamseteB = 2; // default, should be good
         public static final double kRamseteZeta = 0.7; // default, should be good
         // Encoders (on back)
-        public static final boolean LEFT_BACK_SENSOR_PHASE = false;
-        public static final boolean RIGHT_BACK_SENSOR_PHASE = false;
+        public static final boolean LEFT_BACK_SENSOR_PHASE = true;
+        public static final boolean RIGHT_BACK_SENSOR_PHASE = true;
         // Wheel
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(6);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
@@ -104,18 +104,18 @@ public final class Constants {
     public static class Shooter {
         public static final int LEFT_MOTOR_ID = 30;
         public static final int RIGHT_MOTOR_ID = 31;
-        public static final boolean LEFT_MOTOR_INVERTED = true;
+        public static final boolean LEFT_MOTOR_INVERTED = false;
         public static final boolean RIGHT_MOTOR_INVERTED = true;
         public static final boolean LEFT_SENSOR_PHASE = false;
-        public static final boolean RIGHT_SENSOR_PHASE = true;
+        public static final boolean RIGHT_SENSOR_PHASE = false;
         public static final int TICKS_PER_REV = 4096;
         public static class Characteristics {
-            public static final double P = 0.00165;
+            public static final double P = /*0.00165*/0.05;
             public static final double I = 0.0;
             public static final double D = 0.0;
             public static final double MAX_BATTERY_V = 12;
-            public static final double ksVolts = 0.211;
-            public static final double kvVoltSecondsPerRotation = 0.163;
+            public static final double ksVolts = 0.281;
+            public static final double kvVoltSecondsPerRotation = 0.162;
             public static final double RPM_THRESHOLD = 10;
         }
         public static final Function<Double, Integer> METERS_TO_RPM_FUNCTION = meters -> {

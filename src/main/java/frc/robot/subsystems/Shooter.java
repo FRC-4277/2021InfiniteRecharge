@@ -57,11 +57,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     leftMotor.config_kP(0, P);
     leftMotor.config_kI(0, I);
     leftMotor.config_kD(0, D);
-    leftMotor.configAllowableClosedloopError(0, 4096, 10);
+    leftMotor.configAllowableClosedloopError(0, 0, 10);
     rightMotor.config_kP(0, P);
     rightMotor.config_kI(0, I);
     rightMotor.config_kD(0, D);
-    rightMotor.configAllowableClosedloopError(0, 4096, 10);
+    rightMotor.configAllowableClosedloopError(0, 0, 10);
 
     ShuffleboardLayout layout = driverTab.getLayout("Shooter", BuiltInLayouts.kGrid)
     .withSize(4, 1)

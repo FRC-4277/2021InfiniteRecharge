@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveWheelSpeeds;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
@@ -266,11 +267,14 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   @Override
   public void periodic() {
     odometry.update(Rotation2d.fromDegrees(getHeading()), getLeftDistanceM(), getRightDistanceM());
+    SmartDashboard.putNumber("Left position", getLeftPosition());
+    SmartDashboard.putNumber("Right position", getRightPosition());
   }
   
   public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {
     joystickUsed = true;
-    drive.curvatureDrive(forwardSpeed, rotation, quick);
+    //drive.curvatureDrive(forwardSpeed, rotation, quick);
+    drive.arcadeDrive(forwardSpeed, rotation);
   }
 
   /**

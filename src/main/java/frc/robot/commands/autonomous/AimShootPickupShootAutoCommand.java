@@ -31,10 +31,10 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     super(
       new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
-      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION)
+      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
               .withTimeout(3.0),
       new ParallelCommandGroup(
-        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION),
+        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
         new MoveHopperUpCommand(verticalHopper)
       ).withTimeout(4.0),
       new RotateToCommand(driveTrain, 0).withTimeout(2.0),
@@ -56,10 +56,10 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
         })
       ),
       new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
-      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION)
+      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
               .withTimeout(3.0),
       new ParallelCommandGroup(
-        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION),
+        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
         new MoveHopperUpCommand(verticalHopper)
       ).withTimeout(4.0),
       new RotateToCommand(driveTrain, 0).withTimeout(5.0)

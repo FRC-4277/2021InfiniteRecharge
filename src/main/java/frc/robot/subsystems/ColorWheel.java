@@ -371,10 +371,10 @@ public class ColorWheel extends SubsystemBase implements VerifiableSystem {
    * Color on the control panel wheel
    */
   public enum WheelColor {
-    BLUE(ColorMatch.makeColor(/*0.143, 0.427, 0.429*/0.126, 0.423, 0.449)),
-    RED(ColorMatch.makeColor(/*0.561, 0.232, 0.114*/.497,.358,.144)),
-    GREEN(ColorMatch.makeColor(/*0.197, 0.561, 0.240*/.172,.573,.253)),
-    YELLOW(ColorMatch.makeColor(/*0.361, 0.524, 0.113*/.316,.560,.123));
+    BLUE(ColorMatch.makeColor(/*0.143, 0.427, 0.429*/0.173,0.444,0.382)),
+    RED(ColorMatch.makeColor(/*0.561, 0.232, 0.114*/0.390, 0.411, 0.198)),
+    GREEN(ColorMatch.makeColor(/*0.197, 0.561, 0.240*/.211,.534,.253)),
+    YELLOW(ColorMatch.makeColor(/*0.361, 0.524, 0.113*/.304,.543,.152));
 
     private static double EPSILON = 0.001;
     private Color color;

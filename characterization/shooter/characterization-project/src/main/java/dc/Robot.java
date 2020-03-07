@@ -54,7 +54,8 @@ public class Robot extends TimedRobot {
     stick = new Joystick(0);
 
     master = new WPI_TalonSRX(30);
-    master.setInverted(true);
+    master.configFactoryDefault();
+    master.setInverted(false);
     master.setSensorPhase(false);
     master.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_5Ms);
     master.configVelocityMeasurementWindow(4);
@@ -63,6 +64,7 @@ public class Robot extends TimedRobot {
     master.setNeutralMode(NeutralMode.Brake);
 
     WPI_TalonSRX slave0 = new WPI_TalonSRX(31);
+    slave0.configFactoryDefault();
     slave0.setInverted(true);
     slave0.follow(master);
     slave0.setNeutralMode(NeutralMode.Brake);

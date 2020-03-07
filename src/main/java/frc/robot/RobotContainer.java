@@ -85,8 +85,9 @@ public class RobotContainer {
   private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
   private final ShooterHoldVelocityCommand shooterHoldVelocityViaVisionCommand =
-          new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION);
-  //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
+          //new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true);
+  new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.DRIVER_PROVIDED, true);
+          //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
   private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
@@ -271,8 +272,7 @@ public class RobotContainer {
   protected void autonomousInit() {
     inAutonomous = true;
     if (resetOdometryOnAuto.getBoolean(true)) {
-      System.out.println("Resetting encoders, heading, and odometry");
-      driveTrain.resetEncoders();
+      System.out.println("Resetting encoders, heading, and odometry");     driveTrain.resetEncoders();
       driveTrain.zeroHeading();
       driveTrain.resetOdometry();
       System.out.println("DriveTrain's encoders & heading are reset.");

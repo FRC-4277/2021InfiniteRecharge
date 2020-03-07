@@ -23,11 +23,12 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   private int loopsReachedRPM = 0;
   private boolean runForever, finished;
 
-  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, RPMSource rpmSource) {
+  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, RPMSource rpmSource, boolean runForever) {
     this.shooter = shooter;
     this.visionSystem = visionSystem;
     this.rpmSource = rpmSource;
     this.rpm = -1;
+    this.runForever = runForever;
   }
 
   public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, Integer rpm) {
@@ -41,6 +42,9 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   @Override
   public void initialize() {
     shooter.setReachedRPMDisplay(false);
+    for (int i = 0; i < 5; i++) {
+      visionSystem.usePortPipeline();
+    }
     visionSystem.setCalculateDistance(true);
   }
 
@@ -80,6 +84,9 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     shooter.stopShooter();
     shooter.setReachedRPMDisplay(false);
     visionSystem.setCalculateDistance(false);
+    for (int i = 0; i < 5; i++) {
+      visionSystem.useDriverPipeline();
+    }
   }
 
   // Returns true when the command should end.
