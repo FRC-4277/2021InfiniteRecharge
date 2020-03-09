@@ -11,6 +11,8 @@ import java.util.function.Supplier;
 
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.NeutralMode;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
@@ -61,6 +63,13 @@ public class Robot extends TimedRobot {
 
   double priorAutospeed = 0;
   Number[] numberArray = new Number[10];
+
+  public void setupEncoder(WPI_TalonSRX tSrx) {
+    tSrx.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_5Ms);
+    tSrx.configVelocityMeasurementWindow(4);
+    tSrx.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10);
+    tSrx.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 10);
+  }
 
   @Override
   public void robotInit() {
@@ -117,6 +126,7 @@ public class Robot extends TimedRobot {
         FeedbackDevice.QuadEncoder,
         PIDIDX, 10
     );
+    setupEncoder(leftMaster);
     leftEncoderPosition = ()
         -> leftMaster.getSelectedSensorPosition(PIDIDX) * encoderConstant;
     leftEncoderRate = ()
@@ -127,6 +137,7 @@ public class Robot extends TimedRobot {
         FeedbackDevice.QuadEncoder,
         PIDIDX, 10
     );
+    setupEncoder(rightMaster);
     rightEncoderPosition = ()
         -> rightMaster.getSelectedSensorPosition(PIDIDX) * encoderConstant;
     rightEncoderRate = ()
