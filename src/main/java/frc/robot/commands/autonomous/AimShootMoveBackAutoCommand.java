@@ -28,11 +28,11 @@ public class AimShootMoveBackAutoCommand extends SequentialCommandGroup {
    * Creates a new AimShootBackAutoCommand.
    */
   public AimShootMoveBackAutoCommand(DriveTrain driveTrain, VisionSystem visionSystem,
-                                     Shooter shooter, VerticalHopper verticalHopper) {
+                                     Shooter shooter, VerticalHopper verticalHopper, boolean seekRight) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
-      new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
+      new VisionAlignCommand(driveTrain, visionSystem, false, seekRight).withTimeout(4.0),
       new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
               .withTimeout(3.0),
       new ParallelCommandGroup(

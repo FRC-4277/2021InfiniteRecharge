@@ -151,9 +151,13 @@ public class RobotContainer {
       return driveTrain.generateXTrajectory(currentPose, 1.7);
     }));
 
-    // = Aim, Shoot, Move Off Line
-    autoChooser.addOption("Aim, Shoot, Move Off Line",
-            new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper));
+    // = Aim, Shoot, Move Off Line (Port on Left)
+    autoChooser.addOption("Aim, Shoot, Move Off Line (Port on Left)",
+            new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper, false));
+
+    // = Aim, Shoot, Move Off Line (Port on Right)
+    autoChooser.addOption("Aim, Shoot, Move Off Line (Port on Right)",
+            new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper, true));
 
     // = Aim, Shoot, Pickup Trench, Shoot
     autoChooser.addOption("Aim, Shoot, Pickup Trench, Shoot",

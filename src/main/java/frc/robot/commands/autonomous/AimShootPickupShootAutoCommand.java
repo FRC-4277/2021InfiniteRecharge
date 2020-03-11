@@ -30,7 +30,7 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
-      new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
+      new VisionAlignCommand(driveTrain, visionSystem, false, false).withTimeout(4.0),
       new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
               .withTimeout(3.0),
       new ParallelCommandGroup(
@@ -55,7 +55,7 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
           return driveTrain.generateTrajectory(current, startingPosition, true);
         })
       ),
-      new VisionAlignCommand(driveTrain, visionSystem, false).withTimeout(4.0),
+      new VisionAlignCommand(driveTrain, visionSystem, false, false).withTimeout(4.0),
       new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
               .withTimeout(3.0),
       new ParallelCommandGroup(

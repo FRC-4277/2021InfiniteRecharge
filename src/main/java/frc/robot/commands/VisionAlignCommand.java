@@ -17,7 +17,7 @@ import frc.robot.util.limelight.Target;
 public class VisionAlignCommand extends CommandBase {
   private static final double ROTATE_P = 0.2d;
   private static final double DEG_TOLERANCE = 2d;
-  private static final double MIN_COMMAND = 0.35;
+  private static final double MIN_COMMAND = 0.3;
   private static final double SEEK_SPEED = 0.15;
   private static final double CORRECT_LOOPS_NEEDED = 5;
 
@@ -25,16 +25,22 @@ public class VisionAlignCommand extends CommandBase {
   private VisionSystem visionSystem;
   private boolean runForever;
   private int correctLoops;
-  
+  private Boolean seekRight;
+
+  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever) {
+    this(driveTrain, visionSystem, runForever, null);
+  }
+
   /**
    * Creates a new VisionAlignCommand.
    */
-  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever) {
+  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, Boolean seekRight) {
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
-    addRequirements(driveTrain, visionSystem);
-    // Use addRequirements() here to declare subsystem dependencies.
     this.runForever = runForever;
+    this.seekRight = seekRight;
+    // Use addRequirements() here to declare subsystem dependencies.
+    addRequirements(driveTrain, visionSystem);
   }
 
   // Called when the command is initially scheduled.
@@ -72,12 +78,17 @@ public class VisionAlignCommand extends CommandBase {
       System.out.println("No Limelight Target");
       Optional<Target> lastTarget = visionSystem.getLimelight().getLastTarget();
       // Seek for target using lastTarget
-      if (lastTarget.isEmpty()) {
+      double x;
+      if (lastTarget.isPresent()) {
+        x = lastTarget.get().getX();
+      } else if (seekRight != null) {
+        x = seekRight ? 1 : -1;
+      } else {
         return;
       }
       // From signum, it would be 1 if the target is to the right, -1 if the target is to the left
       // Then we multiply that by 0.2
-      steerAdjust = SEEK_SPEED * Math.signum(lastTarget.get().getX());
+      steerAdjust = SEEK_SPEED * Math.signum(x);
     }
 
     driveTrain.rawTankDrive(steerAdjust, -steerAdjust);
