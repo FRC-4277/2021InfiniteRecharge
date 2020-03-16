@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
@@ -171,9 +172,15 @@ public class RobotContainer {
     autoChooser.addOption("Aim, Shoot, Move Off Line (Port on Right)",
             new AimShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper, true));
 
-    // = Aim, Shoot, Pickup Trench, Shoot
-    autoChooser.addOption("Aim, Shoot, Pickup Trench, Shoot",
-            new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));
+    // = Aim, Shoot, Pickup Trench, Go to line, Shoot
+    autoChooser.addOption("6 ball (2nd shooting from line)",
+            new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake,
+                    new Pose2d(0, 0, new Rotation2d(0))));
+
+    // = Aim, Shoot, Pickup Trench, Go to corner of trench, Shoot
+    autoChooser.addOption("6 ball (2nd shooting from trench)",
+            new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake,
+                    new Pose2d(5.461 - 3.162, -1.38 - -0.7, new Rotation2d(0))));
 
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 

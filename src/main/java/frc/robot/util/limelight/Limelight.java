@@ -94,6 +94,7 @@ public class Limelight {
              */
 
             double d = robotTranslation.getDistance(portTranslation);
+            // implementing acot(x) as 0.5PI - atan(x)
             double a1Rad = Math.PI - MOUNT_ANGLE_RAD - (Math.PI * 0.5D - Math.atan(d / (MOUNT_HEIGHT_M - PORT_CENTER_HEIGHT_M)));
             double a1Deg = Math.toDegrees(a1Rad);
 

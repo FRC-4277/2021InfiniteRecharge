@@ -9,12 +9,15 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+
+import java.util.function.Supplier;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -27,7 +30,8 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
    * Creates a new AimShootPickupShootAutoCommand.
    */
   public AimShootPickupShootAutoCommand(DriveTrain driveTrain, VisionSystem visionSystem,
-                                        Shooter shooter, VerticalHopper verticalHopper, Intake intake) {
+                                        Shooter shooter, VerticalHopper verticalHopper, Intake intake,
+                                        Pose2d returnPosition) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
@@ -52,10 +56,9 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
         new IdleHopperCommand(verticalHopper),
         // Go back to the start, so we can shoot again
         new LazyRamseteCommand(driveTrain, () -> {
-          Pose2d startingPosition = new Pose2d(0, 0, new Rotation2d(0));
           Pose2d current = driveTrain.getPose();
-          System.out.println("RETURNING PATH GEN from " + current + " to " + startingPosition);
-          return driveTrain.generateTrajectory(current, startingPosition, true, true);
+          System.out.println("RETURNING PATH GEN from " + current + " to " + returnPosition);
+          return driveTrain.generateTrajectory(current, returnPosition, true, true);
         }, true)
       ).withTimeout(4.0),
       new PrintCommand("VISION AT START AGAIN"),
