@@ -45,6 +45,8 @@ import static edu.wpi.first.wpilibj.XboxController.Button.*;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private static RobotContainer instance;
+
   // Pneumatics
   //private Compressor compressor = new Compressor(0);
   // todo : uncomment when compressor added
@@ -108,6 +110,8 @@ public class RobotContainer {
    * The container for the robot.  Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+    instance = this;
+
     // Subsystems
     SmartDashboard.putData(driveTrain);
     SmartDashboard.putData(intake);
@@ -134,6 +138,14 @@ public class RobotContainer {
     setupTestingTab();
   }
 
+  public static RobotContainer getInstance() {
+    return instance;
+  }
+
+  public DriveTrain getDriveTrain() {
+    return driveTrain;
+  }
+
   private void setupTestingTab() {
     testTab.add(toggleCameraCommand);
   }
@@ -149,7 +161,7 @@ public class RobotContainer {
       Pose2d currentPose = driveTrain.getPose();
       // Move 1.7 meters to the right [PathWeaver view]
       return driveTrain.generateXTrajectory(currentPose, 1.7);
-    }));
+    }, true));
 
     // = Aim, Shoot, Move Off Line (Port on Left)
     autoChooser.addOption("Aim, Shoot, Move Off Line (Port on Left)",

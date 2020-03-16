@@ -15,7 +15,6 @@ import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -25,6 +24,7 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Robot;
 
 public class Shooter extends SubsystemBase implements VerifiableSystem {
   //public static final double FORWARDS_SPEED = 0.5;
@@ -41,6 +41,9 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   private NetworkTableEntry shooterReachedRPMEntry;
 
   private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerRotation);
+
+  private static final double SIM_MAX_RPM = 4277;
+  private int simRPM = 0;
 
   /**
    * Creates a new Shooter.
@@ -103,6 +106,9 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void runForward() {
+    if (Robot.isSimulation()) {
+      simRPM = (int) (SIM_MAX_RPM * shooterSpeedEntry.getValue().getDouble());
+    }
     leftMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble()); 
     rightMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble()); 
   }
@@ -113,6 +119,9 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
   public void holdVelocity(int ticksPerDs) {
     int rpm = ticksPerDsToRPM(ticksPerDs);
+    if (Robot.isSimulation()) {
+      simRPM = rpm;
+    }
     int rps = (int) Math.round(rpm / 60d);
     double feedForwardVolts = feedforward.calculate(rps);
     double feedForwardNormalized = feedForwardVolts / MAX_BATTERY_V;
@@ -121,18 +130,30 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public int getVelocity() {
+    if (Robot.isSimulation()) {
+      return rpmToTicksPerDs(simRPM);
+    }
     return (leftMotor.getSelectedSensorVelocity() + rightMotor.getSelectedSensorVelocity()) / 2;
   }
 
   public int getVelocityRPM() {
+    if (Robot.isSimulation()) {
+      return simRPM;
+    }
     return ticksPerDsToRPM(getVelocity());
   }
 
   public int getLeftRPM() {
+    if (Robot.isSimulation()) {
+      return simRPM;
+    }
     return ticksPerDsToRPM(leftMotor.getSelectedSensorVelocity());
   }
 
   public int getRightRPM() {
+    if (Robot.isSimulation()) {
+      return simRPM;
+    }
     return ticksPerDsToRPM(rightMotor.getSelectedSensorVelocity());
   }
 
@@ -145,11 +166,13 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void runBackwards() {
+    simRPM = (int) (SIM_MAX_RPM * -shooterSpeedEntry.getValue().getDouble());
     leftMotor.set(ControlMode.PercentOutput, -shooterSpeedEntry.getValue().getDouble());
     rightMotor.set(ControlMode.PercentOutput, -shooterSpeedEntry.getValue().getDouble());
   }
 
   public void stopShooter() {
+    simRPM = 0;
     leftMotor.set(ControlMode.PercentOutput, 0);
     rightMotor.set(ControlMode.PercentOutput, 0);
   }

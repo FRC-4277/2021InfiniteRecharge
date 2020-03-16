@@ -10,16 +10,17 @@ package frc.robot.commands;
 import java.util.Optional;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.VisionSystem;
 import frc.robot.util.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
   private static final double ROTATE_P = 0.2d;
-  private static final double DEG_TOLERANCE = 2d;
+  private static final double DEG_TOLERANCE = 2.7d;
   private static final double MIN_COMMAND = 0.3;
-  private static final double SEEK_SPEED = 0.15;
-  private static final double CORRECT_LOOPS_NEEDED = 5;
+  private static final double SEEK_SPEED = 0.3;
+  private static final double CORRECT_LOOPS_NEEDED = Robot.isReal() ? 5 : 1;
 
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
@@ -69,13 +70,14 @@ public class VisionAlignCommand extends CommandBase {
           correctLoops++;
         }
         return;
+      } else {
+        correctLoops = 0;
       }
       steerAdjust = xError * ROTATE_P;
-      if (Math.abs(steerAdjust) < MIN_COMMAND) {
+      if (Math.abs(steerAdjust) < MIN_COMMAND && Robot.isReal()) {
         steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
       }
     } else {
-      System.out.println("No Limelight Target");
       Optional<Target> lastTarget = visionSystem.getLimelight().getLastTarget();
       // Seek for target using lastTarget
       double x;
@@ -101,6 +103,7 @@ public class VisionAlignCommand extends CommandBase {
     for (int i = 0; i < 5; i++) {
       visionSystem.useDriverPipeline();
     }
+    driveTrain.stopDrive();
   }
 
   // Returns true when the command should end.

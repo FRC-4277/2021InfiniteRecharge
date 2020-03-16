@@ -60,8 +60,12 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     //System.out.println(intakeSensor.get());
   }
 
+  public void moveUp(double speed) {
+    leftMotor.set(ControlMode.PercentOutput, speed);
+  }
+
   public void moveUp() {
-    leftMotor.set(ControlMode.PercentOutput, UP_SPEED);
+    moveUp(UP_SPEED);
   }
 
   public void moveDown() {

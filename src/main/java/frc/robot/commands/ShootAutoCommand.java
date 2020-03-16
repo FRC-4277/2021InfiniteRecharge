@@ -42,7 +42,7 @@ public class ShootAutoCommand extends SequentialCommandGroup {
       new WaitCommand(0.4),
       new StopHopperCommand(hopper),
       new WaitCommand(0.4),
-      new StopShooterCommand(shooter)
+      new IdleShooterCommand(shooter)
     )));
   }
 }

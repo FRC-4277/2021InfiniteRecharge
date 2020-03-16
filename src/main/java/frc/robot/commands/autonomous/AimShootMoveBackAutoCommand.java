@@ -9,6 +9,7 @@ package frc.robot.commands.autonomous;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.*;
 import frc.robot.subsystems.DriveTrain;
@@ -37,17 +38,17 @@ public class AimShootMoveBackAutoCommand extends SequentialCommandGroup {
               .withTimeout(3.0),
       new ParallelCommandGroup(
         new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
-        new MoveHopperUpCommand(verticalHopper)
+        new MoveHopperUpCommand(verticalHopper, 0.2)
       ).withTimeout(6.0),
-      new ParallelCommandGroup(
-        new StopShooterCommand(shooter),
-        new StopHopperCommand(verticalHopper),
+      new ParallelRaceGroup(
+        new IdleShooterCommand(shooter),
+        new IdleHopperCommand(verticalHopper),
         new SequentialCommandGroup(
           new RotateToCommand(driveTrain, 0).withTimeout(2.0),
           new LazyRamseteCommand(driveTrain, () -> {
             Pose2d currentPose = driveTrain.getPose();
             return driveTrain.generateXTrajectory(currentPose, TO_SWITCH_DISTANCE_M);
-          })
+          }, true)
         )
       )
     );

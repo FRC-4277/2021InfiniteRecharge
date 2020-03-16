@@ -10,6 +10,7 @@ package frc.robot.commands;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.util.LogitechButton;
 
@@ -38,7 +39,7 @@ public class JoystickDriveCommand extends CommandBase {
   public void execute() {
     // y is inverted on Xbox Controller
     double y = -controller.getY(Hand.kLeft); // Forward/backwards (axis inverted)
-    double x = controller.getRawAxis(2); // Logitech Twist
+    double x = controller.getRawAxis(Robot.isReal() ? 2 : 0); // Logitech Twist
     /*double x = controller.getX(Hand.kRight);
     double z = controller.getRawAxis(2);
     if (Math.abs(z) >= TURN_DEADBAND) {

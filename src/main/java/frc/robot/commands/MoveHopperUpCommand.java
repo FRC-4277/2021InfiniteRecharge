@@ -12,12 +12,22 @@ import frc.robot.subsystems.VerticalHopper;
 
 public class MoveHopperUpCommand extends CommandBase {
   private VerticalHopper hopper;
-  
+  private Double speed;
+
+  /**
+   * Creates a new MoveHopperUpCommand.
+ * @param hopper
+   */
+  public MoveHopperUpCommand(VerticalHopper hopper) {
+    this(hopper, null);
+  }
+
   /**
    * Creates a new MoveHopperUpCommand.
    */
-  public MoveHopperUpCommand(VerticalHopper hopper) {
+  public MoveHopperUpCommand(VerticalHopper hopper, Double speed) {
     this.hopper = hopper;
+    this.speed = speed;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(hopper);
   }
@@ -30,7 +40,11 @@ public class MoveHopperUpCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    hopper.moveUp();
+    if (speed == null) {
+      hopper.moveUp();
+    } else {
+      hopper.moveUp(speed);
+    }
   }
 
   // Called once the command ends or is interrupted.

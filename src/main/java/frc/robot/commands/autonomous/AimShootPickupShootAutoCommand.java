@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
@@ -35,34 +36,41 @@ public class AimShootPickupShootAutoCommand extends SequentialCommandGroup {
               .withTimeout(3.0),
       new ParallelCommandGroup(
         new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
-        new MoveHopperUpCommand(verticalHopper)
+        new MoveHopperUpCommand(verticalHopper, 0.2)
       ).withTimeout(4.0),
-      new RotateToCommand(driveTrain, 0).withTimeout(2.0),
-      new ParallelCommandGroup(
-        new StopShooterCommand(shooter),
+      new RotateToCommand(driveTrain, 0).withTimeout(3.0),
+      new ParallelRaceGroup(
+        new IdleShooterCommand(shooter),
         new AutoHopperMoveInCommand(verticalHopper),
         new ParallelRaceGroup(
           new TrenchRunAutoCommand(driveTrain, visionSystem),
           new IntakeCommand(intake, verticalHopper)
-        ).withTimeout(7.0)
-      ),
-      new ParallelCommandGroup(
+        )
+      ).withTimeout(5.0),
+      new PrintCommand("RETURNING SOON"),
+      new ParallelRaceGroup(
         new IdleHopperCommand(verticalHopper),
         // Go back to the start, so we can shoot again
         new LazyRamseteCommand(driveTrain, () -> {
           Pose2d startingPosition = new Pose2d(0, 0, new Rotation2d(0));
           Pose2d current = driveTrain.getPose();
-          return driveTrain.generateTrajectory(current, startingPosition, true);
-        })
-      ),
+          System.out.println("RETURNING PATH GEN from " + current + " to " + startingPosition);
+          return driveTrain.generateTrajectory(current, startingPosition, true, true);
+        }, true)
+      ).withTimeout(4.0),
+      new PrintCommand("VISION AT START AGAIN"),
       new VisionAlignCommand(driveTrain, visionSystem, false, false).withTimeout(4.0),
+      new PrintCommand("VISION DONE"),
       new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
               .withTimeout(3.0),
+      new PrintCommand("VELOCITY DONE"),
       new ParallelCommandGroup(
         new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
-        new MoveHopperUpCommand(verticalHopper)
+        new MoveHopperUpCommand(verticalHopper, 0.2)
       ).withTimeout(4.0),
-      new RotateToCommand(driveTrain, 0).withTimeout(5.0)
+      new PrintCommand("SHOOTING DONE"),
+      new RotateToCommand(driveTrain, 0).withTimeout(5.0),
+      new PrintCommand("ROTATE DONE")
     );
   }
 }

@@ -116,7 +116,7 @@ public final class Constants {
             public static final double MAX_BATTERY_V = 12;
             public static final double ksVolts = 0.281;
             public static final double kvVoltSecondsPerRotation = 0.162;
-            public static final double RPM_THRESHOLD = 10;
+            public static final double RPM_THRESHOLD = 50;
         }
         public static final Function<Double, Integer> METERS_TO_RPM_FUNCTION = meters -> {
             return (int) Math.round(meters * 247); // todo: Empirically find a formula
