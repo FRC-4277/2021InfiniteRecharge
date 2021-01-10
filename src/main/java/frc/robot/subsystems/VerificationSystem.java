@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused") // TODO : Implement more verifications
 public class VerificationSystem extends SubsystemBase {
   private DriveTrain driveTrain;
   private Intake intake;

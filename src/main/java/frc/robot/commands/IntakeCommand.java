@@ -13,6 +13,7 @@ import frc.robot.subsystems.VerticalHopper;
 
 public class IntakeCommand extends CommandBase {
   private Intake intake;
+  @SuppressWarnings("unused") // TODO: Figure out if I needed/wanted this
   private VerticalHopper verticalHopper;
   private static int intakeMinStopTimeMs = 400;
   private boolean ballIntaking = false;

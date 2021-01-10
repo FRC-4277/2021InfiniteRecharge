@@ -82,7 +82,7 @@ public class RobotContainer {
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
-  private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
+  //private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
   private final ShooterHoldVelocityCommand shooterHoldVelocityViaVisionCommand =
           //new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true);
@@ -244,7 +244,7 @@ public class RobotContainer {
     POVButton upPOVButton = new POVButton(xboxController, 0);
     upPOVButton.whileActiveOnce(winchClimbCommand);
 
-    POVButton downPOVButton = new POVButton(xboxController, 180);
+    //POVButton downPOVButton = new POVButton(xboxController, 180);
 
     POVButton leftPOVButton = new POVButton(xboxController, 270);
     leftPOVButton.whileActiveOnce(hookDownCommand);

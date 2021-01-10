@@ -15,7 +15,6 @@ import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -30,7 +29,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   //public static final double FORWARDS_SPEED = 0.5;
   //public static final double BACKWARDS_SPEED = -0.5; 
   
-  private ShuffleboardTab settingsTab;
+  //private ShuffleboardTab settingsTab;
   private TalonSRX leftMotor = new TalonSRX(LEFT_MOTOR_ID);
   private TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
 
@@ -46,7 +45,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
    * Creates a new Shooter.
    */
   public Shooter(ShuffleboardTab settingsTab, ShuffleboardTab driverTab) {
-    this.settingsTab = settingsTab;
+    //this.settingsTab = settingsTab;
     leftMotor.configFactoryDefault();
     leftMotor.setInverted(LEFT_MOTOR_INVERTED);
     leftMotor.setSensorPhase(LEFT_SENSOR_PHASE);
@@ -112,7 +111,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void holdVelocity(int ticksPerDs) {
-    int rpm = ticksPerDsToRPM(ticksPerDs);
+    double rpm = ticksPerDsToRPM(ticksPerDs);
     int rps = (int) Math.round(rpm / 60d);
     double feedForwardVolts = feedforward.calculate(rps);
     double feedForwardNormalized = feedForwardVolts / MAX_BATTERY_V;
@@ -120,19 +119,19 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rightMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedForwardNormalized);
   }
 
-  public int getVelocity() {
+  public double getVelocity() {
     return (leftMotor.getSelectedSensorVelocity() + rightMotor.getSelectedSensorVelocity()) / 2;
   }
 
-  public int getVelocityRPM() {
+  public double getVelocityRPM() {
     return ticksPerDsToRPM(getVelocity());
   }
 
-  public int getLeftRPM() {
+  public double getLeftRPM() {
     return ticksPerDsToRPM(leftMotor.getSelectedSensorVelocity());
   }
 
-  public int getRightRPM() {
+  public double getRightRPM() {
     return ticksPerDsToRPM(rightMotor.getSelectedSensorVelocity());
   }
 
@@ -165,11 +164,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     return (int) Math.round(ticksPerDs);
   }
 
-  public int ticksPerDsToRPM(int ticksPerDs) {
+  public double ticksPerDsToRPM(double ticksPerDs) {
     double ticksPerS = ticksPerDs * 10d;
     double ticksPerMinute = ticksPerS * 60d;
     double rpm = ticksPerMinute / (double) TICKS_PER_REV;
-    return (int) Math.round(rpm);
+    return rpm;
   }
 
   @Override

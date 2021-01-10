@@ -16,7 +16,7 @@ import frc.robot.util.LogitechButton;
 import java.util.function.Supplier;
 
 public class JoystickDriveCommand extends CommandBase {
-  private static final double TURN_DEADBAND = 0.1;
+  //private static final double TURN_DEADBAND = 0.1;
 
   private DriveTrain driveTrain;
   private Joystick controller;

@@ -10,14 +10,14 @@ package frc.robot.commands.autonomous;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.VisionSystem;
-import io.github.pseudoresonance.pixy2api.Pixy2CCC;
+//import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 
 import java.util.Optional;
 
 public class TrenchRunAutoCommand extends CommandBase {
   private static final double MAXIMUM_DISTANCE_RIGHT_M = 8.54 - 3.16;
   private static final double STRAIGHT_MOVEMENT_SPEED = 0.4;
-  private static final double TURN_P = 0.025d;
+  //private static final double TURN_P = 0.025d;
   private static final double TURN_DEG_TOLERANCE = 5;
   private static final double MIN_TURN_ADJUST = 0.05;
   private DriveTrain driveTrain;

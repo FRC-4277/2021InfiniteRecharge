@@ -42,7 +42,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 import static frc.robot.Constants.DriveTrain.*;
 
@@ -64,14 +63,14 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
           = new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER);
 
   private double yawOffset = 0;
-  private ShuffleboardTab testTab;
+  //private ShuffleboardTab testTab;
   private boolean joystickUsed = false;
 
   /**
    * Creates a new DriveTrain.
    */
   public DriveTrain(ShuffleboardTab testTab) {
-    this.testTab = testTab;
+    //this.testTab = testTab;
 
     // Reset TalonSRX config
     frontLeftMotor.configFactoryDefault();
@@ -144,7 +143,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return odometry.getPoseMeters();
   }
 
-  public double ticksToRotations(int ticks) {
+  public double ticksToRotations(double ticks) {
     return ticks / (double) ENCODER_TICKS_PER_ROTATION;
   }
 
@@ -152,7 +151,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return rotations * ENCODER_TICKS_PER_ROTATION;
   }
 
-  public double ticksToMeters(int ticks) {
+  public double ticksToMeters(double ticks) {
     return ticksToRotations(ticks) * WHEEL_CIRCUMFERENCE_METERS;
   }
 
@@ -166,10 +165,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return Wheel speeds in m/s
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
-    int leftTicksPerDs = backLeftMotor.getSelectedSensorVelocity();
+    double leftTicksPerDs = backLeftMotor.getSelectedSensorVelocity();
     double leftMetersPerSecond = ticksToMeters(leftTicksPerDs * 10);
 
-    int rightTicksPerDs = backRightMotor.getSelectedSensorVelocity();
+    double rightTicksPerDs = backRightMotor.getSelectedSensorVelocity();
     double rightMetersPerSecond = ticksToMeters(rightTicksPerDs * 10);
 
     return new DifferentialDriveWheelSpeeds(leftMetersPerSecond, rightMetersPerSecond);
@@ -191,11 +190,11 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     odometry.resetPosition(translationPose, Rotation2d.fromDegrees(getHeading()));
   }
 
-  private int getLeftPosition() {
+  private double getLeftPosition() {
     return backLeftMotor.getSelectedSensorPosition();
   }
 
-  private int getRightPosition() {
+  private double getRightPosition() {
     return backRightMotor.getSelectedSensorPosition();
   }
 
@@ -204,7 +203,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return Distance in meters
    */
   public double getLeftDistanceM() {
-    int leftTicks = backLeftMotor.getSelectedSensorPosition();
+    double leftTicks = backLeftMotor.getSelectedSensorPosition();
     return ticksToMeters(leftTicks);
   }
 
@@ -213,7 +212,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return Distance in meters
    */
   public double getRightDistanceM() {
-    int rightTicks = backRightMotor.getSelectedSensorPosition();
+    double rightTicks = backRightMotor.getSelectedSensorPosition();
     return ticksToMeters(rightTicks);
   }
 
