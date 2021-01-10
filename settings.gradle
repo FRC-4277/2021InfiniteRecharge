@@ -25,3 +25,6 @@ pluginManagement {
         }
     }
 }
+
+include 'recharge-plugin'
+include 'recharge-vision'

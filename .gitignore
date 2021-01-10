@@ -271,3 +271,12 @@ gradle-app.setting
 **/build/
 
 # End of https://www.toptal.com/developers/gitignore/api/c++,java,linux,macos,gradle,windows,visualstudiocode,intellij
+
+## Added by Andrew
+*.classpath
+*.project
+recharge-plugin/.settings
+recharge-plugin/bin
+recharge-vision/.settings
+recharge-vision/bin
+## End of Andrew
