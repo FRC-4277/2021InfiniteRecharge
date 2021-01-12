@@ -47,7 +47,7 @@ public class AutoHopperMoveInCommand extends CommandBase {
       this.pulsing = true;
       this.lastBallInTime = System.currentTimeMillis();
     }
-    // false is ball found!
+    
     if (ballPresent && pulsing && (System.currentTimeMillis() - this.lastBallInTime <= 500)) {
       hopper.moveUp();
     } else {
