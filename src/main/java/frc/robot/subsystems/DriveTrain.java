@@ -442,10 +442,11 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return
    */
   public Trajectory generateTrajectory(Pose2d start, Pose2d end, List<Translation2d> interiorWaypoints, double maxVelocity,
-                                       double maxAccel) {
+                                       double maxAccel, boolean reversed) {
     var trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAccel)
             .setKinematics(KINEMATICS)
-            .addConstraint(VOLTAGE_CONSTRAINT);
+            .addConstraint(VOLTAGE_CONSTRAINT)
+            .setReversed(reversed);
 
     return TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, trajectoryConfig);
   }
@@ -459,15 +460,29 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
    * @return
    */
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel, boolean genMiddle) {
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel,
+                                       boolean genMiddle) {
+    return generateTrajectory(start, end, maxVelocity, maxAccel, genMiddle, false);
+  }
+
+  /**
+   * Generate trajectory from only a start, an end, and other constraints.
+   * @param start Starting pose
+   * @param end Ending pose
+   * @param maxVelocity maximum velocity in m/s
+   * @param maxAccel Maximum acceleration in m/s^2
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @return
+   */
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel,
+                                       boolean genMiddle, boolean reversed) {
     List<Translation2d> interiorWaypoints = new ArrayList<>();
     if (genMiddle) {
       var middle = new Translation2d(((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
               ((start.getTranslation().getY() + end.getTranslation().getY()) / 2));
       interiorWaypoints.add(middle);
     }
-    
-    return generateTrajectory(start, end, interiorWaypoints, maxVelocity, maxAccel);
+    return generateTrajectory(start, end, interiorWaypoints, maxVelocity, maxAccel, reversed);
   }
 
   /**
@@ -478,7 +493,20 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return Trajectory generated
    */
   public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean genMiddle) {
-    return generateTrajectory(start, end, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, genMiddle);
+    return generateTrajectory(start, end, genMiddle, false);
+  }
+
+  /**
+   * Generate trajectory from a start and an end using default constraints.
+   * @param start Starting pose
+   * @param end Ending pose
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @param reversed Whether to reverse trajectory
+   * @return Trajectory generated
+   */
+  public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean genMiddle,
+                                       boolean reversed) {
+    return generateTrajectory(start, end, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, genMiddle, reversed);
   }
 
   /**
@@ -490,8 +518,20 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return Trajectory generated under constraints
    */
   public Trajectory generateXTrajectory(Pose2d start, double xMeters, double maxVelocity, double maxAccel) {
+    return generateXTrajectory(start, xMeters, maxVelocity, maxAccel, false);
+  }
+
+  /**
+   * Generate trajectory that moves robot only in x direction, with specified constraints.
+   * @param start Starting pose
+   * @param xMeters Meters to move (positive is right on field [PathWeaver view])
+   * @param maxVelocity Maximum velocity
+   * @param maxAccel Maximum acceleration
+   * @return Trajectory generated under constraints
+   */
+  public Trajectory generateXTrajectory(Pose2d start, double xMeters, double maxVelocity, double maxAccel, boolean reversed) {
     Pose2d end = new Pose2d(start.getTranslation().getX() + xMeters, start.getTranslation().getY(), start.getRotation());
-    return generateTrajectory(start, end, maxVelocity, maxAccel, true);
+    return generateTrajectory(start, end, maxVelocity, maxAccel, true, reversed);
   }
 
   /**
@@ -501,7 +541,18 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @return Trajectory generated
    */
   public Trajectory generateXTrajectory(Pose2d start, double xMeters) {
-    return generateXTrajectory(start, xMeters, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED);
+    return generateXTrajectory(start, xMeters, false);
+  }
+
+  /**
+   * Generate trajectory that moves robot only in x direction, with default constraints.
+   * @param start Starting pose
+   * @param xMeters Meters to move (positive is right on field [PathWeaver view])
+   * @return Trajectory generated
+   */
+  public Trajectory generateXTrajectory(Pose2d start, double xMeters, boolean reversed) {
+    return generateXTrajectory(start, xMeters, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+            reversed);
   }
 
   @Override
