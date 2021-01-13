@@ -8,8 +8,8 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.*;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.TalonFX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -35,7 +35,6 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
-import frc.robot.util.TalonSRXChecker;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -47,19 +46,23 @@ import static frc.robot.Constants.DriveTrain.*;
 
 
 public class DriveTrain extends SubsystemBase implements VerifiableSystem {
-  private WPI_TalonSRX frontLeftMotor = new WPI_TalonSRX(FRONT_LEFT);
-  private WPI_TalonSRX frontRightMotor = new WPI_TalonSRX(FRONT_RIGHT);
-  private WPI_TalonSRX backLeftMotor = new WPI_TalonSRX(BACK_LEFT);
-  private WPI_TalonSRX backRightMotor = new WPI_TalonSRX(BACK_RIGHT);
+  private final WPI_TalonFX frontLeftMotor = new WPI_TalonFX(FRONT_LEFT);
+  private final WPI_TalonFX frontRightMotor = new WPI_TalonFX(FRONT_RIGHT);
+  private final WPI_TalonFX backLeftMotor = new WPI_TalonFX(BACK_LEFT);
+  private final WPI_TalonFX backRightMotor = new WPI_TalonFX(BACK_RIGHT);
+  //private WPI_TalonSRX frontLeftMotor = new WPI_TalonSRX(FRONT_LEFT);
+  //private WPI_TalonSRX frontRightMotor = new WPI_TalonSRX(FRONT_RIGHT);
+  //private WPI_TalonSRX backLeftMotor = new WPI_TalonSRX(BACK_LEFT);
+  //private WPI_TalonSRX backRightMotor = new WPI_TalonSRX(BACK_RIGHT);
   
-  private SpeedControllerGroup leftGroup = new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
-  private SpeedControllerGroup rightGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
+  private final SpeedControllerGroup leftGroup = new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
+  private final SpeedControllerGroup rightGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
   
-  private AHRS navX = new AHRS(); //todo: add ADXRS450 as backup (remember proper math on #getAngle when using it)
+  private final AHRS navX = new AHRS(); //todo: add ADXRS450 as backup (remember proper math on #getAngle when using it)
 
-  private DifferentialDrive drive = new DifferentialDrive(leftGroup, rightGroup);
-  private DifferentialDriveOdometry odometry;
-  private SimpleMotorFeedforward motorFeedforward
+  private final DifferentialDrive drive = new DifferentialDrive(leftGroup, rightGroup);
+  private final DifferentialDriveOdometry odometry;
+  private final SimpleMotorFeedforward motorFeedforward
           = new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER);
 
   private double yawOffset = 0;
@@ -78,22 +81,30 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     backLeftMotor.configFactoryDefault();
     backRightMotor.configFactoryDefault();
 
-    // Make fronts follow backs as backs have encoders
+    /*// Make fronts follow backs as backs have encoders
     frontLeftMotor.follow(backLeftMotor);
-    frontRightMotor.follow(backRightMotor);
+    frontRightMotor.follow(backRightMotor);*/
 
-    // Invert left side, so green is forward for it
+    /*// Invert left side, so green is forward for it
     frontRightMotor.setInverted(true);
-    backRightMotor.setInverted(true);
+    backRightMotor.setInverted(true);*/
+    frontLeftMotor.setInverted(TalonFXInvertType.Clockwise);
+    frontRightMotor.setInverted(TalonFXInvertType.CounterClockwise);
+    backLeftMotor.setInverted(TalonFXInvertType.Clockwise);
+    backRightMotor.setInverted(TalonFXInvertType.CounterClockwise);
 
-    // Don't let WPI invert, we already did through TalonSRX APIs
+    // Don't let WPI invert, we already did through TalonFX APIs. We want forward to be a green LED on the controllers.
     drive.setRightSideInverted(false);
 
     // DriveTrain Velocity PID
-    configureEncoderTalon(backLeftMotor);
-    configureEncoderTalon(backRightMotor);
-    backLeftMotor.setSensorPhase(LEFT_BACK_SENSOR_PHASE);
-    backRightMotor.setSensorPhase(RIGHT_BACK_SENSOR_PHASE);
+    configureTalon(frontLeftMotor);
+    configureTalon(frontRightMotor);
+    configureTalon(backLeftMotor);
+    configureTalon(backRightMotor);
+
+    // Sensor phases are no longer relevant with TalonFX
+    //backLeftMotor.setSensorPhase(LEFT_BACK_SENSOR_PHASE);
+    //backRightMotor.setSensorPhase(RIGHT_BACK_SENSOR_PHASE);
 
     /*SmartDashboard.putData(frontLeftMotor);
     SmartDashboard.putData(frontRightMotor);
@@ -113,7 +124,18 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return odometry;
   }
 
-  private void configureEncoderTalon(TalonSRX talonSRX) {
+  private void configureTalon(TalonFX talonFX) {
+    // Encoder
+    talonFX.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, VELOCITY_PID_IDX, DEFAULT_SETTING_TIMEOUT_MS);
+    // Velocity PID
+    talonFX.config_kP(VELOCITY_PID_IDX, VELOCITY_P);
+    talonFX.config_kI(VELOCITY_PID_IDX, VELOCITY_I);
+    talonFX.config_kD(VELOCITY_PID_IDX, VELOCITY_D);
+    // Brake Mode
+    talonFX.setNeutralMode(NeutralMode.Brake);
+  }
+
+  /*private void configureEncoderTalon(TalonSRX talonSRX) {
     talonSRX.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     talonSRX.configAllowableClosedloopError(0, DRIVE_VELOCITY_ERROR_TOLERANCE, 0);
     talonSRX.config_kP(0, DRIVE_P);
@@ -123,14 +145,16 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     talonSRX.configVelocityMeasurementPeriod(VELOCITY_MEAS_PERIOD);
     talonSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_2_FEEDBACK_MS);
     talonSRX.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, STATUS_3_QUADRATURE_MS);
-  }
+  }*/
 
   /**
    * Zero all encoders
    */
   public void resetEncoders() {
-    backLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    backRightMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    //backLeftMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    //backRightMotor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    frontLeftMotor.setSelectedSensorPosition(0);
+    frontRightMotor.setSelectedSensorPosition(0);
     backLeftMotor.setSelectedSensorPosition(0);
     backRightMotor.setSelectedSensorPosition(0);
   }
@@ -143,6 +167,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return odometry.getPoseMeters();
   }
 
+  // Rotations of the wheel
   public double ticksToRotations(double ticks) {
     return ticks / (double) ENCODER_TICKS_PER_ROTATION;
   }
@@ -347,7 +372,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
               private double prevLeftMPS, prevRightMPS;
               private double prevTime;
               private boolean firstRun = true;
-              private Timer timer = new Timer();
+              private final Timer timer = new Timer();
 
               @Override
               public void accept(Double leftMetersPerSecond, Double rightMetersPerSecond) {
@@ -370,27 +395,31 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
                 double leftAcceleration = dtIsPositive ? (leftMetersPerSecond - prevLeftMPS) / dt : 0;
                 double leftFeedforwardVolts = motorFeedforward.calculate(leftMetersPerSecond, leftAcceleration);
-                double leftFeedforward = leftFeedforwardVolts / MAX_BATTERY_V;
+                double leftFeedforward = leftFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
                 double leftTicksPerSecond = metersToTicks(leftMetersPerSecond);
                 double leftTicksPerDs = leftTicksPerSecond / 10;
                 if (!HAS_ENCODERS) {
                   backLeftMotor.set(leftFeedforward);
+                  frontLeftMotor.set(leftFeedforward);
                 } else {
-                  backLeftMotor.set(ControlMode.Velocity, leftTicksPerDs, DemandType.ArbitraryFeedForward, leftFeedforward);
+                  backLeftMotor.set(TalonFXControlMode.Velocity, leftTicksPerDs, DemandType.ArbitraryFeedForward, leftFeedforward);
+                  frontLeftMotor.set(TalonFXControlMode.Velocity, leftTicksPerDs, DemandType.ArbitraryFeedForward, leftFeedforward);
                 }
 
                 double rightAcceleration = dtIsPositive ? (rightMetersPerSecond - prevRightMPS) / dt : 0;
                 double rightFeedforwardVolts = motorFeedforward.calculate(rightMetersPerSecond, rightAcceleration);
-                double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V;
+                double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
                 double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
                 double rightTicksPerDs = rightTicksPerSecond / 10;
                 if (!HAS_ENCODERS) {
                   backRightMotor.set(rightFeedforward);
+                  frontRightMotor.set(rightFeedforward);
                 } else {
-                  backRightMotor.set(ControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
+                  backRightMotor.set(TalonFXControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
+                  frontRightMotor.set(TalonFXControlMode.Velocity, rightTicksPerDs, DemandType.ArbitraryFeedForward, rightFeedforward);
                 }
 
-                System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
+                //System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 
                 prevLeftMPS = leftMetersPerSecond;
                 prevRightMPS = rightMetersPerSecond;
@@ -479,11 +508,12 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   public List<Verification> getVerifications(VerificationSystem system) {
     return List.of(
       new Verification("Joystick Drive", () -> joystickUsed),
-      new Verification("Faults", () ->
+      // TODO : Update verification system to support TalonFX
+      /*new Verification("Faults", () ->
               TalonSRXChecker.check("Front Left", frontLeftMotor, system) &&
               TalonSRXChecker.check("Front Right", frontRightMotor, system) &&
               TalonSRXChecker.check("Back Left", backLeftMotor, system) &&
-              TalonSRXChecker.check("Back Right", backRightMotor, system)),
+              TalonSRXChecker.check("Back Right", backRightMotor, system)),*/
       new Verification("Encoders", () -> {
         if (getLeftPosition() <= 100) {
           system.error("L. drive encoder pos less than 100");

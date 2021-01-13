@@ -10,7 +10,7 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="2021InfiniteRecharge.main" />
     <orderEntry type="library" name="Gradle: pw.otake.pseudoresonance:pixy2-java-api:1.4" level="project" />
-    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:4.0.409" level="project" />
+    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:3.1.413" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.wpilibj:wpilibj-java:2021.1.2" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.wpimath:wpimath-java:2021.1.2" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.ntcore:ntcore-java:2021.1.2" level="project" />

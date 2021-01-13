@@ -31,6 +31,8 @@ public final class Constants {
         public static final int BACK_LEFT = 60;
         public static final int BACK_RIGHT = 44;
 
+        public static final int DEFAULT_SETTING_TIMEOUT_MS = 10;
+
         // todo : add from characterization data @
         public static final double KS_VOLTS = 0.22; // @
         public static final double KS_VOLT_SECONDS_PER_METER = 1.98; // @
@@ -52,11 +54,13 @@ public final class Constants {
         // Wheel
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(6);
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        public static final int ENCODER_TICKS_PER_ROTATION = 4096;
-        // Drive velocity PID (TALONSRX)
-        public static final double DRIVE_P = 0.1; // @
-        public static final double DRIVE_I = 0.1; // @
-        public static final double DRIVE_D = 0.1; // @
+        public static final int DRIVE_GEARING = 40; // if ratio from motor to wheel is X:1, enter X // todo : change
+        public static final int ENCODER_TICKS_PER_ROTATION = 2048 * DRIVE_GEARING; // 2048 for TalonFX, 4096 for TalonSRX
+        // Drive velocity PID (TalonFX)
+        public static final int VELOCITY_PID_IDX = 0;
+        public static final double VELOCITY_P = 0.1; // @
+        public static final double VELOCITY_I = 0.1; // @
+        public static final double VELOCITY_D = 0.1; // @
         public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = (int) (.1d * ENCODER_TICKS_PER_ROTATION); // .1 rotation tolerance
         // Drive velocity sampling settings
         public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32
