@@ -139,13 +139,13 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     drivetrainSim.setInputs(leftGroup.get() * RobotController.getBatteryVoltage(),
             rightGroup.get() * RobotController.getBatteryVoltage());
     drivetrainSim.update(0.020);
-    System.out.println("Navx Set to: " + -drivetrainSim.getHeading().getDegrees());
+    //System.out.println("Navx Set to: " + -drivetrainSim.getHeading().getDegrees());
 
     // From NavX example
     int dev = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(dev, "Yaw"));
     // NavX expects clockwise positive, but sim outputs clockwise negative
-    angle.set(-drivetrainSim.getHeading().getDegrees());
+    angle.set(Math.IEEEremainder(-drivetrainSim.getHeading().getDegrees(), 360));
     //navxSimAngle = -drivetrainSim.getHeading().getDegrees();
 
     // Encoders
@@ -313,10 +313,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    */
   public double getHeading() {
     double heading = -navX.getYaw() + yawOffset;
-    if (heading > 180) {
-      heading -=180;
-    } else if (heading < -180) {
-      heading += 180;
+    if (heading > 180 || heading < 180) {
+      heading = Math.IEEEremainder(heading, 360);
     }
     return heading;
   }
