@@ -144,7 +144,7 @@ public class RobotContainer {
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
 
-    // = Move Off Line
+    /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
       Pose2d currentPose = driveTrain.getPose();
       // Move 1.7 meters to the right [PathWeaver view]
@@ -161,7 +161,7 @@ public class RobotContainer {
 
     // = Aim, Shoot, Pickup Trench, Shoot
     autoChooser.addOption("Aim, Shoot, Pickup Trench, Shoot",
-            new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));
+            new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));*/
 
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 

@@ -11,8 +11,11 @@ import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
+import edu.wpi.first.wpilibj.system.LinearSystem;
+import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.numbers.N2;
 
 import java.util.function.Function;
 
@@ -31,31 +34,40 @@ public final class Constants {
         public static final int BACK_LEFT = 60;
         public static final int BACK_RIGHT = 44;
 
-        public static final int DEFAULT_SETTING_TIMEOUT_MS = 10;
+        public static final int DEFAULT_SETTING_TIMEOUT_MS = 50;
 
         // todo : add from characterization data @
         public static final double KS_VOLTS = 0.22; // @
         public static final double KS_VOLT_SECONDS_PER_METER = 1.98; // @
         public static final double KS_VOLT_SECONDS_SQUARED_PER_METER = 0.2; // @
+        public static final double KS_VOLT_SECONDS_PER_RADIAN = 1.5; // @
+        public static final double KS_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3;
         public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(19.5); //todo : check
         public static final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
-        public static final DifferentialDriveVoltageConstraint VOLTAGE_CONSTRAINT = 
-            new DifferentialDriveVoltageConstraint(
-                new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER),
-                 KINEMATICS, 10); //10V max to account for battery sag
+        public static final DifferentialDriveVoltageConstraint VOLTAGE_CONSTRAINT =
+                new DifferentialDriveVoltageConstraint(
+                        new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER),
+                        KINEMATICS, 10); //10V max to account for battery sag
+        public static final LinearSystem<N2, N2, N2> PLANT =
+                LinearSystemId.identifyDrivetrainSystem(
+                        KS_VOLT_SECONDS_PER_METER,
+                        KS_VOLT_SECONDS_SQUARED_PER_METER,
+                        KS_VOLT_SECONDS_PER_RADIAN,
+                        KS_VOLT_SECONDS_SQUARED_PER_RADIAN);
         public static final double MAX_SPEED_METERS_PER_SECOND = 3; //todo : change @
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; //todo : change @, not as important due to voltage constraint
         // RAMSETE constants
         public static final double kRamseteB = 2; // default, should be good
         public static final double kRamseteZeta = 0.7; // default, should be good
         // Encoders (on back)
-        public static final boolean LEFT_BACK_SENSOR_PHASE = true;
-        public static final boolean RIGHT_BACK_SENSOR_PHASE = true;
+        //public static final boolean LEFT_BACK_SENSOR_PHASE = true;
+        //public static final boolean RIGHT_BACK_SENSOR_PHASE = true;
         // Wheel
         public static final double WHEEL_DIAMETER_METERS = Units.inchesToMeters(6);
+        public static final double WHEEL_RADIUS_METERS = WHEEL_DIAMETER_METERS / 2.0d;
         public static final double WHEEL_CIRCUMFERENCE_METERS = WHEEL_DIAMETER_METERS * Math.PI;
-        public static final int DRIVE_GEARING = 40; // if ratio from motor to wheel is X:1, enter X // todo : change
-        public static final int ENCODER_TICKS_PER_ROTATION = 2048 * DRIVE_GEARING; // 2048 for TalonFX, 4096 for TalonSRX
+        public static final double DRIVE_GEARING = 10.71; // if ratio from motor to wheel is X:1, enter X, todo: ask Ed for real value
+        public static final int ENCODER_TICKS_PER_ROTATION = (int) Math.round(2048 * DRIVE_GEARING); // 2048 for TalonFX, 4096 for TalonSRX
         // Drive velocity PID (TalonFX)
         public static final int VELOCITY_PID_IDX = 0;
         public static final double VELOCITY_P = 0.1; // @
@@ -69,7 +81,7 @@ public final class Constants {
         public static final int STATUS_3_QUADRATURE_MS = 20; // 160ms default
 
         public static final int MAX_BATTERY_V = 12;
-        public static final boolean HAS_ENCODERS = false;
+        public static final boolean HAS_ENCODERS = true;
     }
 
     public static class Vision {

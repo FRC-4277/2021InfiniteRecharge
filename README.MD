@@ -5,8 +5,7 @@
 - Optional: [FRC Game Tools](https://docs.wpilib.org/en/stable/docs/zero-to-robot/step-2/frc-game-tools.html)
 - Optional: [IntelliJ IDE](https://www.jetbrains.com/idea/download/) 
 - [CTRE Phoenix Framework](https://github.com/CrossTheRoadElec/Phoenix-Releases/releases)
-- KauaiLabs NavX Library
-  - As of 1/10/21, NavX has not yet released their installer for 2021. Go to Manage Vendor Libraries in VS Code and use the url `https://www.kauailabs.com/dist/frc/2020/navx_frc.json`
+- [KauaiLabs NavX Library](https://pdocs.kauailabs.com/navx-mxp/software/roborio-libraries/java/)
     
 # Usage
 - Most common tasks can be done in the WPILib Command Palette in VS Code

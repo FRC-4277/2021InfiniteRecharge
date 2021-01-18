@@ -14,15 +14,15 @@
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: pw.otake.pseudoresonance:pixy2-java-api:1.4" level="project" />
-    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:3.1.413" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.wpilibj:wpilibj-java:2021.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: com.kauailabs.navx.frc:navx-java:4.0.412" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.wpilibj:wpilibj-java:2021.2.1" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.wpimath:wpimath-java:2021.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.ntcore:ntcore-java:2021.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.wpiutil:wpiutil-java:2021.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.ntcore:ntcore-java:2021.2.1" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.wpiutil:wpiutil-java:2021.2.1" level="project" />
     <orderEntry type="library" name="Gradle: edu.wpi.first.thirdparty.frc2021.opencv:opencv-java:3.4.7-5" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.cscore:cscore-java:2021.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.cameraserver:cameraserver-java:2021.1.2" level="project" />
-    <orderEntry type="library" name="Gradle: edu.wpi.first.hal:hal-java:2021.1.2" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.cscore:cscore-java:2021.2.1" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.cameraserver:cameraserver-java:2021.2.1" level="project" />
+    <orderEntry type="library" name="Gradle: edu.wpi.first.hal:hal-java:2021.2.1" level="project" />
     <orderEntry type="library" name="Gradle: org.ejml:ejml-simple:0.38" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-databind:2.10.0" level="project" />
     <orderEntry type="library" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.10.0" level="project" />
