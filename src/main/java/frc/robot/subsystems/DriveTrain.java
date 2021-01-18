@@ -26,12 +26,14 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -73,12 +75,15 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private final Field2d fieldSim = new Field2d();
   private double leftEncoderSimVelocity = 0, rightEncoderSimVelocity = 0;
   private double leftEncoderSimPosition = 0, rightEncoderSimPosition = 0;
+  private ShuffleboardTab simulationTab;
+  private SendableChooser<Translation2d> startingPositionChooser;
 
   /**
    * Creates a new DriveTrain.
    */
-  public DriveTrain(ShuffleboardTab testTab) {
+  public DriveTrain(ShuffleboardTab testTab, ShuffleboardTab simulationTab) {
     //this.testTab = testTab;
+    this.simulationTab = simulationTab;
 
     // Reset TalonSRX config
     frontLeftMotor.configFactoryDefault();
@@ -127,9 +132,15 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
               DRIVE_GEARING,
               TRACK_WIDTH_METERS,
               WHEEL_RADIUS_METERS,
-              VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005) // TODO : Change default standard deviations?
+              null //VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005) // TODO : Change default standard deviations?
       );
     }
+
+    startingPositionChooser = new SendableChooser<>();
+    // Provide in PathWeaver coordinates (FEET), code will adjust it to Field2D coordinates
+    startingPositionChooser.setDefaultOption("0,0", new Translation2d(0, 0));
+    startingPositionChooser.addOption("Barrel Start (3, -8)", new Translation2d(3, -8));
+    simulationTab.add(startingPositionChooser);
 
     SmartDashboard.putData("Field", fieldSim);
   }
@@ -330,9 +341,22 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   @Override
   public void periodic() {
     odometry.update(Rotation2d.fromDegrees(getHeading()), getLeftDistanceM(), getRightDistanceM());
-    fieldSim.setRobotPose(getPose());
+
+    fieldSim.setRobotPose(getFieldPose());
+
     SmartDashboard.putNumber("Left position", getLeftPosition());
     SmartDashboard.putNumber("Right position", getRightPosition());
+  }
+
+  public Pose2d getFieldPose() {
+    Pose2d robotPose = getPose();
+    Translation2d startingPosition = startingPositionChooser.getSelected();
+    // Convert PathWeaver feet to meters
+    double newX = Units.feetToMeters(startingPosition.getX()) + robotPose.getX();
+    // PathWeaver coordinates are different than Field2D in the y position
+    double newY = Units.feetToMeters((startingPosition.getY() * -1)) + robotPose.getY();
+    Rotation2d newRotation = robotPose.getRotation();
+    return new Pose2d(newX, newY, newRotation);
   }
   
   public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {

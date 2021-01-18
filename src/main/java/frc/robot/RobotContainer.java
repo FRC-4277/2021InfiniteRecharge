@@ -20,6 +20,8 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -61,9 +63,10 @@ public class RobotContainer {
   private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
   private final ShuffleboardTab verificationTab = Shuffleboard.getTab("Verification");
+  private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
 
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain driveTrain = new DriveTrain(testTab);
+  private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab);
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
@@ -144,6 +147,11 @@ public class RobotContainer {
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
 
+    autoChooser.addOption("Barrel Racing Path", new LazyRamseteCommand(driveTrain, () -> {
+      Trajectory trajectory = driveTrain.generateTrajectory("Barrel Racing");
+      return driveTrain.translateToOrigin(trajectory);
+    }));
+
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
       Pose2d currentPose = driveTrain.getPose();
@@ -168,13 +176,29 @@ public class RobotContainer {
     resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
             .withWidget(BuiltInWidgets.kToggleSwitch)
             .getEntry();
-    autonomousTab.addString("Odometry X", () -> {
+    autonomousTab.addString("Odometry X (m)", () -> {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
       return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getX());
     });
-    autonomousTab.addString("Odometry Y", () -> {
+    autonomousTab.addString("Odometry Y (m)", () -> {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
       return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getY());
+    });
+    autonomousTab.addString("Odometry X (ft)", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getX()));
+    });
+    autonomousTab.addString("Odometry Y (ft)", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getY()));
+    });
+    autonomousTab.addString("Field X (ft)", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(Units.metersToFeet(driveTrain.getFieldPose().getX()));
+    });
+    autonomousTab.addString("Field Y (ft)", () -> {
+      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
+      return odometry == null ? "null" : Double.toString(Units.metersToFeet(driveTrain.getFieldPose().getY()));
     });
     autonomousTab.addString("Odometry Degrees", () -> {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
