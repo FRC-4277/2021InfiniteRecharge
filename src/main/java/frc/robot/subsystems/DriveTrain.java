@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
 
@@ -59,7 +60,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private final SpeedControllerGroup leftGroup = new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
   private final SpeedControllerGroup rightGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
   
-  private final AHRS navX = new AHRS(); //todo: add ADXRS450 as backup (remember proper math on #getAngle when using it)
+  private final AHRS navX = new AHRS();
 
   private DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
@@ -135,17 +136,6 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
       backLeftSimSensors = backLeftSimMotor.getSimCollection();
       backRightSimSensors = backRightSimMotor.getSimCollection();
 
-      for (TalonSRX talonSRX :
-              new TalonSRX[]{frontLeftSimMotor, frontRightSimMotor,
-                      backLeftSimMotor, backRightSimMotor}) {
-        // talonSRX.configSelectedFeedbackSensor(TalonSRXFeedbackDevice.CTRE_MagEncoder_Relative,
-        //         VELOCITY_PID_IDX, DEFAULT_SETTING_TIMEOUT_MS);
-        //talonSRX.config_kP(VELOCITY_PID_IDX, 0.2);
-        //talonSRX.config_kI(VELOCITY_PID_IDX, 0);
-        //talonSRX.config_kD(VELOCITY_PID_IDX, 0);
-        // 12 ft/s = 16756 ticks/100ms
-        //talonSRX.config_kF(VELOCITY_PID_IDX, 1023/25000d);
-      }
       drive = new DifferentialDrive(new SpeedControllerGroup(frontLeftMotor, backLeftMotor),
               new SpeedControllerGroup(frontRightMotor, backRightMotor));
       drive.setRightSideInverted(false);
@@ -155,8 +145,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
               DRIVE_GEARING,
               TRACK_WIDTH_METERS,
               WHEEL_RADIUS_METERS,
-              null //VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005)
-              // TODO : Change default standard deviations?
+              VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005)
       );
     }
 
