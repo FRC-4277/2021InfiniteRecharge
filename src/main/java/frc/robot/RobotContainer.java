@@ -17,19 +17,20 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.BatterySim;
+import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
-import frc.robot.commands.autonomous.AimShootMoveBackAutoCommand;
-import frc.robot.commands.autonomous.AimShootPickupShootAutoCommand;
-import frc.robot.commands.autonomous.LazyRamseteCommand;
+import frc.robot.commands.autonomous.*;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
@@ -147,10 +148,8 @@ public class RobotContainer {
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
 
-    autoChooser.addOption("Barrel Racing Path", new LazyRamseteCommand(driveTrain, () -> {
-      Trajectory trajectory = driveTrain.generateTrajectory("Barrel Racing");
-      return driveTrain.translateToOrigin(trajectory);
-    }));
+    autoChooser.addOption("Barrel Racing Path", new BarrelAutoCommand(driveTrain));
+    autoChooser.addOption("Bounce Path", new BounceAutoCommand(driveTrain));
 
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
@@ -191,14 +190,6 @@ public class RobotContainer {
     autonomousTab.addString("Odometry Y (ft)", () -> {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
       return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getY()));
-    });
-    autonomousTab.addString("Field X (ft)", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(Units.metersToFeet(driveTrain.getFieldPose().getX()));
-    });
-    autonomousTab.addString("Field Y (ft)", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(Units.metersToFeet(driveTrain.getFieldPose().getY()));
     });
     autonomousTab.addString("Odometry Degrees", () -> {
       DifferentialDriveOdometry odometry = driveTrain.getOdometry();
@@ -300,7 +291,8 @@ public class RobotContainer {
   protected void autonomousInit() {
     inAutonomous = true;
     if (resetOdometryOnAuto.getBoolean(true)) {
-      System.out.println("Resetting encoders, heading, and odometry");     driveTrain.resetEncoders();
+      System.out.println("Resetting encoders, heading, and odometry");
+      driveTrain.resetEncoders();
       driveTrain.zeroHeading();
       driveTrain.resetOdometry();
       System.out.println("DriveTrain's encoders & heading are reset.");
@@ -320,5 +312,10 @@ public class RobotContainer {
     // An ExampleCommand will run in autonomous
     return (autoChooser == null ? null : autoChooser.getSelected());
     //return m_autoCommand;
+  }
+
+  public void simulationPeriodic() {
+    double current = driveTrain.getSimDrawnCurrentAmps(); // Add other power loads here...
+    RoboRioSim.setVInVoltage(Math.min(BatterySim.calculateDefaultBatteryLoadedVoltage(current), 12.0));
   }
 }

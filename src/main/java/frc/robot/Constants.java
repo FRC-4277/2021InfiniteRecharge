@@ -70,9 +70,9 @@ public final class Constants {
         public static final int ENCODER_TICKS_PER_ROTATION = (int) Math.round(2048 * DRIVE_GEARING); // 2048 for TalonFX, 4096 for TalonSRX
         // Drive velocity PID (TalonFX)
         public static final int VELOCITY_PID_IDX = 0;
-        public static final double VELOCITY_P = 0.1; // @
-        public static final double VELOCITY_I = 0.1; // @
-        public static final double VELOCITY_D = 0.1; // @
+        public static final double VELOCITY_P = 0; // @
+        public static final double VELOCITY_I = 0; // @
+        public static final double VELOCITY_D = 0; // @
         public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = (int) (.1d * ENCODER_TICKS_PER_ROTATION); // .1 rotation tolerance
         // Drive velocity sampling settings
         public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32

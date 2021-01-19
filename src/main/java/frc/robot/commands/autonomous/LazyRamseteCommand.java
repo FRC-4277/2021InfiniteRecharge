@@ -8,13 +8,21 @@ import frc.robot.subsystems.DriveTrain;
 import java.util.function.Supplier;
 
 public class LazyRamseteCommand extends CommandBase {
-    private DriveTrain driveTrain;
-    private Supplier<Trajectory> trajectorySupplier;
+    private final DriveTrain driveTrain;
+    private final Supplier<Trajectory> trajectorySupplier;
+    private final boolean stopAtEnd;
     private RamseteCommand ramseteCommand;
 
     public LazyRamseteCommand(DriveTrain driveTrain, Supplier<Trajectory> trajectorySupplier) {
         this.driveTrain = driveTrain;
         this.trajectorySupplier = trajectorySupplier;
+        this.stopAtEnd = true;
+    }
+
+    public LazyRamseteCommand(DriveTrain driveTrain, Supplier<Trajectory> trajectorySupplier, boolean stopAtEnd) {
+        this.driveTrain = driveTrain;
+        this.trajectorySupplier = trajectorySupplier;
+        this.stopAtEnd = stopAtEnd;
         addRequirements(driveTrain);
     }
 
@@ -35,6 +43,9 @@ public class LazyRamseteCommand extends CommandBase {
 
     @Override
     public void end(boolean interrupted) {
+        if (stopAtEnd) {
+            driveTrain.stopDrive();
+        }
         if (ramseteCommand != null) {
             ramseteCommand.end(interrupted);
         }
