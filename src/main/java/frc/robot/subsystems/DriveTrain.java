@@ -41,6 +41,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
+import frc.robot.util.limelight.LimelightSim;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -152,7 +153,9 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     resetEncoders();
     odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
 
+    // Field2D
     SmartDashboard.putData("Field", fieldSim);
+    fieldSim.getObject("Power Port").setPose(LimelightSim.POWER_PORT_LOCATION);
   }
 
   @Override
@@ -189,6 +192,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     backLeftSimSensors.setBusVoltage(RobotController.getBatteryVoltage());
     frontRightSimSensors.setBusVoltage(RobotController.getBatteryVoltage());
     backRightSimSensors.setBusVoltage(RobotController.getBatteryVoltage());
+
+    LimelightSim.updateTarget(getPose());
   }
 
   public double getSimDrawnCurrentAmps() {
