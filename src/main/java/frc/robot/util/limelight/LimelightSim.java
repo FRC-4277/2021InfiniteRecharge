@@ -25,8 +25,8 @@ public class LimelightSim {
         double x = Math.toDegrees(thetaRad);
         x -= robotPose.getRotation().getDegrees();
         x *= -1;
-        //x -= 180; // Flip
-        //x = Math.IEEEremainder(x, 360); // Bound to -180..180
+        x -= 180; // Flip
+        x = Math.IEEEremainder(x, 360); // Bound to -180..180
 
         double d = robotTranslation.getDistance(portTranslation);
         // implementing acot(x) as 0.5PI - atan(x)
