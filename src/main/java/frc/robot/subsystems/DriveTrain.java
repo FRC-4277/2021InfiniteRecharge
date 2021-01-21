@@ -544,7 +544,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
                   velocityDriveRight(rightTicksPerDs, rightFeedforward);
                 }
 
-                System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
+                //System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 
                 prevLeftMPS = leftMetersPerSecond;
                 prevRightMPS = rightMetersPerSecond;
