@@ -214,8 +214,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     // Brake Mode
     talonFX.setNeutralMode(NeutralMode.Brake);
     // CAN Status Frames
-    talonFX.configVelocityMeasurementWindow(ROLLING_VELOCITY_SAMPLES);
-    talonFX.configVelocityMeasurementPeriod(VELOCITY_MEAS_PERIOD);
+    //talonFX.configVelocityMeasurementWindow(ROLLING_VELOCITY_SAMPLES);
+    //talonFX.configVelocityMeasurementPeriod(VELOCITY_MEAS_PERIOD);
     talonFX.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_2_FEEDBACK_MS);
     talonFX.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, STATUS_3_QUADRATURE_MS);
   }

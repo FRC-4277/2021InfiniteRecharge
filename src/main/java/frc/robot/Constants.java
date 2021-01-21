@@ -75,8 +75,8 @@ public final class Constants {
         public static final double VELOCITY_D = 0; // @
         public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = (int) (.1d * ENCODER_TICKS_PER_ROTATION); // .1 rotation tolerance
         // Drive velocity sampling settings
-        public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32
-        public static final VelocityMeasPeriod VELOCITY_MEAS_PERIOD = VelocityMeasPeriod.Period_5Ms;
+        //public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32
+        //public static final VelocityMeasPeriod VELOCITY_MEAS_PERIOD = VelocityMeasPeriod.Period_5Ms;
         public static final int STATUS_2_FEEDBACK_MS = 20; // 20ms default
         public static final int STATUS_3_QUADRATURE_MS = 40; // 160ms default
 
