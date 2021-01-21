@@ -77,8 +77,8 @@ public final class Constants {
         // Drive velocity sampling settings
         public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32
         public static final VelocityMeasPeriod VELOCITY_MEAS_PERIOD = VelocityMeasPeriod.Period_5Ms;
-        public static final int STATUS_2_FEEDBACK_MS = 10; // 20ms default
-        public static final int STATUS_3_QUADRATURE_MS = 20; // 160ms default
+        public static final int STATUS_2_FEEDBACK_MS = 20; // 20ms default
+        public static final int STATUS_3_QUADRATURE_MS = 40; // 160ms default
 
         public static final int MAX_BATTERY_V = 12;
         public static final boolean HAS_ENCODERS = true;
