@@ -42,7 +42,7 @@ public final class Constants {
         public static final double KS_VOLT_SECONDS_SQUARED_PER_METER = 0.2; // @
         public static final double KS_VOLT_SECONDS_PER_RADIAN = 1.5; // @
         public static final double KS_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3;
-        public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(19.5); //todo : check
+        public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(22); //todo : check IRL
         public static final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
         public static final DifferentialDriveVoltageConstraint VOLTAGE_CONSTRAINT =
                 new DifferentialDriveVoltageConstraint(
