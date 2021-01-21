@@ -146,7 +146,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
               DRIVE_GEARING,
               TRACK_WIDTH_METERS,
               WHEEL_RADIUS_METERS,
-              VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005)
+              null //VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005)
       );
     }
 
@@ -155,7 +155,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
     // Field2D
     SmartDashboard.putData("Field", fieldSim);
-    fieldSim.getObject("Power Port").setPose(LimelightSim.POWER_PORT_LOCATION);
+    fieldSim.getObject("Power Port").setPose(LimelightSim.POWER_PORT_LOCATION_GLASS);
   }
 
   @Override

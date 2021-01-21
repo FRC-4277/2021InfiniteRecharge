@@ -1,0 +1,10 @@
+{
+    "game": "Field With Border",
+    "field-image": "field-with-border.png",
+    "field-corners": {
+      "top-left": [20, 20],
+      "bottom-right": [1374, 698]
+    },
+    "field-size": [9.144, 4.572],
+    "field-unit": "meter"
+  }

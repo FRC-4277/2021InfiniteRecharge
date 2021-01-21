@@ -4,6 +4,7 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.util.Units;
 
@@ -14,6 +15,9 @@ public class LimelightSim {
     private static final NetworkTable NETWORK_TABLE = NetworkTableInstance.getDefault().getTable(TABLE_NAME);
     public static final Pose2d POWER_PORT_LOCATION =
             new Pose2d(Units.feetToMeters(2.5), Units.feetToMeters(7.5), new Rotation2d(0));
+    // Offset because Glass simulator wants coordinates of middle of object
+    public static final Pose2d POWER_PORT_LOCATION_GLASS = POWER_PORT_LOCATION
+            .plus(new Transform2d(new Translation2d(-0.754126/2d, 0), new Rotation2d(0)));
 
     public static void updateTarget(Pose2d robotPose) {
         Translation2d robotTranslation = robotPose.getTranslation();
