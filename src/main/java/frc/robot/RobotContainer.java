@@ -148,9 +148,9 @@ public class RobotContainer {
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
 
-    autoChooser.addOption("Barrel Racing Path", new BarrelAutoCommand(driveTrain));
-    autoChooser.addOption("Bounce Path", new BounceAutoCommand(driveTrain));
-    autoChooser.addOption("Slalom Path", new SlalomAutoCommand(driveTrain));
+    autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
+    autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
+    autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
 
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
