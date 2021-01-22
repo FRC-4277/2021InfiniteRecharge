@@ -148,6 +148,8 @@ public class RobotContainer {
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
 
+    autoChooser.addOption("Drive Straight (2m)", new DriveStraightXCommand(driveTrain, 2.0));
+
     autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));

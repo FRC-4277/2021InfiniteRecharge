@@ -688,6 +688,19 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   }
 
   /**
+   * Generate trajectory that moves in x direction from current pose, with default constraints.
+   * @param xMeters Meters to move (+ = right on field)
+   * @return Trajectory generated
+   */
+  public Trajectory generateXTrajectory(double xMeters) {
+    return generateXTrajectory(getPose(), xMeters, false);
+  }
+
+  public Trajectory generateXTrajectory(double xMeters, boolean reversed) {
+    return generateXTrajectory(getPose(), xMeters, reversed);
+  }
+
+  /**
    * Generate trajectory that moves robot only in x direction, with default constraints.
    * @param start Starting pose
    * @param xMeters Meters to move (positive is right on field [PathWeaver view])
