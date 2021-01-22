@@ -16,7 +16,7 @@
     # Inversions for the left-side motors
     "leftMotorsInverted": [False, False],
     # Inversions for the right side motors
-    "rightMotorsInverted": [True, True],
+    "rightMotorsInverted": [False, False],
     # Wheel diameter (in units of your choice - will dictate units of analysis)
     "wheelDiameter": 0.152,
     # If your robot has only one encoder, set all right encoder fields to `None`
