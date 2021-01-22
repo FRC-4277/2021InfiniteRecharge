@@ -27,12 +27,12 @@ import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
 
-import com.revrobotics.CANSparkMax;
+/*import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.EncoderType;
-import com.revrobotics.AlternateEncoderType;
+import com.revrobotics.AlternateEncoderType; ANDREW EDIT*/
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -177,8 +177,8 @@ public class Robot extends TimedRobot {
     WPI_TalonFX leftFollowerID60 = setupWPI_TalonFX(60, Sides.FOLLOWER, false);
     leftFollowerID60.follow(leftMotor);
 
-    WPI_TalonFX rightMotor = setupWPI_TalonFX(58, Sides.RIGHT, true);
-    WPI_TalonFX rightFollowerID44 = setupWPI_TalonFX(44, Sides.FOLLOWER, true);    
+    WPI_TalonFX rightMotor = setupWPI_TalonFX(58, Sides.RIGHT, false);
+    WPI_TalonFX rightFollowerID44 = setupWPI_TalonFX(44, Sides.FOLLOWER, false);
     rightFollowerID44.follow(rightMotor);
     drive = new DifferentialDrive(leftMotor, rightMotor);
     drive.setDeadband(0);
