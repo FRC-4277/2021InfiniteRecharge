@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryUtil;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -47,12 +49,14 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static frc.robot.Constants.DriveTrain.*;
 
 
 public class DriveTrain extends SubsystemBase implements VerifiableSystem {
+  private ShuffleboardTab autonomousTab;
   private final WPI_TalonFX frontLeftMotor = new WPI_TalonFX(FRONT_LEFT);
   private final WPI_TalonFX frontRightMotor = new WPI_TalonFX(FRONT_RIGHT);
   private final WPI_TalonFX backLeftMotor = new WPI_TalonFX(BACK_LEFT);
@@ -83,9 +87,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   /**
    * Creates a new DriveTrain.
    */
-  public DriveTrain(ShuffleboardTab testTab, ShuffleboardTab simulationTab) {
+  public DriveTrain(ShuffleboardTab testTab, ShuffleboardTab simulationTab, ShuffleboardTab autonomousTab) {
     //this.testTab = testTab;
     this.simulationTab = simulationTab;
+    this.autonomousTab = autonomousTab;
 
     // Reset TalonSRX config
     frontLeftMotor.configFactoryDefault();
@@ -156,6 +161,29 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     // Field2D
     SmartDashboard.putData("Field", fieldSim);
     fieldSim.getObject("Power Port").setPose(LimelightSim.POWER_PORT_LOCATION_GLASS);
+
+    // Autonomous Shuffleboard Tab
+    autonomousTab.addString("Odometry X (m)", () -> {
+      DifferentialDriveOdometry odometry = getOdometry();
+      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getX());
+    }).withPosition(2, 0);
+    autonomousTab.addString("Odometry Y (m)", () -> {
+      DifferentialDriveOdometry odometry = getOdometry();
+      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getY());
+    }).withPosition(3, 0);
+    autonomousTab.addString("Odometry X (ft)", () -> {
+      DifferentialDriveOdometry odometry = getOdometry();
+      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getX()));
+    }).withPosition(2, 1);
+    autonomousTab.addString("Odometry Y (ft)", () -> {
+      DifferentialDriveOdometry odometry = getOdometry();
+      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getY()));
+    }).withPosition(3, 1);
+    autonomousTab.addString("Odometry Deg", () -> {
+      DifferentialDriveOdometry odometry = getOdometry();
+      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
+    })
+    .withPosition(4, 0);
   }
 
   @Override

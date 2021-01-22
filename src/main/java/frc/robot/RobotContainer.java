@@ -67,7 +67,7 @@ public class RobotContainer {
   private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
 
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab);
+  private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab, autonomousTab);
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
@@ -180,32 +180,6 @@ public class RobotContainer {
             .withPosition(0, 1)
             .withSize(2, 1)
             .getEntry();
-    autonomousTab.addString("Odometry X (m)", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getX());
-    }).withPosition(2, 0);
-    autonomousTab.addString("Odometry Y (m)", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getY());
-    }).withPosition(3, 0);
-    autonomousTab.addString("Odometry X (ft)", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getX()));
-    }).withPosition(2, 1);
-    autonomousTab.addString("Odometry Y (ft)", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getY()));
-    }).withPosition(3, 1);
-    autonomousTab.addString("Odometry Deg", () -> {
-      DifferentialDriveOdometry odometry = driveTrain.getOdometry();
-      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
-    })
-    /*.withWidget(BuiltInWidgets.kNumberBar)
-    .withProperties(Map.of(
-            "Min", -180,
-            "Max", 180
-    ))*/
-    .withPosition(4, 0);
   }
 
   private void setupDriverTab() {
