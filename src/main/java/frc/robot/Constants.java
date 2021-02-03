@@ -29,10 +29,10 @@ import java.util.function.Function;
  */
 public final class Constants {
     public static class DriveTrain {
-        public static final int FRONT_LEFT = 12;
-        public static final int FRONT_RIGHT = 58;
-        public static final int BACK_LEFT = 60;
-        public static final int BACK_RIGHT = 44;
+        public static final int FRONT_LEFT = 4;
+        public static final int FRONT_RIGHT = 3;
+        public static final int BACK_LEFT = 2;
+        public static final int BACK_RIGHT = 1;
 
         public static final int DEFAULT_SETTING_TIMEOUT_MS = 50;
 
