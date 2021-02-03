@@ -42,6 +42,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
   private double calculatedDistanceMeters = 0.0;
   private Pixy2 pixy2;
   private boolean usingPixy = false;
+  private List<Block> blocksList;
   private Block largestBlock = null;
 
   /**
@@ -113,9 +114,20 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     if (usingPixy) {
       int blockCount = pixy2.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG_ALL, 25);
       SmartDashboard.putNumber("Block Count", blockCount);
-      ArrayList<Block> blocks = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
+      blocksList = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
+
+      // Show blocks in SmartDashboard
+      for (int i = 0; i < 5; i++) {
+        SmartDashboard.putString("Block" + i, "");
+      }
+      for (int i = 0; i < blocksList.size(); i++) {
+        Block block = blocksList.get(i);
+        SmartDashboard.putString("Block" + i, block.toString());
+      }
+
+      // Find largest block
       largestBlock = null;
-      for (Block block : blocks) { // Loops through all blocks and finds the widest one
+      for (Block block : blocksList) { // Loops through all blocks and finds the widest one
         if (largestBlock == null) {
           largestBlock = block;
         } else if (block.getWidth() > largestBlock.getWidth()) {
@@ -124,6 +136,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
       }
       if (largestBlock != null) {
         SmartDashboard.putString("X Value", Integer.toString(largestBlock.getX()));
+        SmartDashboard.putString("BlockLargest", largestBlock.toString());
       } else {
         SmartDashboard.putString("X Value", "null");
       }
@@ -132,6 +145,10 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
 
   public void setUsingPixy(boolean usingPixy) {
     this.usingPixy = usingPixy;
+  }
+
+  public List<Block> getBlocksList() {
+    return blocksList;
   }
 
   public Optional<Block> getLargestBlock() {
