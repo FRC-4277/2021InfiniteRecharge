@@ -1,9 +1,9 @@
 {
     # Ports for motors
     # If doing drive test, treat this as the left side of the drivetrain
-    "motorPorts": [12, 60],
+    "motorPorts": [4, 2],
     # Only if you are doing drive (leave empty "[]" if not)
-    "rightMotorPorts": [58, 44],
+    "rightMotorPorts": [3, 1],
     # Class names of motor controllers used.
     # 'WPI_TalonSRX'
     # 'WPI_VictorSPX'

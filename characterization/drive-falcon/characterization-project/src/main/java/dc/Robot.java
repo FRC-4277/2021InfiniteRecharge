@@ -172,13 +172,13 @@ public class Robot extends TimedRobot {
     stick = new Joystick(0);
     
     // create left motor
-    WPI_TalonFX leftMotor = setupWPI_TalonFX(12, Sides.LEFT, false);
+    WPI_TalonFX leftMotor = setupWPI_TalonFX(4, Sides.LEFT, false);
 
-    WPI_TalonFX leftFollowerID60 = setupWPI_TalonFX(60, Sides.FOLLOWER, false);
+    WPI_TalonFX leftFollowerID60 = setupWPI_TalonFX(2, Sides.FOLLOWER, false);
     leftFollowerID60.follow(leftMotor);
 
-    WPI_TalonFX rightMotor = setupWPI_TalonFX(58, Sides.RIGHT, false);
-    WPI_TalonFX rightFollowerID44 = setupWPI_TalonFX(44, Sides.FOLLOWER, false);
+    WPI_TalonFX rightMotor = setupWPI_TalonFX(3, Sides.RIGHT, false);
+    WPI_TalonFX rightFollowerID44 = setupWPI_TalonFX(1, Sides.FOLLOWER, false);
     rightFollowerID44.follow(rightMotor);
     drive = new DifferentialDrive(leftMotor, rightMotor);
     drive.setDeadband(0);
