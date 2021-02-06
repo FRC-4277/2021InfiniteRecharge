@@ -70,7 +70,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
   private final SimpleMotorFeedforward motorFeedforward
-          = new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER);
+          = new SimpleMotorFeedforward(kS, kV, kA);
 
   private double yawOffset = 0;
   //private ShuffleboardTab testTab;
@@ -273,19 +273,19 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   }
 
   // Rotations of the wheel
-  public double ticksToRotations(double ticks) {
+  public static double ticksToRotations(double ticks) {
     return ticks / (double) ENCODER_TICKS_PER_ROTATION;
   }
 
-  public double rotationsToTicks(double rotations) {
+  public static double rotationsToTicks(double rotations) {
     return rotations * ENCODER_TICKS_PER_ROTATION;
   }
 
-  public double ticksToMeters(double ticks) {
+  public static double ticksToMeters(double ticks) {
     return ticksToRotations(ticks) * WHEEL_CIRCUMFERENCE_METERS;
   }
 
-  public double metersToTicks(double meters) {
+  public static double metersToTicks(double meters) {
     double rotations = meters / WHEEL_CIRCUMFERENCE_METERS;
     return rotationsToTicks(rotations);
   }

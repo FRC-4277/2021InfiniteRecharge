@@ -36,22 +36,21 @@ public final class Constants {
 
         public static final int DEFAULT_SETTING_TIMEOUT_MS = 50;
 
-        // todo : add from characterization data @
-        public static final double KS_VOLTS = 0.22; // @
-        public static final double KS_VOLT_SECONDS_PER_METER = 1.98; // @
-        public static final double KS_VOLT_SECONDS_SQUARED_PER_METER = 0.2; // @
-        public static final double KS_VOLT_SECONDS_PER_RADIAN = 1.5; // @
-        public static final double KS_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3;
-        public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(22); //todo : check IRL
+        public static final double kS = 0.631; // kS
+        public static final double kV = .289; // kV
+        public static final double kA = 0.0145; // kA
+        public static final double KS_VOLT_SECONDS_PER_RADIAN = 1.5; // TODO?
+        public static final double KS_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3; // TODO?
+        public static final double TRACK_WIDTH_METERS = Units.inchesToMeters(22); //todo : check IRL, characterization (4.810525759308524)
         public static final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
         public static final DifferentialDriveVoltageConstraint VOLTAGE_CONSTRAINT =
                 new DifferentialDriveVoltageConstraint(
-                        new SimpleMotorFeedforward(KS_VOLTS, KS_VOLT_SECONDS_PER_METER, KS_VOLT_SECONDS_SQUARED_PER_METER),
+                        new SimpleMotorFeedforward(kS, kV, kA),
                         KINEMATICS, 10); //10V max to account for battery sag
         public static final LinearSystem<N2, N2, N2> PLANT =
                 LinearSystemId.identifyDrivetrainSystem(
-                        KS_VOLT_SECONDS_PER_METER,
-                        KS_VOLT_SECONDS_SQUARED_PER_METER,
+                        kV,
+                        kA,
                         KS_VOLT_SECONDS_PER_RADIAN,
                         KS_VOLT_SECONDS_SQUARED_PER_RADIAN);
         public static final double MAX_SPEED_METERS_PER_SECOND = 3; //todo : change @
@@ -70,9 +69,9 @@ public final class Constants {
         public static final int ENCODER_TICKS_PER_ROTATION = (int) Math.round(2048 * DRIVE_GEARING); // 2048 for TalonFX, 4096 for TalonSRX
         // Drive velocity PID (TalonFX)
         public static final int VELOCITY_PID_IDX = 0;
-        public static final double VELOCITY_P = 0; // @
-        public static final double VELOCITY_I = 0; // @
-        public static final double VELOCITY_D = 0; // @
+        public static final double VELOCITY_P = 0.0175; //
+        public static final double VELOCITY_I = 0; //
+        public static final double VELOCITY_D = 0; //
         public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = (int) (.1d * ENCODER_TICKS_PER_ROTATION); // .1 rotation tolerance
         // Drive velocity sampling settings
         //public static final int ROLLING_VELOCITY_SAMPLES = 4; // 1,2,4,8,16,32
