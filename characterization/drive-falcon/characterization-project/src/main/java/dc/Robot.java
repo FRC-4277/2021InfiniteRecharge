@@ -9,6 +9,7 @@ package dc;
 
 import java.util.function.Supplier;
 
+import com.ctre.phoenix.motorcontrol.TalonFXInvertType;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
@@ -97,13 +98,13 @@ public class Robot extends TimedRobot {
   }
 
   // methods to create and setup motors (reduce redundancy)
-  public WPI_TalonFX setupWPI_TalonFX(int port, Sides side, boolean inverted) {
+  public WPI_TalonFX setupWPI_TalonFX(int port, Sides side, TalonFXInvertType invertType) {
     // create new motor and set neutral modes (if needed)
     WPI_TalonFX motor = new WPI_TalonFX(port);
     // setup talon
     motor.configFactoryDefault();
     motor.setNeutralMode(NeutralMode.Brake);
-    motor.setInverted(inverted);
+    motor.setInverted(invertType);
 
     // ----> ANDREW EDIT
 
@@ -172,15 +173,16 @@ public class Robot extends TimedRobot {
     stick = new Joystick(0);
     
     // create left motor
-    WPI_TalonFX leftMotor = setupWPI_TalonFX(4, Sides.LEFT, false);
+    WPI_TalonFX leftMotor = setupWPI_TalonFX(4, Sides.LEFT, TalonFXInvertType.Clockwise);
 
-    WPI_TalonFX leftFollowerID60 = setupWPI_TalonFX(2, Sides.FOLLOWER, false);
+    WPI_TalonFX leftFollowerID60 = setupWPI_TalonFX(2, Sides.FOLLOWER, TalonFXInvertType.Clockwise);
     leftFollowerID60.follow(leftMotor);
 
-    WPI_TalonFX rightMotor = setupWPI_TalonFX(3, Sides.RIGHT, false);
-    WPI_TalonFX rightFollowerID44 = setupWPI_TalonFX(1, Sides.FOLLOWER, false);
+    WPI_TalonFX rightMotor = setupWPI_TalonFX(3, Sides.RIGHT, TalonFXInvertType.CounterClockwise);
+    WPI_TalonFX rightFollowerID44 = setupWPI_TalonFX(1, Sides.FOLLOWER, TalonFXInvertType.CounterClockwise);
     rightFollowerID44.follow(rightMotor);
     drive = new DifferentialDrive(leftMotor, rightMotor);
+    drive.setRightSideInverted(false); // ANDREW EDIT
     drive.setDeadband(0);
 
     //
