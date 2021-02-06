@@ -180,6 +180,7 @@ public class RobotContainer {
             .withPosition(0, 1)
             .withSize(2, 1)
             .getEntry();
+    autonomousTab.add(intakeCommand);
   }
 
   private void setupDriverTab() {
