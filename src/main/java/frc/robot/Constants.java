@@ -36,7 +36,7 @@ public final class Constants {
 
         public static final int DEFAULT_SETTING_TIMEOUT_MS = 50;
 
-        public static final double kS = 0.631; // kS
+        public static final double kS = 0.63; // kS
         public static final double kV = .289; // kV
         public static final double kA = 0.0145; // kA
         public static final double KS_VOLT_SECONDS_PER_RADIAN = 1.5; // TODO?
@@ -69,7 +69,7 @@ public final class Constants {
         public static final int ENCODER_TICKS_PER_ROTATION = (int) Math.round(2048 * DRIVE_GEARING); // 2048 for TalonFX, 4096 for TalonSRX
         // Drive velocity PID (TalonFX)
         public static final int VELOCITY_PID_IDX = 0;
-        public static final double VELOCITY_P = 0.0175; //
+        public static final double VELOCITY_P = 0.0000000000000351; // 3.51e-14
         public static final double VELOCITY_I = 0; //
         public static final double VELOCITY_D = 0; //
         public static final int DRIVE_VELOCITY_ERROR_TOLERANCE = (int) (.1d * ENCODER_TICKS_PER_ROTATION); // .1 rotation tolerance
