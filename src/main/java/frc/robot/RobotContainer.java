@@ -69,7 +69,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab, autonomousTab);
   private final Intake intake = new Intake();
-  private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab);
+  private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
   private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   //private final Gate gate = new Gate();

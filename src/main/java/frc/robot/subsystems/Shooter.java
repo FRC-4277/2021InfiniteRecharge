@@ -75,7 +75,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
     // ShuffleBoard
     shooterSpeedEntry = settingsTab
-    .add("Shooter Speed", 0.75)
+    .add("Shooter Speed (do not use)", 0.75)
     .withWidget(BuiltInWidgets.kNumberSlider)
     .withProperties(Map.of("min", 0, "max", 1))
     .getEntry();

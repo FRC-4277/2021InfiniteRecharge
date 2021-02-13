@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -21,9 +22,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 import java.util.List;
+import java.util.Map;
 
 public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
-  public static final double UP_SPEED = 1.0;
+  private static final int DEFAULT_INDEX_RUN_TIME = 10;
+  private static final int DEFAULT_INDEX_BETWEEN_TIME = 400;
+  private final NetworkTableEntry UP_SPEED_ENTRY;
+  private final NetworkTableEntry INDEX_RUN_TIME_MS_ENTRY;
+  private final NetworkTableEntry INDEX_TIME_BETWEEN_BALL_ENTRY;
   public static final double DOWN_SPEED = -0.5;
   private VictorSPX leftMotor = new VictorSPX(LEFT_MOTOR_ID);
   private VictorSPX rightMotor = new VictorSPX(RIGHT_MOTOR_ID);
@@ -41,7 +47,7 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   /**
    * Creates a new VerticalHopper.
    */
-  public VerticalHopper(DigitalInput intakeSensor, ShuffleboardTab driverTab) {
+  public VerticalHopper(DigitalInput intakeSensor, ShuffleboardTab driverTab, ShuffleboardTab settingsTab) {
     this.intakeSensor = intakeSensor;
     this.driverTab = driverTab;
     leftMotor.configFactoryDefault();
@@ -49,7 +55,22 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     rightMotor.configFactoryDefault();
     rightMotor.follow(leftMotor);
     rightMotor.setInverted(InvertType.OpposeMaster);
-  
+
+    UP_SPEED_ENTRY = settingsTab
+            .add("Hopper Up Speed", 1.0)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 1))
+            .getEntry();
+    INDEX_RUN_TIME_MS_ENTRY = settingsTab
+            .add("Index Run Time (ms)", DEFAULT_INDEX_RUN_TIME)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+    INDEX_TIME_BETWEEN_BALL_ENTRY = settingsTab
+            .add("Index Time Between Balls (ms)", DEFAULT_INDEX_BETWEEN_TIME)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+
+
     driverTab.addBoolean("Ramp Full", topBallSensor::get).withWidget(BuiltInWidgets.kBooleanBox)
     .withPosition(9, 0).withSize(1, 1);
   }
@@ -60,8 +81,16 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     //System.out.println(intakeSensor.get());
   }
 
+  public int getIndexRunTimeMs() {
+    return (int) Math.round(INDEX_RUN_TIME_MS_ENTRY.getDouble(DEFAULT_INDEX_RUN_TIME));
+  }
+
+  public int getIndexBetweenBallMs() {
+    return (int) Math.round(INDEX_TIME_BETWEEN_BALL_ENTRY.getDouble(DEFAULT_INDEX_BETWEEN_TIME));
+  }
+
   public void moveUp() {
-    leftMotor.set(ControlMode.PercentOutput, UP_SPEED);
+    leftMotor.set(ControlMode.PercentOutput, UP_SPEED_ENTRY.getDouble(1.0));
   }
 
   public void moveDown() {

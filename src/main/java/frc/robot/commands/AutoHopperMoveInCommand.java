@@ -48,7 +48,7 @@ public class AutoHopperMoveInCommand extends CommandBase {
       this.lastBallInTime = System.currentTimeMillis();
     }
     
-    if (ballPresent && pulsing && (System.currentTimeMillis() - this.lastBallInTime <= 10)) {
+    if (ballPresent && pulsing && (System.currentTimeMillis() - this.lastBallInTime <= hopper.getIndexRunTimeMs())) {
       hopper.moveUp();
     } else {
       hopper.stopMoving();
@@ -61,7 +61,8 @@ public class AutoHopperMoveInCommand extends CommandBase {
       startOfWaitTime = System.currentTimeMillis();
     }
 
-    if (waitingBetween && (startOfWaitTime != null && (System.currentTimeMillis() - startOfWaitTime >= 400))) {
+    if (waitingBetween && (startOfWaitTime != null &&
+            (System.currentTimeMillis() - startOfWaitTime >= hopper.getIndexBetweenBallMs()))) {
       this.pulsing = false;
       this.lastBallInTime = null;
       this.waitingBetween = false;
