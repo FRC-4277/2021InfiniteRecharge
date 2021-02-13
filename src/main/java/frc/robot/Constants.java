@@ -53,8 +53,8 @@ public final class Constants {
                         kA,
                         KS_VOLT_SECONDS_PER_RADIAN,
                         KS_VOLT_SECONDS_SQUARED_PER_RADIAN);
-        public static final double MAX_SPEED_METERS_PER_SECOND = 3; //todo : change @
-        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 3; //todo : change @, not as important due to voltage constraint
+        public static final double MAX_SPEED_METERS_PER_SECOND = 0.5; //todo : change @
+        public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 0.5; //todo : change @, not as important due to voltage constraint
         // RAMSETE constants
         public static final double kRamseteB = 2; // default, should be good
         public static final double kRamseteZeta = 0.7; // default, should be good
