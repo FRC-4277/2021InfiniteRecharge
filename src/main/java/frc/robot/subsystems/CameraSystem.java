@@ -35,7 +35,7 @@ public class CameraSystem extends SubsystemBase implements VerifiableSystem {
   public CameraSystem(ShuffleboardTab driverTab) {
     this.driverTab = driverTab;
 
-    nameEntry = driverTab.add("Camera", "limelight")
+    nameEntry = driverTab.add("[Camera]", "limelight")
     .withWidget(BuiltInWidgets.kTextView)
     .withPosition(6, 0)
     .withSize(1, 1)
