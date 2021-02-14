@@ -19,7 +19,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   private Shooter shooter;
   private VisionSystem visionSystem;
   private RPMSource rpmSource;
-  private Integer rpm = -1;
+  private double rpm;
   private int loopsReachedRPM = 0;
   private boolean runForever, finished;
 
@@ -31,7 +31,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     this.runForever = runForever;
   }
 
-  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, Integer rpm) {
+  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, double rpm) {
     this.shooter = shooter;
     this.visionSystem = visionSystem;
     this.rpmSource = RPMSource.CONSTANT;
