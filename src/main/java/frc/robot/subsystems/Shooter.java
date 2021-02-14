@@ -106,7 +106,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rightMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble()); 
   }
 
-  public void holdVelocityRPM(int rpm) {
+  public void holdVelocityRPM(double rpm) {
     holdVelocity(rpmToTicksPerDs(rpm));
   }
 
@@ -135,7 +135,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     return ticksPerDsToRPM(rightMotor.getSelectedSensorVelocity());
   }
 
-  public boolean hasReachedRPM(int rpm) {
+  public boolean hasReachedRPM(double rpm) {
     return Math.abs(getVelocityRPM() - rpm) <= RPM_THRESHOLD;
   }
 
@@ -153,11 +153,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rightMotor.set(ControlMode.PercentOutput, 0);
   }
 
-  public int getDriverDesiredRPM() {
-    return Double.valueOf(shooterDesiredRPMEntry.getDouble(0.0)).intValue();
+  public double getDriverDesiredRPM() {
+    return shooterDesiredRPMEntry.getDouble(0.0);
   }
 
-  public int rpmToTicksPerDs(int rpm) {
+  public int rpmToTicksPerDs(double rpm) {
     double ticksPerMinute = rpm * (double) TICKS_PER_REV;
     double ticksPerS = ticksPerMinute / 60d;
     double ticksPerDs = ticksPerS / 10d;
