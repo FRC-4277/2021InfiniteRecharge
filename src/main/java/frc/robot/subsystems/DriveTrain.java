@@ -423,7 +423,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     SmartDashboard.putNumber("Right position", getRightPosition());
   }
   
-  public void joystickDrive(double forwardSpeed, double rotation, boolean quick) {
+  public void joystickDrive(double forwardSpeed, double rotation) {
     joystickUsed = true;
     //drive.curvatureDrive(forwardSpeed, rotation, quick);
     drive.arcadeDrive(forwardSpeed, rotation);
@@ -531,8 +531,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
               @Override
               public void accept(Double leftMetersPerSecond, Double rightMetersPerSecond) {
-                System.out.println("LEFT MPS: " + leftMetersPerSecond);
-                System.out.println("RIGHT MPS: " + rightMetersPerSecond);
+                //System.out.println("LEFT MPS: " + leftMetersPerSecond);
+                //System.out.println("RIGHT MPS: " + rightMetersPerSecond);
                 double currentTime = timer.get();
                 boolean wasFirstRun = false;
                 if (firstRun) {
@@ -561,7 +561,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
                   leftGroup.set(leftFeedforward);
                 } else {
                   velocityDriveLeft(leftTicksPerDs, leftFeedforward);
-                  System.out.println("Left ff: " + leftFeedforward);
+                  //System.out.println("Left ff: " + leftFeedforward);
                 }
 
                 double rightAcceleration = wasFirstRun ? 0 : (rightMetersPerSecond - prevRightMPS) / dt;
@@ -573,10 +573,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
                   rightGroup.set(rightFeedforward);
                 } else {
                   velocityDriveRight(rightTicksPerDs, rightFeedforward);
-                  System.out.println("Right ff: " + rightFeedforward);
+                  //System.out.println("Right ff: " + rightFeedforward);
                 }
 
-                System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
+                //System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 
                 prevLeftMPS = leftMetersPerSecond;
                 prevRightMPS = rightMetersPerSecond;

@@ -19,16 +19,15 @@ public class JoystickDriveCommand extends CommandBase {
   //private static final double TURN_DEADBAND = 0.1;
 
   private DriveTrain driveTrain;
-  private Joystick controller;
-  private Supplier<Boolean> invertControls;
+  private Supplier<Boolean> invertControls = () -> false;
+  private Supplier<Double> yControllerSupplier, xControllerSupplier;
+
 
   /**
    * Creates a new JoystickDriveCommand.
    */
-  public JoystickDriveCommand(DriveTrain driveTrain, Joystick controller, Supplier<Boolean> invertControls) {
+  public JoystickDriveCommand(DriveTrain driveTrain) {
     this.driveTrain = driveTrain;
-    this.controller = controller;
-    this.invertControls = invertControls;
     addRequirements(driveTrain);
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -36,12 +35,16 @@ public class JoystickDriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (yControllerSupplier == null || xControllerSupplier == null) {
+      return;
+    }
     // y is inverted on Xbox Controller
-    double y = -controller.getY(Hand.kLeft); // Forward/backwards (axis inverted)
-    double x = controller.getRawAxis(2); // Logitech Twist
-    /*double x = controller.getX(Hand.kRight);
-    double z = controller.getRawAxis(2);
-    if (Math.abs(z) >= TURN_DEADBAND) {
+    //double y = -controller.getY(Hand.kLeft); // Forward/backwards (axis inverted)
+    double y = yControllerSupplier.get();
+    //double x = controller.getRawAxis(2); // Logitech Twist
+    double x = xControllerSupplier.get();
+
+    /*if (Math.abs(z) >= TURN_DEADBAND) {
       x = z;
     }*/
 
@@ -49,8 +52,19 @@ public class JoystickDriveCommand extends CommandBase {
       y *= -1;
     }
 
-    boolean quickTurn = controller.getRawButton(LogitechButton.TRIGGER);
-    driveTrain.joystickDrive(y, x, quickTurn);
+    driveTrain.joystickDrive(y, x);
+  }
+
+  public void setYControllerSupplier(Supplier<Double> yControllerSupplier) {
+    this.yControllerSupplier = yControllerSupplier;
+  }
+
+  public void setXControllerSupplier(Supplier<Double> xControllerSupplier) {
+    this.xControllerSupplier = xControllerSupplier;
+  }
+
+  public void setInvertControls(Supplier<Boolean> invertControls) {
+    this.invertControls = invertControls;
   }
 
   // Returns true when the command should end.

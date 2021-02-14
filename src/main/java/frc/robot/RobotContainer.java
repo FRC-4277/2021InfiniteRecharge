@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
@@ -25,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
@@ -53,9 +55,7 @@ public class RobotContainer {
   // todo : uncomment when compressor added
 
   // Controllers
-  private Joystick driveStick = new Joystick(0);
-  private Supplier<Boolean> invertControls = () -> driveStick.getRawAxis(3) <= .5; // Throttle is negative = invert
-  private XboxController xboxController = new XboxController(1);
+  private Supplier<Boolean> invertControls = () -> false;
 
   // ShuffleBoard
   private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
@@ -81,7 +81,7 @@ public class RobotContainer {
           driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
           verificationTab);
 
-  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain, driveStick, invertControls);
+  private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
@@ -105,6 +105,9 @@ public class RobotContainer {
   private NetworkTableEntry resetOdometryOnAuto;
 
   private boolean inAutonomous = true;
+
+  private boolean drivingFromHome = false;
+  private boolean drivingFromHomeInverted = false;
 
   //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
@@ -206,18 +209,47 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    // === MAIN DRIVER - Logitech Extreme 3D Pro
 
-    // Note: Trigger (button 1) is used in JoystickDriveCommand for quick turn
+    drivingFromHome = DriverStation.getInstance().getJoystickIsXbox(0);
 
-    JoystickButton pointerButton = new JoystickButton(driveStick, LogitechButton.POINTER);
-    pointerButton.whenPressed(toggleCameraCommand);
+    XboxController xboxController = new XboxController(drivingFromHome ? 0 : 1);
+    if (!drivingFromHome) {
+      Joystick driveStick = new Joystick(0);
+      // === MAIN DRIVER - Logitech Extreme 3D Pro
+
+      // Note: Trigger (button 1) is used in JoystickDriveCommand for quick turn
+
+      JoystickButton pointerButton = new JoystickButton(driveStick, LogitechButton.POINTER);
+      pointerButton.whenPressed(toggleCameraCommand);
+
+      invertControls = () -> driveStick.getRawAxis(3) <= .5; // Invert controls when throttle is negative value
+
+      // Drive with Logitech
+      driveCommand.setYControllerSupplier(() -> -driveStick.getY(Hand.kLeft));
+      driveCommand.setXControllerSupplier(() -> driveStick.getRawAxis(2));
+    } else {
+      // Drive with Xbox Controller
+      driveCommand.setYControllerSupplier(() -> -xboxController.getY(Hand.kLeft));
+      driveCommand.setXControllerSupplier(() -> xboxController.getX(Hand.kRight));
+
+      // Invert controls via START button
+      JoystickButton startButton = new JoystickButton(xboxController, kStart.value);
+      startButton.whileActiveOnce(new InstantCommand(new Runnable() {
+        @Override
+        public void run() {
+          System.out.println("Inverted to " + !drivingFromHomeInverted);
+          drivingFromHomeInverted = !drivingFromHomeInverted;
+        }
+      }));
+      invertControls = () -> drivingFromHomeInverted;
+    }
 
     Trigger invertControlsThrottle = new Trigger(invertControls::get);
     // Automatically switch camera when drive is inverted/normal
     invertControlsThrottle.whenActive(useShooterCameraCommand);
     invertControlsThrottle.whenInactive(useIntakeCameraCommand);
 
+    driveCommand.setInvertControls(invertControls);
 
     // === CO-PILOT - Xbox 360/One Controller
 
