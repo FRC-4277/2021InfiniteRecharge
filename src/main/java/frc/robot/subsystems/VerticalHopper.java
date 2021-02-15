@@ -110,6 +110,10 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     return null;
   }
 
+  public boolean isBallPresentAtBottom() {
+    return !intakeSensor.get();
+  }
+
   public class VerticalHopperSendable implements Sendable {
 
     @Override

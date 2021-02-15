@@ -57,6 +57,10 @@ public class GalacticPath {
         return List.of(firstPowerCell, secondPowerCell, thirdPowerCell);
     }
 
+    public boolean isPowerCellClose() {
+        return color.isPowerCellClose();
+    }
+
     @Override
     public String toString() {
         return getLetter().name() + " - " + getColor().name();

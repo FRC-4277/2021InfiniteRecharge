@@ -95,6 +95,25 @@ public final class Constants {
         }
     }
 
+    public static class GalacticSearch {
+        // Area threshold for ball to be considered CLOSE (Pixy camera)
+        public static final int PIXY_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL = 3445; // todo: change
+
+        /* https://www.desmos.com/calculator/t27bf6ftoy */
+        // Robot Start X
+        public static final double ROBOT_START_X = Units.feetToMeters(3.82);
+        // Distance to CLOSE ball
+        public static final double CLOSE_BALL_DISTANCE = Units.feetToMeters(3.68);
+        // Distance to FAR ball
+        public static final double FAR_BALL_DISTANCE = Units.feetToMeters(11.18);
+        // How close to get to balls
+        public static final double DESIRED_DISTANCE_TO_BALL = Units.inchesToMeters(12);
+        // Speed to go when driving towards ball to intake
+        public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.2;
+        // Time to wait before moving again after ball is detected at intake sensor
+        public static final double WAIT_AFTER_INTAKE_SECONDS = 0.5;
+    }
+
     public static class Intake {
         public static final int MOTOR_ID = 59;
         public static final boolean MOTOR_INVERTED = true;

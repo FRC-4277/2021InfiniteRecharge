@@ -33,6 +33,7 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
 import frc.robot.commands.autonomous.*;
+import frc.robot.commands.autonomous.galactic.GalacticAutoCommand;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
@@ -100,11 +101,13 @@ public class RobotContainer {
   private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
   private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
   private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
+  private final IntakeLineUpCommand intakeLineUpCommand = new IntakeLineUpCommand(driveTrain, visionSystem);
 
   private SendableChooser<Command> autoChooser;
   private NetworkTableEntry resetOdometryOnAuto;
 
   private boolean inAutonomous = true;
+  private NetworkTableEntry autonomousMessageEntry;
 
   private boolean drivingFromHome = false;
   private boolean drivingFromHomeInverted = false;
@@ -156,6 +159,8 @@ public class RobotContainer {
     autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
+    autoChooser.addOption("Galactic Search",
+            new GalacticAutoCommand(this, driveTrain, visionSystem, hopper));
 
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
@@ -178,12 +183,25 @@ public class RobotContainer {
 
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
+    autonomousMessageEntry = autonomousTab
+            .add("Autonomous Message", "...")
+            .withPosition(0, 3)
+            .withSize(5, 1)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+
     resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
             .withWidget(BuiltInWidgets.kToggleSwitch)
             .withPosition(0, 1)
             .withSize(2, 1)
             .getEntry();
     autonomousTab.add(intakeCommand);
+  }
+
+  public void setAutonomousMessage(String message) {
+    if (autonomousMessageEntry != null) {
+      autonomousMessageEntry.setString(message);
+    }
   }
 
   private void setupDriverTab() {
@@ -286,7 +304,8 @@ public class RobotContainer {
     POVButton rightPOVButton = new POVButton(xboxController, 90);
     rightPOVButton.whileActiveOnce(hookUpCommand);
 
-    //todo : bind ball intake align to button
+    JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
+    backButton.whileActiveOnce(intakeLineUpCommand);
   }
 
   private void switchToDriverView() {

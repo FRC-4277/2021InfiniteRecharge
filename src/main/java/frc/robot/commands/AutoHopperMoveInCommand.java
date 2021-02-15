@@ -42,7 +42,7 @@ public class AutoHopperMoveInCommand extends CommandBase {
       return;
     }
 
-    boolean ballPresent = !hopper.intakeSensor.get();
+    boolean ballPresent = hopper.isBallPresentAtBottom();
     if (ballPresent && !pulsing) {
       this.pulsing = true;
       this.lastBallInTime = System.currentTimeMillis();

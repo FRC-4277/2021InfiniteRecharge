@@ -163,7 +163,8 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     for (int i = 0; i < pathCells.size(); i++) {
       Translation2d cellPosition = pathCells.get(i);
       FieldObject2d object2d = fieldSimPowerCells.get(i);
-      object2d.setPose(new Pose2d(cellPosition, new Rotation2d()));
+      Translation2d transformed = new Translation2d(cellPosition.getX(), cellPosition.getY() * -1);
+      object2d.setPose(new Pose2d(transformed, new Rotation2d()));
     }
   }
 
