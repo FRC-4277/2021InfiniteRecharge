@@ -3,6 +3,7 @@ package frc.robot.commands.autonomous.galactic;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.VerticalHopper;
 import frc.robot.subsystems.VisionSystem;
 import frc.robot.Constants.GalacticSearch;
@@ -18,12 +19,19 @@ public class IntakeGalacticBallCommand extends CommandBase {
     private VisionSystem visionSystem;
     private VerticalHopper verticalHopper;
 
+    private Intake intake;
+    private static int intakeMinStopTimeMs = 400; // From IntakeCommand.java
+    private boolean ballIntaking = false; //
+    private Long ballIntakeTime = 0L; //
+
     private Timer timer;
 
-    public IntakeGalacticBallCommand(DriveTrain driveTrain, VisionSystem visionSystem, VerticalHopper verticalHopper) {
+    public IntakeGalacticBallCommand(DriveTrain driveTrain, VisionSystem visionSystem,
+                                     VerticalHopper verticalHopper, Intake intake) {
         this.driveTrain = driveTrain;
         this.visionSystem = visionSystem;
         this.verticalHopper = verticalHopper;
+        this.intake = intake;
         // NOTE: Purposely not adding vertical hopper so AutoHopperMoveInCommands still runs...
         addRequirements(driveTrain, visionSystem);
     }
@@ -32,6 +40,10 @@ public class IntakeGalacticBallCommand extends CommandBase {
     public void initialize() {
         visionSystem.setUsingPixy(true);
         timer = null;
+
+        // From IntakeCommand.java BELOW:
+        this.ballIntaking = false;
+        this.ballIntakeTime = 0L;
     }
 
     @Override
@@ -56,11 +68,26 @@ public class IntakeGalacticBallCommand extends CommandBase {
             timer.reset();
             timer.start();
         }
+
+        // From IntakeCommand.java BELOW:
+        boolean intakeBallPresent = !intake.intakeSensor.get();
+        if (intakeBallPresent && !ballIntaking) {
+            ballIntaking = true;
+        }
+        if (ballIntaking && (System.currentTimeMillis() - ballIntakeTime >= intakeMinStopTimeMs)) {
+            ballIntaking = false;
+        }
+        if (!ballIntaking) {
+            intake.runIntake();
+        } else {
+            intake.stopIntake();
+        }
     }
 
     @Override
     public void end(boolean interrupted) {
         visionSystem.setUsingPixy(false);
+        intake.stopIntake(); // From IntakeCommand.java
         driveTrain.stopDrive();
     }
 

@@ -160,7 +160,7 @@ public class RobotContainer {
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
     autoChooser.addOption("Galactic Search",
-            new GalacticAutoCommand(this, driveTrain, visionSystem, hopper));
+            new GalacticAutoCommand(this, driveTrain, visionSystem, hopper, intake));
 
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {

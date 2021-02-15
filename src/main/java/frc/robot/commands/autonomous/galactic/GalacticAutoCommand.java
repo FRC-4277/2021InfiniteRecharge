@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.RobotContainer;
 import frc.robot.commands.autonomous.ResetOdometryCommand;
 import frc.robot.subsystems.DriveTrain;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.VerticalHopper;
 import frc.robot.subsystems.VisionSystem;
 import frc.robot.Constants.GalacticSearch;
@@ -16,7 +17,7 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
     private GalacticPath pathDetected;
 
     public GalacticAutoCommand(RobotContainer container, DriveTrain driveTrain, VisionSystem visionSystem,
-                               VerticalHopper verticalHopper) {
+                               VerticalHopper verticalHopper, Intake intake) {
         this.container = container;
         addCommands(
                 // Figure out path from Pixy2
@@ -27,7 +28,7 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
                 // Move straight forward to JUST BEFORE first ball #1
                 new FirstForwardMoveCommand(this, driveTrain),
                 // Pickup ball #1
-                new IntakeGalacticBallCommand(driveTrain, visionSystem, verticalHopper)
+                new IntakeGalacticBallCommand(driveTrain, visionSystem, verticalHopper, intake)
 
                 // Drive to JUST BEFORE ball #2
         );
