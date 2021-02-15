@@ -163,15 +163,22 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     for (int i = 0; i < pathCells.size(); i++) {
       Translation2d cellPosition = pathCells.get(i);
       FieldObject2d object2d = fieldSimPowerCells.get(i);
-      Translation2d transformed = new Translation2d(cellPosition.getX(), cellPosition.getY() * -1);
-      object2d.setPose(new Pose2d(transformed, new Rotation2d()));
+      //Translation2d transformed = new Translation2d(cellPosition.getX(), cellPosition.getY() * -1);
+      object2d.setPose(new Pose2d(cellPosition, new Rotation2d()));
     }
+  }
+
+  public GalacticPath getSimPathSelected() {
+    if (simulatedPathChooser == null) {
+      return null;
+    }
+    return simulatedPathChooser.getSelected();
   }
 
   @Override
   public void periodic() {
     if (RobotBase.isSimulation()) {
-      GalacticPath selectedPath = simulatedPathChooser.getSelected();
+      GalacticPath selectedPath = getSimPathSelected();
       if (lastPathUpdated != selectedPath) {
         lastPathUpdated = selectedPath;
         updateSimPowerCells(selectedPath);

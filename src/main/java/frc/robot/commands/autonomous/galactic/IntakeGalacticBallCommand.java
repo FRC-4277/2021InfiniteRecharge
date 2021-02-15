@@ -1,5 +1,6 @@
 package frc.robot.commands.autonomous.galactic;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
@@ -15,6 +16,7 @@ public class IntakeGalacticBallCommand extends CommandBase {
     private static final double TURN_DEG_TOLERANCE = 5;
     private static final double MIN_TURN_ADJUST = 0.05;
 
+    private GalacticAutoCommand galacticAutoCommand;
     private DriveTrain driveTrain;
     private VisionSystem visionSystem;
     private VerticalHopper verticalHopper;
@@ -26,8 +28,9 @@ public class IntakeGalacticBallCommand extends CommandBase {
 
     private Timer timer;
 
-    public IntakeGalacticBallCommand(DriveTrain driveTrain, VisionSystem visionSystem,
+    public IntakeGalacticBallCommand(GalacticAutoCommand galacticAutoCommand, DriveTrain driveTrain, VisionSystem visionSystem,
                                      VerticalHopper verticalHopper, Intake intake) {
+        this.galacticAutoCommand = galacticAutoCommand;
         this.driveTrain = driveTrain;
         this.visionSystem = visionSystem;
         this.verticalHopper = verticalHopper;
@@ -44,29 +47,33 @@ public class IntakeGalacticBallCommand extends CommandBase {
         // From IntakeCommand.java BELOW:
         this.ballIntaking = false;
         this.ballIntakeTime = 0L;
+        galacticAutoCommand.setMessage("[Intake] Initialized");
     }
 
     @Override
     public void execute() {
         // Similar code to IntakeLineUpCommand!!
-        Optional<Double> targetOptional = visionSystem.getBallTargetDegrees();
-        double headingError = targetOptional.orElse(0.0);
-        if (Math.abs(headingError) <= TURN_DEG_TOLERANCE) {
-            return;
-        }
-        double steerAdjust = headingError * TURN_P;
-        if (Math.abs(steerAdjust) < MIN_TURN_ADJUST) {
-            steerAdjust = Math.copySign(MIN_TURN_ADJUST, steerAdjust);
-        }
-        //
+        if (timer == null) {
+            Optional<Double> targetOptional = visionSystem.getBallTargetDegrees();
+            double headingError = targetOptional.orElse(0.0);
+            boolean withinTolerance = Math.abs(headingError) <= TURN_DEG_TOLERANCE;
+            double steerAdjust = headingError * TURN_P;
+            if (!withinTolerance && Math.abs(steerAdjust) < MIN_TURN_ADJUST) {
+                steerAdjust = Math.copySign(MIN_TURN_ADJUST, steerAdjust);
+            }
+            //
 
-        double speed = GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED;
-        driveTrain.rawTankDrive(speed + steerAdjust, speed - steerAdjust);
+            double speed = GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED;
+            driveTrain.rawTankDrive(speed + steerAdjust, speed - steerAdjust);
 
-        if (verticalHopper.isBallPresentAtBottom() && timer == null) {
-            timer = new Timer();
-            timer.reset();
-            timer.start();
+            if (verticalHopper.isBallPresentAtBottom() && timer == null) {
+                timer = new Timer();
+                timer.reset();
+                timer.start();
+                galacticAutoCommand.setMessage("[Intake] Detected ball at bottom, done soon!");
+            }
+            galacticAutoCommand.setMessage(String.format("[Intake] Heading error %.2f, speed %.2f, steer adjust %.2f",
+                    headingError, speed, steerAdjust));
         }
 
         // From IntakeCommand.java BELOW:

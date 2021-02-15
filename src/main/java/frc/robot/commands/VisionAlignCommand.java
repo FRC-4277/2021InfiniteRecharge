@@ -71,11 +71,9 @@ public class VisionAlignCommand extends CommandBase {
       Target target = targetOptional.get();
       double xDeg = target.getX();
       double xError = xDeg; // Degrees, Positive is CCW
-      System.out.println("X ERROR:" + xError);
       if (Math.abs(xError) <= DEG_TOLERANCE) {
         correctLoops++;
         if (vibrate) {
-          System.out.println("VIBRATE");
           visionSystem.vibrateController();
         }
         return;

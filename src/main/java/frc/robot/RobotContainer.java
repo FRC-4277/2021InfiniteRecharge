@@ -14,7 +14,6 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -23,24 +22,25 @@ import edu.wpi.first.wpilibj.simulation.RoboRioSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
-import frc.robot.commands.autonomous.*;
+import frc.robot.commands.autonomous.BarrelAutoCommand;
+import frc.robot.commands.autonomous.BounceAutoCommand;
+import frc.robot.commands.autonomous.DriveStraightXCommand;
+import frc.robot.commands.autonomous.SlalomAutoCommand;
 import frc.robot.commands.autonomous.galactic.GalacticAutoCommand;
+import frc.robot.commands.autonomous.galactic.GalacticPath;
 import frc.robot.subsystems.*;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 
-import java.util.function.Supplier;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static edu.wpi.first.wpilibj.XboxController.Button.*;
 
@@ -70,7 +70,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab, autonomousTab);
   private final Intake intake = new Intake();
-  private final VerticalHopper hopper = new VerticalHopper(intake.intakeSensor, driverTab, settingsTab);
+  private final VerticalHopper hopper = new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
   private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   //private final Gate gate = new Gate();
@@ -199,6 +199,7 @@ public class RobotContainer {
   }
 
   public void setAutonomousMessage(String message) {
+    System.out.println(">>> " + message);
     if (autonomousMessageEntry != null) {
       autonomousMessageEntry.setString(message);
     }
@@ -339,6 +340,14 @@ public class RobotContainer {
 
   public boolean isInAutonomous() {
     return inAutonomous;
+  }
+
+  public Pose2d getSimPose() {
+    return driveTrain.getPose();
+  }
+
+  public GalacticPath getSimPath() {
+    return visionSystem.getSimPathSelected();
   }
 
   /**

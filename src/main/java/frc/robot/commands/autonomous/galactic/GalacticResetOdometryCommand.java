@@ -7,7 +7,11 @@ import frc.robot.subsystems.DriveTrain;
 import java.util.function.Supplier;
 
 public class GalacticResetOdometryCommand extends InstantCommand {
-    public GalacticResetOdometryCommand(DriveTrain driveTrain, Supplier<Pose2d> poseSupplier) {
-        super(() -> driveTrain.resetOdometry(poseSupplier.get()), driveTrain);
+    public GalacticResetOdometryCommand(GalacticAutoCommand galacticAutoCommand, DriveTrain driveTrain, Supplier<Pose2d> poseSupplier) {
+        super(() -> {
+            Pose2d pose = poseSupplier.get();
+            driveTrain.resetOdometry(poseSupplier.get());
+            galacticAutoCommand.setMessage("[Reset Odometry] Pose reset to " + pose);
+        }, driveTrain);
     }
 }

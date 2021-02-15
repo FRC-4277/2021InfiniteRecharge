@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_VictorSPX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import static frc.robot.Constants.Intake.*;
@@ -17,7 +18,7 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import java.util.List;
 
 public class Intake extends SubsystemBase implements VerifiableSystem {
-  private VictorSPX motor = new VictorSPX(MOTOR_ID);
+  private VictorSPX motor = new WPI_VictorSPX(MOTOR_ID);
   private static final double INTAKE_SPEED = .5;
   private static final double REVERSE_INTAKE_SPEED = -0.5;
   public DigitalInput intakeSensor = new DigitalInput(INTAKE_SENSOR);

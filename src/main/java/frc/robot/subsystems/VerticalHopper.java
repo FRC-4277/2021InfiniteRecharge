@@ -15,11 +15,17 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.Sendable;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.RobotContainer;
+import frc.robot.commands.autonomous.galactic.GalacticPath;
 
 import java.util.List;
 import java.util.Map;
@@ -39,6 +45,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   private double speedRunning = 0.0;
   private VerticalHopperSendable sendable = new VerticalHopperSendable();
 
+  private RobotContainer robotContainer;
+
   public DigitalInput topBallSensor = new DigitalInput(0);
   public DigitalInput intakeSensor;
 
@@ -47,7 +55,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   /**
    * Creates a new VerticalHopper.
    */
-  public VerticalHopper(DigitalInput intakeSensor, ShuffleboardTab driverTab, ShuffleboardTab settingsTab) {
+  public VerticalHopper(RobotContainer robotContainer, DigitalInput intakeSensor, ShuffleboardTab driverTab, ShuffleboardTab settingsTab) {
+    this.robotContainer = robotContainer;
     this.intakeSensor = intakeSensor;
     this.driverTab = driverTab;
     leftMotor.configFactoryDefault();
@@ -111,6 +120,19 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   }
 
   public boolean isBallPresentAtBottom() {
+    if (RobotBase.isSimulation()) {
+      Pose2d pose = robotContainer.getSimPose();
+      GalacticPath path = robotContainer.getSimPath();
+      if (pose != null && path != null) {
+        for (Translation2d ballPos : path.getThreePowerCells()) {
+          double distance = ballPos.getDistance(pose.getTranslation());
+          if (distance <= Units.inchesToMeters(6)) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
     return !intakeSensor.get();
   }
 

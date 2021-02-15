@@ -1,5 +1,6 @@
 package frc.robot.commands.autonomous.galactic;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GalacticSearch;
 import frc.robot.subsystems.VisionSystem;
@@ -25,10 +26,20 @@ public class DetectPathCommand extends CommandBase {
     public void initialize() {
         visionSystem.setUsingPixy(true);
         stableLoops = 0;
+        galacticAutoCommand.setPathDetected(null);
     }
 
     @Override
     public void execute() {
+        if (RobotBase.isSimulation()) {
+            GalacticPath path = visionSystem.getSimPathSelected();
+            if (path == null) {
+                galacticAutoCommand.setMessage("[Detect Path] Please select simulation path");
+            }
+            galacticAutoCommand.setPathDetected(path);
+            return;
+        }
+
         List<Pixy2CCC.Block> blocks = visionSystem.getBlocksList();
         // See if we see at least two balls
         if (blocks.size() >= 2) {

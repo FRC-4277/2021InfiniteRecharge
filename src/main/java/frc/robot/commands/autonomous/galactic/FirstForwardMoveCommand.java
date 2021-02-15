@@ -22,6 +22,7 @@ public class FirstForwardMoveCommand extends CommandBase {
         double distanceForward = path.isPowerCellClose() ?
                 GalacticSearch.CLOSE_BALL_DISTANCE : GalacticSearch.FAR_BALL_DISTANCE;
         distanceForward -= GalacticSearch.DESIRED_DISTANCE_TO_BALL;
+        galacticAutoCommand.setMessage("[First Forward] Distance forward calculated to be " + distanceForward);
         ramseteCommand = driveTrain
                 .generateRamseteCommand(driveTrain.generateXTrajectory(distanceForward), false);
         ramseteCommand.initialize();
@@ -29,14 +30,17 @@ public class FirstForwardMoveCommand extends CommandBase {
 
     @Override
     public void execute() {
+        //galacticAutoCommand.setMessage("[First Forward] Moving...");
         ramseteCommand.execute();
     }
 
     @Override
     public void end(boolean interrupted) {
+        galacticAutoCommand.setMessage("[First Forward] End");
         driveTrain.stopDrive();
         if (ramseteCommand != null) {
             ramseteCommand.end(interrupted);
+            ramseteCommand = null;
         }
     }
 
