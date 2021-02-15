@@ -10,9 +10,11 @@ package frc.robot.subsystems;
 import edu.wpi.cscore.HttpCamera;
 import edu.wpi.cscore.MjpegServer;
 import edu.wpi.cscore.UsbCamera;
+import edu.wpi.cscore.VideoCamera;
 import edu.wpi.cscore.VideoSource.ConnectionStrategy;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -24,7 +26,7 @@ public class CameraSystem extends SubsystemBase implements VerifiableSystem {
   private static final String WIDGET_NAME = "Driver Switching Camera";
   private ShuffleboardTab driverTab;
   private UsbCamera backCamera;
-  private HttpCamera limelightStream;
+  private VideoCamera limelightStream;
   private boolean useLimelightStream = true;
   private MjpegServer server;
   private NetworkTableEntry nameEntry;
@@ -49,7 +51,11 @@ public class CameraSystem extends SubsystemBase implements VerifiableSystem {
     // Make MjpegServer which uses dummy source
     server = CameraServer.getInstance().addSwitchedCamera(SERVER_NAME);
     // Add CameraServer widget to Shuffleboard with dummy source
-    limelightStream = new HttpCamera("limelight", "http://10.42.77.11:5800/stream.mjpg");
+    if (RobotBase.isReal()) {
+      limelightStream = new HttpCamera("limelight", "http://10.42.77.11:5800/stream.mjpg");
+    } else {
+      limelightStream = new UsbCamera("limelight", 1);
+    }
     this.driverTab.add(WIDGET_NAME, server.getSource())
             .withWidget(BuiltInWidgets.kCameraStream)
             .withPosition(0,0)

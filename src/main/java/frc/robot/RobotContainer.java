@@ -74,7 +74,7 @@ public class RobotContainer {
   private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
-  private final VisionSystem visionSystem = new VisionSystem(driverTab);
+  private final VisionSystem visionSystem = new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
   private final Winch winch = new Winch();
   private final HookElevator hookElevator = new HookElevator();
   private final VerificationSystem verificationSystem = new VerificationSystem(
@@ -95,7 +95,7 @@ public class RobotContainer {
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
   private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
-  private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem, true);
+  private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem, true, true);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
   private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
   private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
@@ -213,6 +213,7 @@ public class RobotContainer {
     drivingFromHome = DriverStation.getInstance().getJoystickIsXbox(0);
 
     XboxController xboxController = new XboxController(drivingFromHome ? 0 : 1);
+    visionSystem.setXboxController(xboxController);
     if (!drivingFromHome) {
       Joystick driveStick = new Joystick(0);
       // === MAIN DRIVER - Logitech Extreme 3D Pro

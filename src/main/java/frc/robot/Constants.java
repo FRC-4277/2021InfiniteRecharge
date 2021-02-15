@@ -39,8 +39,8 @@ public final class Constants {
         public static final double kS = 0.62; // kS
         public static final double kV = 2.42; // kV
         public static final double kA = 0.165; // kA
-        public static final double KS_VOLT_SECONDS_PER_RADIAN = 1.5; // TODO? Only for simulation
-        public static final double KS_VOLT_SECONDS_SQUARED_PER_RADIAN = 0.3; // TODO? Only for simulation
+        public static final double kVAngular = 1.654294727;
+        public static final double kAAngular = kA; // ???????
         public static final double TRACK_WIDTH_METERS = 0.5757943419; // About 22.6" from characterization, was 22" from CAD
         public static final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(TRACK_WIDTH_METERS);
         public static final DifferentialDriveVoltageConstraint VOLTAGE_CONSTRAINT =
@@ -51,8 +51,8 @@ public final class Constants {
                 LinearSystemId.identifyDrivetrainSystem(
                         kV,
                         kA,
-                        KS_VOLT_SECONDS_PER_RADIAN,
-                        KS_VOLT_SECONDS_SQUARED_PER_RADIAN);
+                        kVAngular,
+                        kAAngular);
         public static final double MAX_SPEED_METERS_PER_SECOND = 0.5; //todo : change @
         public static final double MAX_ACCELERATION_METERS_PER_SECOND_SQUARED = 0.5; //todo : change @, not as important due to voltage constraint
         // RAMSETE constants

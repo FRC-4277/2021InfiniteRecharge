@@ -272,6 +272,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return odometry.getPoseMeters();
   }
 
+  public Field2d getFieldSim() {
+    return fieldSim;
+  }
+
   // Rotations of the wheel
   public static double ticksToRotations(double ticks) {
     return ticks / (double) ENCODER_TICKS_PER_ROTATION;

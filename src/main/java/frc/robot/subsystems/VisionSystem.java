@@ -7,13 +7,21 @@
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.autonomous.galactic.GalacticPath;
+import frc.robot.commands.autonomous.galactic.GalacticPaths;
 import frc.robot.util.limelight.Limelight;
 import frc.robot.util.limelight.Pipeline;
 import frc.robot.util.limelight.StreamMode;
@@ -25,14 +33,13 @@ import io.github.pseudoresonance.pixy2api.links.SPILink;
 import static frc.robot.Constants.Vision.Limelight.*;
 import frc.robot.Constants.Vision.Pixy2Constants;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 
 public class VisionSystem extends SubsystemBase implements VerifiableSystem {
-  private ShuffleboardTab driverTab;
+  private ShuffleboardTab driverTab, autonomousTab;
   private ShuffleboardLayout layout;
   private Pipeline driverPipeline = new Pipeline("Driver", 0);
   private Pipeline portPipeline = new Pipeline("Port", 1);
@@ -43,14 +50,25 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
   private Pixy2 pixy2;
   private boolean usingPixy = false;
   private List<Block> blocksList;
+  private Block widestBlock = null;
   private Block largestBlock = null;
+  private Color lastPixyColor = null;
+  private XboxController xboxController;
+
+  // Simulation
+  private SendableChooser<GalacticPath> simulatedPathChooser = null;
+  private GalacticPath lastPathUpdated = null;
+  private Field2d fieldSim;
+  private List<FieldObject2d> fieldSimPowerCells;
 
   /**
    * Creates a new VisionSystem.
    * 
    */
-  public VisionSystem(ShuffleboardTab driverTab) {
+  public VisionSystem(ShuffleboardTab driverTab, ShuffleboardTab autonomousTab, Field2d fieldSim) {
     this.driverTab = driverTab;
+    this.autonomousTab = autonomousTab;
+    this.fieldSim = fieldSim;
     this.limelight = new Limelight(driverPipeline, portPipeline);
 
     this.layout = this.driverTab.getLayout("Limelight", BuiltInLayouts.kGrid)
@@ -77,15 +95,42 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
 
     useDriverPipeline();
 
+    // Pixy2 Stuff
     this.pixy2 = Pixy2.createInstance(new SPILink());
     SmartDashboard.putNumber("Pixy2 Status", pixy2.init());
     pixy2.setLamp((byte) 0, (byte) 0);
-    pixy2.setLED(200, 30, 255);
+    setPixyColor(Color.RED);
     this.usingPixy = true;
+
+    // Simulated ball placement chooser
+    if (RobotBase.isSimulation()) {
+      simulatedPathChooser = new SendableChooser<>();
+      SendableRegistry.setName(simulatedPathChooser, "Simulated Ball Placement");
+      simulatedPathChooser.setDefaultOption("None", null);
+      for (GalacticPath path : GalacticPaths.getAllPaths()) {
+        simulatedPathChooser.addOption(path.toString(), path);
+      }
+      autonomousTab.add(simulatedPathChooser).withPosition(0, 4).withSize(2, 1);
+
+      fieldSimPowerCells = new ArrayList<>(3);
+      // Simulated power cells (3 of them)
+      for (int i = 0; i < 3; i++) {
+        fieldSimPowerCells.add(fieldSim.getObject("Power Cell" + i));
+      }
+      updateSimPowerCells(null);
+    }
   }
 
   public Limelight getLimelight() {
     return limelight;
+  }
+
+  public void setXboxController(XboxController xboxController) {
+    this.xboxController = xboxController;
+  }
+
+  public void vibrateController() {
+    xboxController.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
   }
 
   public void usePortPipeline() {
@@ -106,15 +151,52 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     return String.format("%.2f", optional.map(function).get());
   }
 
+  private void updateSimPowerCells(GalacticPath galacticPath) {
+    if (galacticPath == null) {
+      for (FieldObject2d object2d : fieldSimPowerCells) {
+        object2d.setPose(99.99, 99.99, new Rotation2d()); // Not visible
+      }
+      return;
+    }
+
+    List<Translation2d> pathCells = galacticPath.getThreePowerCells();
+    for (int i = 0; i < pathCells.size(); i++) {
+      Translation2d cellPosition = pathCells.get(i);
+      FieldObject2d object2d = fieldSimPowerCells.get(i);
+      object2d.setPose(new Pose2d(cellPosition, new Rotation2d()));
+    }
+  }
+
   @Override
   public void periodic() {
+    if (RobotBase.isSimulation()) {
+      GalacticPath selectedPath = simulatedPathChooser.getSelected();
+      if (lastPathUpdated != selectedPath) {
+        lastPathUpdated = selectedPath;
+        updateSimPowerCells(selectedPath);
+      }
+    }
+
     // This method will be called once per scheduler run
     calculateDistanceIfNeeded();
 
+    setPixyColor(usingPixy ? Color.GREEN : Color.RED);
     if (usingPixy) {
       int blockCount = pixy2.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG_ALL, 25);
       SmartDashboard.putNumber("Block Count", blockCount);
       blocksList = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
+
+      switch(blocksList.size()) {
+        case 1:
+          setPixyColor(Color.ORANGE);
+          break;
+        case 2:
+          setPixyColor(Color.MAGENTA);
+          break;
+        case 3:
+          setPixyColor(Color.BLUE);
+          break;
+      }
 
       // Show blocks in SmartDashboard
       for (int i = 0; i < 5; i++) {
@@ -125,30 +207,55 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
         SmartDashboard.putString("Block" + i, block.toString());
       }
 
-      // Find largest block
-      largestBlock = null;
-      for (Block block : blocksList) { // Loops through all blocks and finds the widest one
-        if (largestBlock == null) {
-          largestBlock = block;
-        } else if (block.getWidth() > largestBlock.getWidth()) {
-          largestBlock = block;
+      // Find widest block
+      widestBlock = null;
+      int widestBlockIndex = -1;
+      for (int i = 0; i < blocksList.size(); i++) {
+        Block block = blocksList.get(i);
+        if (widestBlock == null || block.getWidth() > widestBlock.getWidth()) {
+          widestBlock = block;
+          widestBlockIndex = i;
         }
       }
-      if (largestBlock != null) {
-        SmartDashboard.putString("X Value", Integer.toString(largestBlock.getX()));
-        SmartDashboard.putString("BlockLargest", largestBlock.toString());
-      } else {
-        SmartDashboard.putString("X Value", "null");
+      SmartDashboard.putString("BlockWidest", Integer.toString(widestBlockIndex));
+
+      // Find largest block
+      largestBlock = null;
+      int largestBlockIndex = -1;
+      for (int i = 0; i < blocksList.size(); i++) {
+        Block block = blocksList.get(i);
+        if (largestBlock == null || calculateArea(block) > calculateArea(largestBlock)) {
+          largestBlock = block;
+          largestBlockIndex = i;
+        }
       }
+      SmartDashboard.putString("BlockLargest", Integer.toString(largestBlockIndex));
     }
+  }
+
+  public int calculateArea(Block block) {
+    return block.getX() * block.getY();
   }
 
   public void setUsingPixy(boolean usingPixy) {
     this.usingPixy = usingPixy;
   }
 
+  public void setPixyColor(Color color) {
+    if (Objects.equals(lastPixyColor, color)) {
+      return;
+    }
+    pixy2.setLED(color);
+    lastPixyColor = color;
+  }
+
   public List<Block> getBlocksList() {
     return blocksList;
+  }
+
+  public Optional<Block> getWidestBlock() {
+    this.usingPixy = true;
+    return Optional.ofNullable(widestBlock);
   }
 
   public Optional<Block> getLargestBlock() {
@@ -157,7 +264,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
   }
 
   public Optional<Double> getBallTargetDegrees() {
-    Optional<Block> blockOptional = getLargestBlock();
+    Optional<Block> blockOptional = getWidestBlock();
     if (blockOptional.isPresent()) {
       Block block = blockOptional.get();
       double x = block.getX();

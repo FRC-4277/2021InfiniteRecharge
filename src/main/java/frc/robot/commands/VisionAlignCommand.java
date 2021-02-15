@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import java.util.Optional;
 
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.VisionSystem;
@@ -16,7 +17,7 @@ import frc.robot.util.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
   private static final double ROTATE_P = 0.2d;
-  private static final double DEG_TOLERANCE = 2d;
+  private static final double DEG_TOLERANCE = 5d;
   private static final double MIN_COMMAND = 0.3;
   private static final double SEEK_SPEED = 0.15;
   private static final double CORRECT_LOOPS_NEEDED = 5;
@@ -26,19 +27,25 @@ public class VisionAlignCommand extends CommandBase {
   private boolean runForever;
   private int correctLoops;
   private Boolean seekRight;
+  private boolean vibrate;
 
   public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever) {
-    this(driveTrain, visionSystem, runForever, null);
+    this(driveTrain, visionSystem, runForever, null, false);
+  }
+
+  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, boolean vibrate) {
+    this(driveTrain, visionSystem, runForever, null, vibrate);
   }
 
   /**
    * Creates a new VisionAlignCommand.
    */
-  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, Boolean seekRight) {
+  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, Boolean seekRight, boolean vibrate) {
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
     this.runForever = runForever;
     this.seekRight = seekRight;
+    this.vibrate = vibrate;
     // Use addRequirements() here to declare subsystem dependencies.
     addRequirements(driveTrain, visionSystem);
   }
@@ -64,18 +71,22 @@ public class VisionAlignCommand extends CommandBase {
       Target target = targetOptional.get();
       double xDeg = target.getX();
       double xError = xDeg; // Degrees, Positive is CCW
+      System.out.println("X ERROR:" + xError);
       if (Math.abs(xError) <= DEG_TOLERANCE) {
-        if (!runForever) {
-          correctLoops++;
+        correctLoops++;
+        if (vibrate) {
+          System.out.println("VIBRATE");
+          visionSystem.vibrateController();
         }
         return;
+      } else {
+        correctLoops = 0;
       }
-      steerAdjust = xError * ROTATE_P;
-      if (Math.abs(steerAdjust) < MIN_COMMAND) {
+      steerAdjust = xError * (RobotBase.isReal() ? ROTATE_P : 0.012);
+      if (RobotBase.isReal() && Math.abs(steerAdjust) < MIN_COMMAND) {
         steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
       }
     } else {
-      System.out.println("No Limelight Target");
       Optional<Target> lastTarget = visionSystem.getLimelight().getLastTarget();
       // Seek for target using lastTarget
       double x;
