@@ -66,6 +66,7 @@ public class DetectPathCommand extends CommandBase {
 
             GalacticPath detectedPath = GalacticPaths.findPath(powerCellClose, threeBallsVisible);
             if (detectedPath != null) {
+                galacticAutoCommand.setMessage("[Detect Path] Detected path is " + detectedPath);
                 galacticAutoCommand.setPathDetected(detectedPath); // Found the path!!!!
             }
         }
