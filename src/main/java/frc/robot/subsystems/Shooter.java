@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
   private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltRotationsPerSecond);
 
-  //private FlywheelSim flywheelSim;
+  private FlywheelSim flywheelSim;
   private TalonSRXSimCollection leftTalonSim, rightTalonSim;
 
   /**
@@ -64,14 +64,16 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
     rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
 
-    leftMotor.config_kP(0, P);
-    leftMotor.config_kI(0, I);
-    leftMotor.config_kD(0, D);
-    leftMotor.configAllowableClosedloopError(0, 0, 10);
-    rightMotor.config_kP(0, P);
-    rightMotor.config_kI(0, I);
-    rightMotor.config_kD(0, D);
-    rightMotor.configAllowableClosedloopError(0, 0, 10);
+    if (RobotBase.isReal()) {
+      leftMotor.config_kP(0, P);
+      leftMotor.config_kI(0, I);
+      leftMotor.config_kD(0, D);
+      leftMotor.configAllowableClosedloopError(0, 0, 10);
+      rightMotor.config_kP(0, P);
+      rightMotor.config_kI(0, I);
+      rightMotor.config_kD(0, D);
+      rightMotor.configAllowableClosedloopError(0, 0, 10);
+    }
 
     ShuffleboardLayout layout = driverTab.getLayout("Shooter", BuiltInLayouts.kGrid)
     .withSize(5, 1)
@@ -114,11 +116,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
     // Simulation
     if (RobotBase.isSimulation()) {
-       /*flywheelSim = new FlywheelSim(
+       flywheelSim = new FlywheelSim(
           PLANT,
           DCMotor.getVex775Pro(1),
           4
-       );*/
+       );
        leftTalonSim = leftMotor.getSimCollection();
        rightTalonSim = rightMotor.getSimCollection();
     }
@@ -207,16 +209,14 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
   @Override
   public void simulationPeriodic() {
-    //flywheelSim.setInputVoltage(leftMotor.getMotorOutputVoltage());
+    flywheelSim.setInputVoltage(leftMotor.getMotorOutputVoltage());
     //System.out.println("Left Motor Voltage: " + leftMotor.getMotorOutputVoltage());
-    //flywheelSim.update(0.020);
+    flywheelSim.update(0.020);
     //System.out.println("rad/s from sim: " + flywheelSim.getAngularVelocityRadPerSec());
-    //double rpm = flywheelSim.getAngularVelocityRPM();
+    double rpm = flywheelSim.getAngularVelocityRPM();
     //System.out.println("RPM from sim: " + rpm);
-    //int ticksPerDs = rpmToTicksPerDs(rpm);
-    double rotationsPerSecond = leftMotor.getMotorOutputVoltage() / kvVoltRotationsPerSecond;
-    double rotationsPerMinute = rotationsPerSecond * 60;
-    int ticksPerDs = rpmToTicksPerDs(rotationsPerMinute);
+    int ticksPerDs = rpmToTicksPerDs(rpm);
+
     leftTalonSim.setQuadratureVelocity(ticksPerDs);
     rightTalonSim.setQuadratureVelocity(-ticksPerDs);
   }

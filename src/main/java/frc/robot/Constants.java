@@ -9,6 +9,7 @@ package frc.robot;
 
 import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 import edu.wpi.first.wpilibj.system.LinearSystem;
@@ -157,13 +158,15 @@ public final class Constants {
             public static final double I = 0.0;
             public static final double D = 0.0;
             public static final double MAX_BATTERY_V = 12;
-            public static final double ksVolts = 0.281;
+            public static final double ksVolts = RobotBase.isReal() ? 0.281 : 0;
             public static final double kvVoltRotationsPerSecond = 0.162; // volts per rotations per second
-            //public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond * 2 * Math.PI;
+            public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
+            public static final double kaVoltRotationsPerSecond = 0.00493;
+            public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
             public static final double RPM_THRESHOLD = 10;
             // We never put kA into our feedforward, so just use extremely small amount?
-            //public static final LinearSystem<N1, N1, N1> PLANT =
-            //        LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, 0.000000000000001);
+            public static final LinearSystem<N1, N1, N1> PLANT =
+                    LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, kaVoltRadiansPerSecond);
         }
         public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = meters -> {
             return meters * 247; // todo: Empirically find a formula
