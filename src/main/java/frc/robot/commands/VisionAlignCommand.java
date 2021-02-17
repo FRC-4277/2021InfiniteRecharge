@@ -80,7 +80,7 @@ public class VisionAlignCommand extends CommandBase {
       } else {
         correctLoops = 0;
       }
-      steerAdjust = xError * (RobotBase.isReal() ? ROTATE_P : 0.012);
+      steerAdjust = xError * (RobotBase.isReal() ? ROTATE_P : 0.0075);
       if (RobotBase.isReal() && Math.abs(steerAdjust) < MIN_COMMAND) {
         steerAdjust = Math.copySign(MIN_COMMAND, steerAdjust);
       }

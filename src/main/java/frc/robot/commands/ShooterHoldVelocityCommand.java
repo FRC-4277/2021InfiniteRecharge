@@ -51,6 +51,10 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    if (rpmSource == RPMSource.FROM_SELECTOR) {
+      rpmSource = shooter.getSelectedRPMSource();
+    }
+
     double desiredRPM;
     switch(rpmSource) {
       case CONSTANT:
@@ -102,6 +106,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   public enum RPMSource {
     CONSTANT,
     DRIVER_PROVIDED,
-    VISION
+    VISION,
+    FROM_SELECTOR
   }
 }

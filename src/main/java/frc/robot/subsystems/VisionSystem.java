@@ -72,7 +72,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     this.limelight = new Limelight(driverPipeline, portPipeline);
 
     this.layout = this.driverTab.getLayout("Limelight", BuiltInLayouts.kGrid)
-    .withSize(4, 1)
+    .withSize(5, 1)
     .withPosition(6, 1)
     .withProperties(
       Map.of(

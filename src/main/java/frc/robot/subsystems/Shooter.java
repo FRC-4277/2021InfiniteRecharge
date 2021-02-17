@@ -23,7 +23,10 @@ import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
 
 public class Shooter extends SubsystemBase implements VerifiableSystem {
   //public static final double FORWARDS_SPEED = 0.5;
@@ -34,10 +37,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   private TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
 
   private NetworkTableEntry shooterSpeedEntry;
-  private NetworkTableEntry shooterLeftRPMEntry;
-  private NetworkTableEntry shooterRightRPMEntry;
+  private NetworkTableEntry shooterRPMDisplayEntry;
   private NetworkTableEntry shooterDesiredRPMEntry;
   private NetworkTableEntry shooterReachedRPMEntry;
+  private SendableChooser<RPMSource> rpmSourceSendableChooser;
+  private NetworkTableEntry shooterDesiredRPMSourceEntry;
 
   private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerRotation);
 
@@ -63,12 +67,12 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rightMotor.configAllowableClosedloopError(0, 0, 10);
 
     ShuffleboardLayout layout = driverTab.getLayout("Shooter", BuiltInLayouts.kGrid)
-    .withSize(4, 1)
+    .withSize(5, 1)
     .withPosition(6, 2)
     .withProperties(
       Map.of(
     "Label position", "TOP",
-    "Number of columns", 5,
+    "Number of columns", 4,
     "Number of rows", 1
       )
     );
@@ -80,13 +84,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     .withProperties(Map.of("min", 0, "max", 1))
     .getEntry();
 
-    shooterLeftRPMEntry = layout
-    .add("Left RPM", -1)
-    .withWidget(BuiltInWidgets.kTextView)
-    .getEntry();
-
-    shooterRightRPMEntry = layout
-    .add("Right RPM", -1)
+    shooterRPMDisplayEntry = layout
+    .add("RPM", "")
     .withWidget(BuiltInWidgets.kTextView)
     .getEntry();
 
@@ -96,9 +95,19 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     .getEntry();
 
     shooterReachedRPMEntry = layout
-    .add("Has Reached", false)
+    .add("At Target RPM", false)
     .withWidget(BuiltInWidgets.kBooleanBox)
     .getEntry();
+
+    rpmSourceSendableChooser = new SendableChooser<>();
+    rpmSourceSendableChooser.setDefaultOption("Vision", RPMSource.VISION);
+    rpmSourceSendableChooser.addOption("Manual", RPMSource.DRIVER_PROVIDED);
+    SendableRegistry.setName(rpmSourceSendableChooser, "Source");
+    layout.add(rpmSourceSendableChooser);
+  }
+
+  public RPMSource getSelectedRPMSource() {
+    return rpmSourceSendableChooser.getSelected();
   }
 
   public void runForward() {
@@ -107,6 +116,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void holdVelocityRPM(double rpm) {
+    shooterDesiredRPMEntry.setDouble(rpm);
     holdVelocity(rpmToTicksPerDs(rpm));
   }
 
@@ -174,8 +184,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    shooterLeftRPMEntry.setDouble(getLeftRPM());
-    shooterRightRPMEntry.setDouble(getRightRPM());
+    shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
   }
 
   @Override
