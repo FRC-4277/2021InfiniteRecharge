@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.LinearSystemId;
 import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConstraint;
 import edu.wpi.first.wpilibj.util.Units;
+import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 
 import java.util.function.Function;
@@ -157,8 +158,12 @@ public final class Constants {
             public static final double D = 0.0;
             public static final double MAX_BATTERY_V = 12;
             public static final double ksVolts = 0.281;
-            public static final double kvVoltSecondsPerRotation = 0.162;
+            public static final double kvVoltRotationsPerSecond = 0.162; // volts per rotations per second
+            //public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond * 2 * Math.PI;
             public static final double RPM_THRESHOLD = 10;
+            // We never put kA into our feedforward, so just use extremely small amount?
+            //public static final LinearSystem<N1, N1, N1> PLANT =
+            //        LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, 0.000000000000001);
         }
         public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = meters -> {
             return meters * 247; // todo: Empirically find a formula

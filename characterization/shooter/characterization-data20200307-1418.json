@@ -96678,5 +96678,8 @@
             -874.222900390625,
             -35.498046875
         ]
-    ]
+    ],
+	"test": "Simple",
+    "units": "Rotations",
+    "unitsPerRotation": 1.0
 }

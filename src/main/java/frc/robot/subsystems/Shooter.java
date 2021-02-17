@@ -15,16 +15,20 @@ import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
 
@@ -33,8 +37,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   //public static final double BACKWARDS_SPEED = -0.5; 
   
   //private ShuffleboardTab settingsTab;
-  private TalonSRX leftMotor = new TalonSRX(LEFT_MOTOR_ID);
-  private TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
+  private WPI_TalonSRX leftMotor = new WPI_TalonSRX(LEFT_MOTOR_ID);
+  private WPI_TalonSRX rightMotor = new WPI_TalonSRX(RIGHT_MOTOR_ID);
 
   private NetworkTableEntry shooterSpeedEntry;
   private NetworkTableEntry shooterRPMDisplayEntry;
@@ -43,7 +47,10 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   private SendableChooser<RPMSource> rpmSourceSendableChooser;
   private NetworkTableEntry shooterDesiredRPMSourceEntry;
 
-  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltSecondsPerRotation);
+  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltRotationsPerSecond);
+
+  //private FlywheelSim flywheelSim;
+  private TalonSRXSimCollection leftTalonSim, rightTalonSim;
 
   /**
    * Creates a new Shooter.
@@ -104,6 +111,17 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rpmSourceSendableChooser.addOption("Manual", RPMSource.DRIVER_PROVIDED);
     SendableRegistry.setName(rpmSourceSendableChooser, "Source");
     layout.add(rpmSourceSendableChooser);
+
+    // Simulation
+    if (RobotBase.isSimulation()) {
+       /*flywheelSim = new FlywheelSim(
+          PLANT,
+          DCMotor.getVex775Pro(1),
+          4
+       );*/
+       leftTalonSim = leftMotor.getSimCollection();
+       rightTalonSim = rightMotor.getSimCollection();
+    }
   }
 
   public RPMSource getSelectedRPMSource() {
@@ -122,7 +140,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
   public void holdVelocity(int ticksPerDs) {
     double rpm = ticksPerDsToRPM(ticksPerDs);
-    int rps = (int) Math.round(rpm / 60d);
+    double rps = rpm / 60d;
     double feedForwardVolts = feedforward.calculate(rps);
     double feedForwardNormalized = feedForwardVolts / MAX_BATTERY_V;
     leftMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedForwardNormalized);
@@ -185,6 +203,22 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   public void periodic() {
     // This method will be called once per scheduler run
     shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
+  }
+
+  @Override
+  public void simulationPeriodic() {
+    //flywheelSim.setInputVoltage(leftMotor.getMotorOutputVoltage());
+    //System.out.println("Left Motor Voltage: " + leftMotor.getMotorOutputVoltage());
+    //flywheelSim.update(0.020);
+    //System.out.println("rad/s from sim: " + flywheelSim.getAngularVelocityRadPerSec());
+    //double rpm = flywheelSim.getAngularVelocityRPM();
+    //System.out.println("RPM from sim: " + rpm);
+    //int ticksPerDs = rpmToTicksPerDs(rpm);
+    double rotationsPerSecond = leftMotor.getMotorOutputVoltage() / kvVoltRotationsPerSecond;
+    double rotationsPerMinute = rotationsPerSecond * 60;
+    int ticksPerDs = rpmToTicksPerDs(rotationsPerMinute);
+    leftTalonSim.setQuadratureVelocity(ticksPerDs);
+    rightTalonSim.setQuadratureVelocity(-ticksPerDs);
   }
 
   @Override
