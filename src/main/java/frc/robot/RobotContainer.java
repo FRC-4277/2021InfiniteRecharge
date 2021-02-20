@@ -76,11 +76,11 @@ public class RobotContainer {
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
-  private final Winch winch = new Winch();
-  private final HookElevator hookElevator = new HookElevator();
-  private final VerificationSystem verificationSystem = new VerificationSystem(
+  //private final Winch winch = new Winch();
+  //private final HookElevator hookElevator = new HookElevator();
+  /*private final VerificationSystem verificationSystem = new VerificationSystem(
           driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
-          verificationTab);
+          verificationTab);*/
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
@@ -98,9 +98,9 @@ public class RobotContainer {
   private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem, true, true);
   private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
-  private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
-  private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
-  private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
+  //private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
+  //private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
+  //private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
   private final IntakeLineUpCommand intakeLineUpCommand = new IntakeLineUpCommand(driveTrain, visionSystem);
 
   private SendableChooser<Command> autoChooser;
@@ -127,9 +127,9 @@ public class RobotContainer {
     //SmartDashboard.putData(gate);
     SmartDashboard.putData(cameraSystem);
     SmartDashboard.putData(visionSystem);
-    SmartDashboard.putData(winch);
-    SmartDashboard.putData(hookElevator);
-    SmartDashboard.putData(verificationSystem);
+    //SmartDashboard.putData(winch);
+    //SmartDashboard.putData(hookElevator);
+    //SmartDashboard.putData(verificationSystem);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -314,15 +314,15 @@ public class RobotContainer {
     aButton.whileActiveOnce(visionAlignCommand);
 
     POVButton upPOVButton = new POVButton(xboxController, 0);
-    upPOVButton.whileActiveOnce(winchClimbCommand);
+    //upPOVButton.whileActiveOnce(winchClimbCommand);
 
     //POVButton downPOVButton = new POVButton(xboxController, 180);
 
     POVButton leftPOVButton = new POVButton(xboxController, 270);
-    leftPOVButton.whileActiveOnce(hookDownCommand);
+    //leftPOVButton.whileActiveOnce(hookDownCommand);
 
     POVButton rightPOVButton = new POVButton(xboxController, 90);
-    rightPOVButton.whileActiveOnce(hookUpCommand);
+    //rightPOVButton.whileActiveOnce(hookUpCommand);
 
     JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
     backButton.whileActiveOnce(intakeLineUpCommand);
