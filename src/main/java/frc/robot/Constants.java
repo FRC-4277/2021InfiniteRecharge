@@ -87,8 +87,8 @@ public final class Constants {
 
     public static class Vision {
         public static class Limelight {
-            public static double MOUNT_HEIGHT_M = Units.inchesToMeters(35.25); //todo: change
-            public static double MOUNT_ANGLE_RAD = Math.toRadians(16); // Mount angle, from horizon //todo: change
+            public static double MOUNT_HEIGHT_M = Units.inchesToMeters(30.5); //todo: change
+            public static double MOUNT_ANGLE_RAD = Math.toRadians(27.84868556); // Mount angle, from horizon //todo: change
             public static double PORT_CENTER_HEIGHT_M = Units.inchesToMeters(98.19);
         }
         public static class Pixy2Constants {
@@ -154,7 +154,7 @@ public final class Constants {
         public static final boolean RIGHT_SENSOR_PHASE = false;
         public static final int TICKS_PER_REV = 4096;
         public static class Characteristics {
-            public static final double P = 0.95;
+            public static final double P = 0.2;
             public static final double I = 0.0;
             public static final double D = 0.0;
             public static final double MAX_BATTERY_V = 12;
@@ -163,7 +163,7 @@ public final class Constants {
             public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
             public static final double kaVoltRotationsPerSecond = 0.00493;
             public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
-            public static final double RPM_THRESHOLD = 10;
+            public static final double RPM_THRESHOLD = 50;
             // We never put kA into our feedforward, so just use extremely small amount?
             public static final LinearSystem<N1, N1, N1> PLANT =
                     LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, kaVoltRadiansPerSecond);
