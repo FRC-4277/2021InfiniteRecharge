@@ -244,6 +244,25 @@ public class RobotContainer {
 
       invertControls = () -> driveStick.getRawAxis(3) <= .5; // Invert controls when throttle is negative value
 
+      // Buttons
+      JoystickButton button2 = new JoystickButton(driveStick, 2);
+      button2.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
+
+      JoystickButton triggerButton = new JoystickButton(driveStick, 1);
+      triggerButton.whileActiveOnce(moveHopperUpCommand);
+
+      JoystickButton button3 = new JoystickButton(driveStick, 3);
+      button3.whileActiveOnce(intakeCommand);
+
+      JoystickButton button4 = new JoystickButton(driveStick, 4);
+      button4.whileActiveOnce(reverseIntakeCommand);
+
+      JoystickButton button5 = new JoystickButton(driveStick, 5);
+      button5.whileActiveOnce(visionAlignCommand);
+
+      JoystickButton button6 = new JoystickButton(driveStick, 6);
+      button6.whileActiveOnce(moveHopperDownCommand);
+
       // Drive with Logitech
       driveCommand.setYControllerSupplier(() -> -driveStick.getY(Hand.kLeft));
       driveCommand.setXControllerSupplier(() -> driveStick.getRawAxis(2));
