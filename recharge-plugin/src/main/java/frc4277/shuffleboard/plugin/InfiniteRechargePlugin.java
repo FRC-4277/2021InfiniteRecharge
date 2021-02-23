@@ -7,6 +7,8 @@ import edu.wpi.first.shuffleboard.api.plugin.Description;
 import edu.wpi.first.shuffleboard.api.plugin.Plugin;
 import edu.wpi.first.shuffleboard.api.widget.ComponentType;
 import edu.wpi.first.shuffleboard.api.widget.WidgetType;
+import frc4277.shuffleboard.plugin.cooper.CooperType;
+import frc4277.shuffleboard.plugin.cooper.CooperWidget;
 import frc4277.shuffleboard.plugin.timer.GameTimerType;
 import frc4277.shuffleboard.plugin.timer.GameTimerWidget;
 
@@ -26,7 +28,8 @@ public class InfiniteRechargePlugin extends Plugin {
     public List<DataType> getDataTypes() {
         return ImmutableList.of(
                 //VerticalHopperType.INSTANCE,
-                GameTimerType.INSTANCE
+                GameTimerType.INSTANCE,
+                CooperType.INSTANCE
         );
     }
 
@@ -34,7 +37,8 @@ public class InfiniteRechargePlugin extends Plugin {
     public List<ComponentType> getComponents() {
         return ImmutableList.of(
                 //WidgetType.forAnnotatedWidget(VerticalHopperWidget.class)
-                WidgetType.forAnnotatedWidget(GameTimerWidget.class)
+                WidgetType.forAnnotatedWidget(GameTimerWidget.class),
+                WidgetType.forAnnotatedWidget(CooperWidget.class)
         );
     }
 
@@ -43,6 +47,7 @@ public class InfiniteRechargePlugin extends Plugin {
         return ImmutableMap.<DataType, ComponentType>builder()
                 //.put(VerticalHopperType.INSTANCE, WidgetType.forAnnotatedWidget(VerticalHopperWidget.class))
                 .put(GameTimerType.INSTANCE, WidgetType.forAnnotatedWidget(GameTimerWidget.class))
+                .put(CooperType.INSTANCE, WidgetType.forAnnotatedWidget(CooperWidget.class))
                 .build();
     }
 }

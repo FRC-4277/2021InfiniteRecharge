@@ -35,6 +35,7 @@ import frc.robot.commands.autonomous.SlalomAutoCommand;
 import frc.robot.commands.autonomous.galactic.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galactic.GalacticPath;
 import frc.robot.subsystems.*;
+import frc.robot.util.CooperSendable;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
@@ -220,6 +221,13 @@ public class RobotContainer {
     .withProperties(Map.of("Font Color", "black"))
     .withPosition(7, 0)
     .withSize(2, 1);
+
+    CooperSendable cooperSendable = new CooperSendable();
+    SendableRegistry.add(cooperSendable, "Cooper");
+    driverTab.add(cooperSendable)
+    .withWidget("Cooper")
+    .withPosition(10, 4)
+    .withSize(1, 1);
   }
 
   /**
