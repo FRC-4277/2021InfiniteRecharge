@@ -140,7 +140,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     holdVelocity(rpmToTicksPerDs(rpm));
   }
 
-  public void holdVelocity(int ticksPerDs) {
+  public void holdVelocity(double ticksPerDs) {
     double rpm = ticksPerDsToRPM(ticksPerDs);
     double rps = rpm / 60d;
     double feedForwardVolts = feedforward.calculate(rps);
@@ -187,11 +187,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     return shooterDesiredRPMEntry.getDouble(0.0);
   }
 
-  public int rpmToTicksPerDs(double rpm) {
+  public double rpmToTicksPerDs(double rpm) {
     double ticksPerMinute = rpm * (double) TICKS_PER_REV;
     double ticksPerS = ticksPerMinute / 60d;
     double ticksPerDs = ticksPerS / 10d;
-    return (int) Math.round(ticksPerDs);
+    return ticksPerDs;
   }
 
   public double ticksPerDsToRPM(double ticksPerDs) {
@@ -204,7 +204,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
+    //shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
+    shooterRPMDisplayEntry.setString(String.format("%.2f | %.2f", getLeftRPM(), getRightRPM()));
   }
 
   @Override
@@ -215,10 +216,10 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     //System.out.println("rad/s from sim: " + flywheelSim.getAngularVelocityRadPerSec());
     double rpm = flywheelSim.getAngularVelocityRPM();
     //System.out.println("RPM from sim: " + rpm);
-    int ticksPerDs = rpmToTicksPerDs(rpm);
+    double ticksPerDs = rpmToTicksPerDs(rpm);
 
-    leftTalonSim.setQuadratureVelocity(ticksPerDs);
-    rightTalonSim.setQuadratureVelocity(-ticksPerDs);
+    leftTalonSim.setQuadratureVelocity((int) ticksPerDs);
+    rightTalonSim.setQuadratureVelocity((int) -ticksPerDs);
   }
 
   @Override
