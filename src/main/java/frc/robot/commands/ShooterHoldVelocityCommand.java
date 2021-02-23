@@ -29,6 +29,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     this.rpmSource = rpmSource;
     this.rpm = -1;
     this.runForever = runForever;
+    addRequirements(shooter, visionSystem);
   }
 
   public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, double rpm) {
@@ -42,15 +43,14 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   @Override
   public void initialize() {
     shooter.setReachedRPMDisplay(false);
-    for (int i = 0; i < 5; i++) {
-      visionSystem.usePortPipeline();
-    }
+    visionSystem.usePortPipeline();
     visionSystem.setCalculateDistance(true);
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    RPMSource rpmSource = this.rpmSource;
     if (rpmSource == RPMSource.FROM_SELECTOR) {
       rpmSource = shooter.getSelectedRPMSource();
     }
@@ -88,9 +88,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     shooter.stopShooter();
     shooter.setReachedRPMDisplay(false);
     visionSystem.setCalculateDistance(false);
-    for (int i = 0; i < 5; i++) {
-      visionSystem.useDriverPipeline();
-    }
+    visionSystem.useDriverPipeline();
   }
 
   // Returns true when the command should end.

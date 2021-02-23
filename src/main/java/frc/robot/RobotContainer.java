@@ -90,8 +90,9 @@ public class RobotContainer {
   //private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
   private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
   private final ShooterHoldVelocityCommand shooterHoldVelocityViaVisionCommand =
-          //new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true);
   new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
+  private final ShootAndHopperCommand shootAndHopperCommand = new ShootAndHopperCommand(shooter, hopper, visionSystem,
+          ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR);
           //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
@@ -231,6 +232,11 @@ public class RobotContainer {
 
     drivingFromHome = DriverStation.getInstance().getJoystickIsXbox(0);
 
+    /* Note on shooter commands
+     * ShootAndHopperCommand = Spin up shooter & move hopper up as necessary
+     * ShootHoldVelocityViaVisionCommand = Spin up shooter only, not normally used (so assigned to POV)
+     */
+
     XboxController xboxController = new XboxController(drivingFromHome ? 0 : 1);
     visionSystem.setXboxController(xboxController);
     if (!drivingFromHome) {
@@ -246,7 +252,7 @@ public class RobotContainer {
 
       // Buttons
       JoystickButton button2 = new JoystickButton(driveStick, 2);
-      button2.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
+      button2.whileActiveOnce(shootAndHopperCommand);
 
       JoystickButton triggerButton = new JoystickButton(driveStick, 1);
       triggerButton.whileActiveOnce(moveHopperUpCommand);
@@ -262,6 +268,9 @@ public class RobotContainer {
 
       JoystickButton button6 = new JoystickButton(driveStick, 6);
       button6.whileActiveOnce(moveHopperDownCommand);
+
+      POVButton upPOV = new POVButton(driveStick, 0);
+      upPOV.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 
       // Drive with Logitech
       driveCommand.setYControllerSupplier(() -> -driveStick.getY(Hand.kLeft));
@@ -305,7 +314,7 @@ public class RobotContainer {
     rightBumper.whileActiveOnce(moveHopperDownCommand);
 
     JoystickButton xButton = new JoystickButton(xboxController, kX.value);
-    xButton.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
+    xButton.whileActiveOnce(shootAndHopperCommand);
 
     JoystickButton bButton = new JoystickButton(xboxController, kB.value);
     bButton.whileActiveOnce(shooterBackwardsCommand);
@@ -315,6 +324,7 @@ public class RobotContainer {
 
     POVButton upPOVButton = new POVButton(xboxController, 0);
     //upPOVButton.whileActiveOnce(winchClimbCommand);
+    upPOVButton.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 
     //POVButton downPOVButton = new POVButton(xboxController, 180);
 

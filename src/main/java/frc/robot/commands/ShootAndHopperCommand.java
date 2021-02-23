@@ -1,0 +1,138 @@
+package frc.robot.commands;
+
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants;
+import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.VerticalHopper;
+import frc.robot.subsystems.VisionSystem;
+import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
+
+public class ShootAndHopperCommand extends CommandBase {
+    private static final int RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT = 10; // 20 ms * 10 = 200ms
+    private static final double HOPPER_UP_TO_TOP_SPEED = 0.5; // Speed of hopper when moving ball to top
+    private static final double HOPPER_UP_TO_SHOOTER_SPEED = 0.5; // Speed of hopper when moving ball from top to shooter
+    private static final double BALL_PAUSE_AT_TOP_SECONDS = 0.1; // Time to ensure ball is stationary at top before shooting.
+    private Shooter shooter;
+    private VerticalHopper hopper;
+    private VisionSystem visionSystem;
+    private RPMSource rpmSource;
+    private int loopsReachedRPM = 0;
+    private boolean velocityIsStable;
+    private Timer ballAtTopTimer;
+    private State state;
+    private boolean ballHasLeftTop = false;
+
+    public ShootAndHopperCommand(Shooter shooter, VerticalHopper hopper, VisionSystem visionSystem,
+                                 RPMSource rpmSource) {
+        this.shooter = shooter;
+        this.hopper = hopper;
+        this.visionSystem = visionSystem;
+        this.rpmSource = rpmSource;
+        addRequirements(shooter, hopper, visionSystem);
+    }
+
+    @Override
+    public void initialize() {
+        shooter.setReachedRPMDisplay(false);
+        visionSystem.usePortPipeline();
+        visionSystem.setCalculateDistance(true);
+        loopsReachedRPM = 0;
+        state = State.MOVE_BALL_UP_TO_TOP; // Start off by moving ball up
+    }
+
+    @Override
+    public void execute() {
+        // Get desired RPM from user
+        RPMSource rpmSource = this.rpmSource;
+        if (rpmSource == RPMSource.FROM_SELECTOR) {
+            rpmSource = shooter.getSelectedRPMSource();
+        }
+
+        double desiredRPM;
+        switch (rpmSource) {
+            case DRIVER_PROVIDED:
+                desiredRPM = shooter.getDriverDesiredRPM();
+                break;
+            case VISION:
+                double meters = visionSystem.getCalculatedDistanceMeters();
+                desiredRPM = Constants.Shooter.METERS_TO_RPM_FUNCTION.apply(meters);
+                break;
+            default:
+                return;
+        }
+
+        // Spin up shooter & set velocityIsStable to true when velocity is stable
+        shooter.holdVelocityRPM(desiredRPM);
+        if (shooter.hasReachedRPM(desiredRPM)) {
+            loopsReachedRPM++;
+        } else {
+            loopsReachedRPM = 0;
+        }
+        if (loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT) {
+            shooter.setReachedRPMDisplay(true);
+            velocityIsStable = true;
+        }
+
+        switch (state) {
+            case MOVE_BALL_UP_TO_TOP:
+                /*
+                 * If ball is not on top: Move hopper up
+                 * If ball is on top: Change state to MOVING_TOP_BALL_INTO_SHOOTER
+                 */
+                if (!hopper.isBallPresentTop()) {
+                    hopper.moveUp(HOPPER_UP_TO_TOP_SPEED);
+                } else {
+                    state = State.MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY; // Change state
+                    ballAtTopTimer = new Timer();
+                    ballAtTopTimer.reset();
+                    ballAtTopTimer.start();
+                    ballHasLeftTop = false;
+                }
+                break;
+            case MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY:
+                // Do nothing until shooter velocity is stable
+                if (!velocityIsStable) {
+                    hopper.stopMoving();
+                    return;
+                }
+                // Do nothing until ball on top is there for specified time (makes sure ball is still at the top first)
+                if (!ballAtTopTimer.hasElapsed(BALL_PAUSE_AT_TOP_SECONDS)) {
+                    return;
+                }
+
+                // !!!!! Now start moving up
+                hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED);
+                // Track when the ball leaves the sensor
+                if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
+                    ballHasLeftTop = true;
+                }
+
+                // Now that the ball has left sensor, wait for next ball.
+                if (ballHasLeftTop && hopper.isBallPresentTop()) {
+                    // Once next ball is at sensor, set state to MOVE_BALL_UP_TO_TOP
+                    state = State.MOVE_BALL_UP_TO_TOP;
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        shooter.stopShooter();
+        hopper.stopMoving();
+        shooter.setReachedRPMDisplay(false);
+        visionSystem.setCalculateDistance(false);
+        visionSystem.useDriverPipeline();
+    }
+
+    @Override
+    public boolean isFinished() {
+        return false;
+    }
+
+    public enum State {
+        MOVE_BALL_UP_TO_TOP,
+        MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY
+    }
+}

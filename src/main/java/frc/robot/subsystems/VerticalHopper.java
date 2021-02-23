@@ -80,8 +80,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
             .getEntry();
 
 
-    driverTab.addBoolean("Ramp Full", topBallSensor::get).withWidget(BuiltInWidgets.kBooleanBox)
-    .withPosition(9, 0).withSize(1, 1);
+    driverTab.addBoolean("Ball At Top", this::isBallPresentTop).withWidget(BuiltInWidgets.kBooleanBox)
+    .withPosition(9, 0).withSize(2, 1);
   }
 
   @Override
@@ -100,6 +100,10 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
 
   public void moveUp() {
     leftMotor.set(ControlMode.PercentOutput, UP_SPEED_ENTRY.getDouble(1.0));
+  }
+
+  public void moveUp(double speed) {
+    leftMotor.set(ControlMode.PercentOutput, Math.abs(speed));
   }
 
   public void moveDown() {
@@ -134,6 +138,10 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
       return false;
     }
     return !intakeSensor.get();
+  }
+
+  public boolean isBallPresentTop() {
+    return !topBallSensor.get();
   }
 
   public class VerticalHopperSendable implements Sendable {

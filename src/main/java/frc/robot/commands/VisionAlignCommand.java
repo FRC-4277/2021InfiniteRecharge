@@ -54,9 +54,7 @@ public class VisionAlignCommand extends CommandBase {
   @Override
   public void initialize() {
     visionSystem.setCalculateDistance(true);
-    for (int i = 0; i < 5; i++) {
-      visionSystem.usePortPipeline();
-    }
+    visionSystem.usePortPipeline();
     this.correctLoops = 0;
     // todo : track last target to implement seek
   }
@@ -107,9 +105,8 @@ public class VisionAlignCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     visionSystem.setCalculateDistance(false);
-    for (int i = 0; i < 5; i++) {
-      visionSystem.useDriverPipeline();
-    }
+    visionSystem.useDriverPipeline();
+    visionSystem.stopVibratingController();
   }
 
   // Returns true when the command should end.

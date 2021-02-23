@@ -133,14 +133,22 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     xboxController.setRumble(GenericHID.RumbleType.kLeftRumble, 1.0);
   }
 
+  public void stopVibratingController() {
+    xboxController.setRumble(GenericHID.RumbleType.kLeftRumble, 0);
+  }
+
   public void usePortPipeline() {
-    limelight.setPipeline(portPipeline);
-    limelight.setStreamMode(StreamMode.PIP_MAIN);
+    for (int i = 0; i < 5; i++) { // Not sure why the loop is needed..but it makes it work consistently..
+      limelight.setPipeline(portPipeline);
+      limelight.setStreamMode(StreamMode.PIP_MAIN);
+    }
   }
 
   public void useDriverPipeline() {
-    limelight.setPipeline(driverPipeline);
-    limelight.setStreamMode(StreamMode.PIP_SECONDARY);
+    for (int i = 0; i < 5; i++) {
+      limelight.setPipeline(driverPipeline);
+      limelight.setStreamMode(StreamMode.PIP_SECONDARY);
+    }
   }
 
   private String getLimelightDisplayProperty(Function<Target, Double> function) {
