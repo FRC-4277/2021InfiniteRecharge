@@ -153,6 +153,9 @@ public final class Constants {
         public static final boolean LEFT_SENSOR_PHASE = false;
         public static final boolean RIGHT_SENSOR_PHASE = false;
         public static final int TICKS_PER_REV = 4096;
+        public static final int STATUS_2_FEEDBACK_MS = 20; // 20ms default
+        public static final int STATUS_3_QUADRATURE_MS = 40; // 160ms default
+
         public static class Characteristics {
             public static final double P = 0.2;
             public static final double I = 0.0;

@@ -15,6 +15,7 @@ import java.util.Map;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -63,6 +64,9 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     rightMotor.configFactoryDefault();
     rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
     rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
+
+    setupCANStatusFrames(leftMotor);
+    setupCANStatusFrames(rightMotor);
 
     if (RobotBase.isReal()) {
       leftMotor.config_kP(0, P);
@@ -124,6 +128,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
        leftTalonSim = leftMotor.getSimCollection();
        rightTalonSim = rightMotor.getSimCollection();
     }
+  }
+
+  private void setupCANStatusFrames(WPI_TalonSRX motor) {
+    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_2_FEEDBACK_MS);
+    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, STATUS_3_QUADRATURE_MS);
   }
 
   public RPMSource getSelectedRPMSource() {

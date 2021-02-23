@@ -18,6 +18,7 @@ import com.ctre.phoenix.motorcontrol.NeutralMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.sensors.PigeonIMU;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogGyro;
@@ -104,6 +105,8 @@ public class Robot extends TimedRobot {
     motor.setNeutralMode(NeutralMode.Brake);
     motor.setInverted(inverted);
     motor.setSensorPhase(false); // Andrew EDIT
+    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20); // Andrew EDIT
+    motor.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, 40); // Andrew EDIT
     
     // setup encoder if motor isn't a follower
     if (side != Sides.FOLLOWER) {
