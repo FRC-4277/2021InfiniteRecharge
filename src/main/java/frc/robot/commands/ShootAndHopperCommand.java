@@ -69,10 +69,8 @@ public class ShootAndHopperCommand extends CommandBase {
         } else {
             loopsReachedRPM = 0;
         }
-        if (loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT) {
-            shooter.setReachedRPMDisplay(true);
-            velocityIsStable = true;
-        }
+        velocityIsStable = loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT;
+        shooter.setReachedRPMDisplay(velocityIsStable);
 
         switch (state) {
             case MOVE_BALL_UP_TO_TOP:
