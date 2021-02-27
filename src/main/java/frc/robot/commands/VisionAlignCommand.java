@@ -20,7 +20,7 @@ public class VisionAlignCommand extends CommandBase {
   private static final double DEG_TOLERANCE = 5d;
   private static final double MIN_COMMAND = 0.1;
   private static final double SEEK_SPEED = 0.1;
-  private static final double CORRECT_LOOPS_NEEDED = 5;
+  private static final double CORRECT_LOOPS_NEEDED = 10;
 
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;

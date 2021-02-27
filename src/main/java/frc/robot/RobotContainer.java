@@ -93,7 +93,7 @@ public class RobotContainer {
   private final ShooterHoldVelocityCommand shooterHoldVelocityViaVisionCommand =
   new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
   private final ShootAndHopperCommand shootAndHopperCommand = new ShootAndHopperCommand(shooter, hopper, visionSystem,
-          ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR);
+          ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
           //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
   private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
@@ -162,7 +162,7 @@ public class RobotContainer {
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
     autoChooser.addOption("Galactic Search",
-            new GalacticAutoCommand(this, driveTrain, visionSystem, hopper, intake));
+            new GalacticAutoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
 
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {

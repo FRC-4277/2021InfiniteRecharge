@@ -108,13 +108,13 @@ public final class Constants {
 
         /* https://www.desmos.com/calculator/sxcsdbgjfv */
         // Robot Start X
-        public static final double ROBOT_START_X = Units.feetToMeters(3.82);
+        public static final double ROBOT_START_X = Units.feetToMeters(3.15);
         // Distance to CLOSE ball
         public static final double CLOSE_BALL_DISTANCE = Units.feetToMeters(3.68);
         // Distance to FAR ball
         public static final double FAR_BALL_DISTANCE = Units.feetToMeters(11.18);
         // How close to get to the balls, FROM front of robot (hence adding half of length of obt)
-        public static final double DESIRED_DISTANCE_TO_BALL = Units.inchesToMeters(12) + (RobotDimensions.LENGTH / 2d);
+        public static final double DESIRED_DISTANCE_TO_BALL = Units.inchesToMeters(12 + 12) + (RobotDimensions.LENGTH / 2d);
         // Speed to go when driving towards ball to intake
         public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.15;
         // Time to wait before moving again after ball is detected at intake sensor

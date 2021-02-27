@@ -1,6 +1,7 @@
 package frc.robot.commands.autonomous.galactic;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.util.Units;
 
 import java.util.List;
 
@@ -35,8 +36,8 @@ public class GalacticPaths {
             PathColor.BLUE,
             PathLetter.B,
             new Translation2d(15.0, 5.0),
-            new Translation2d(20.0, 10.0),
-            new Translation2d(25.0, 5.0)
+            new Translation2d(20.0+.75, 10.0),
+            new Translation2d(25.0+.75, 5.0)
     );
 
     public static List<GalacticPath> getAllPaths() {

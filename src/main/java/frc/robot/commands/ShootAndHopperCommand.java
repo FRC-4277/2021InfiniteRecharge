@@ -22,14 +22,53 @@ public class ShootAndHopperCommand extends CommandBase {
     private Timer ballAtTopTimer;
     private State state;
     private boolean ballHasLeftTop = false;
+    private int ballCount = 0;
+    private boolean runForever = false;
+    private boolean finished = false;
+    private int desiredRPM;
+    private Timer finishTimer = null;
 
     public ShootAndHopperCommand(Shooter shooter, VerticalHopper hopper, VisionSystem visionSystem,
-                                 RPMSource rpmSource) {
+                                 RPMSource rpmSource, boolean addRequirementHopper) {
         this.shooter = shooter;
         this.hopper = hopper;
         this.visionSystem = visionSystem;
         this.rpmSource = rpmSource;
-        addRequirements(shooter, hopper, visionSystem);
+        if (addRequirementHopper) {
+            addRequirements(shooter, hopper, visionSystem);
+        } else {
+            addRequirements(shooter, visionSystem);
+        }
+        runForever = true;
+    }
+
+    public ShootAndHopperCommand(Shooter shooter, VerticalHopper hopper, VisionSystem visionSystem,
+    RPMSource rpmSource, boolean runForever, boolean addRequirementHopper) {
+        this.shooter = shooter;
+        this.hopper = hopper;
+        this.visionSystem = visionSystem;
+        this.rpmSource = rpmSource;
+        this.runForever = runForever;
+        if (addRequirementHopper) {
+            addRequirements(shooter, hopper, visionSystem);
+        } else {
+            addRequirements(shooter, visionSystem);
+        }
+    }
+
+    public ShootAndHopperCommand(Shooter shooter, VerticalHopper hopper, VisionSystem visionSystem, boolean runForever,
+    int desiredRPM, boolean addRequirementHopper) {
+        this.shooter = shooter;
+        this.hopper = hopper;
+        this.visionSystem = visionSystem;
+        this.rpmSource = RPMSource.CONSTANT;
+        this.runForever = runForever;
+        this.desiredRPM = desiredRPM;
+        if (addRequirementHopper) {
+            addRequirements(shooter, hopper, visionSystem);
+        } else {
+            addRequirements(shooter, visionSystem);
+        }
     }
 
     @Override
@@ -39,6 +78,9 @@ public class ShootAndHopperCommand extends CommandBase {
         visionSystem.setCalculateDistance(true);
         loopsReachedRPM = 0;
         state = State.MOVE_BALL_UP_TO_TOP; // Start off by moving ball up
+        ballCount = 0;
+        finished = false;
+        finishTimer = null;
     }
 
     @Override
@@ -57,6 +99,9 @@ public class ShootAndHopperCommand extends CommandBase {
             case VISION:
                 double meters = visionSystem.getCalculatedDistanceMeters();
                 desiredRPM = Constants.Shooter.METERS_TO_RPM_FUNCTION.apply(meters);
+                break;
+            case CONSTANT:
+                desiredRPM = this.desiredRPM;
                 break;
             default:
                 return;
@@ -104,7 +149,17 @@ public class ShootAndHopperCommand extends CommandBase {
                 // Track when the ball leaves the sensor
                 if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
                     ballHasLeftTop = true;
+                    ballCount++;
                 }
+
+                if (ballCount >= 3) {
+                    finished = true;
+                    //finishTimer = new Timer();
+                }
+
+                /*if (finishTimer != null && finishTimer.hasElapsed(1.0)) {
+                    finished = true;
+                }*/
 
                 // Now that the ball has left sensor, wait for next ball.
                 if (ballHasLeftTop && hopper.isBallPresentTop()) {
@@ -126,7 +181,7 @@ public class ShootAndHopperCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return false;
+        return !runForever && finished;
     }
 
     public enum State {
