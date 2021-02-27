@@ -146,11 +146,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
   public void holdVelocityRPM(double rpm) {
     shooterDesiredRPMEntry.setDouble(rpm);
-    holdVelocity(rpmToTicksPerDs(rpm));
+    holdVelocity(rpmToTicksPerDs(rpm), rpm);
   }
 
-  public void holdVelocity(double ticksPerDs) {
-    double rpm = ticksPerDsToRPM(ticksPerDs);
+  private void holdVelocity(double ticksPerDs, double equivalentRPM) {
+    double rpm = equivalentRPM;
     double rps = rpm / 60d;
     double feedForwardVolts = feedforward.calculate(rps);
     double feedForwardNormalized = feedForwardVolts / MAX_BATTERY_V;
