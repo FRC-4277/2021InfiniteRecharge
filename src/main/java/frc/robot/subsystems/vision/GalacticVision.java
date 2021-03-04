@@ -30,7 +30,7 @@ public class GalacticVision {
         Collections.reverse(list);
 
         // Limit list to three largest targets
-        if (list.size() >= 3) {
+        if (list.size() > 3) {
             // Top three range: [0..3) (0 is inclusive & 3 is exclusive so it's indexes 0,1,2)
             list = new ArrayList<>(list.subList(0, 3));
         }
