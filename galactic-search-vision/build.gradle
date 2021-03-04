@@ -1,0 +1,70 @@
+plugins {
+    id 'application'
+    //id 'com.github.johnrengelman.shadow' version '6.1.0'
+    id 'org.openjfx.javafxplugin' version '0.0.9'
+    id 'org.beryx.jlink' version '2.23.1'
+    id 'idea'
+}
+
+repositories {
+    mavenCentral()
+    flatDir {
+        dirs '/usr/local/frc/java', './opencv/'
+    }
+    maven {
+        url 'https://frcmaven.wpi.edu/artifactory/release/'
+    }
+}
+
+dependencies {
+    // Add ntcore-java
+    compile "edu.wpi.first.ntcore:ntcore-java:2021.2.2"
+
+    // Add cscore-java
+    compile "edu.wpi.first.cscore:cscore-java:2021.2.2"
+    compile "edu.wpi.first.cameraserver:cameraserver-java:2021.2.2"
+    compile name: 'opencv-347'
+
+    // Add wpiutil-java
+    compile "edu.wpi.first.wpiutil:wpiutil-java:2021.2.2"
+
+    // Add ntcore-jni for runtime. We are adding all supported platforms
+    // so that our application will work on all supported platforms.
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2021.2.2:windowsx86"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2021.2.2:windowsx86-64"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2021.2.2:linuxx86-64"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2021.2.2:linuxraspbian"
+    runtime "edu.wpi.first.ntcore:ntcore-jni:2021.2.2:osxx86-64"
+
+    runtime "edu.wpi.first.cscore:cscore-jni:2021.2.2:windowsx86"
+    runtime "edu.wpi.first.cscore:cscore-jni:2021.2.2:windowsx86-64"
+    runtime "edu.wpi.first.cscore:cscore-jni:2021.2.2:linuxx86-64"
+    runtime "edu.wpi.first.cscore:cscore-jni:2021.2.2:linuxraspbian"
+    runtime "edu.wpi.first.cscore:cscore-jni:2021.2.2:osxx86-64"
+}
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+javafx {
+    version = "11"
+    modules = ['javafx.controls', 'javafx.web', 'javafx.fxml', 'javafx.graphics', 'javafx.swing']
+}
+
+task copyOpenCVDll(type: Copy) {
+    from('opencv')
+    into('build/image/bin')
+    include('*.dll')
+}
+
+jlink {
+    launcher {
+        name = 'GalacticSearchVision'
+    }
+}
+
+build.dependsOn(tasks.jlink)
+build.dependsOn(copyOpenCVDll)
+copyOpenCVDll.shouldRunAfter(tasks.jlink)
+
+mainClassName = "frc4277.galacticvision.GalacticVision"

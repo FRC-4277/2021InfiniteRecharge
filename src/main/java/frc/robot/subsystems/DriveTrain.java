@@ -9,13 +9,11 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
-import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -40,23 +38,21 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpiutil.math.VecBuilder;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
-import frc.robot.util.limelight.LimelightSim;
+import frc.robot.subsystems.vision.limelight.LimelightSim;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static frc.robot.Constants.DriveTrain.*;
 
 
 public class DriveTrain extends SubsystemBase implements VerifiableSystem {
-  private ShuffleboardTab autonomousTab;
+  private final ShuffleboardTab autonomousTab;
   private final WPI_TalonFX frontLeftMotor = new WPI_TalonFX(FRONT_LEFT);
   private final WPI_TalonFX frontRightMotor = new WPI_TalonFX(FRONT_RIGHT);
   private final WPI_TalonFX backLeftMotor = new WPI_TalonFX(BACK_LEFT);

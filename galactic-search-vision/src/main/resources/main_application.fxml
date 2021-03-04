@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane minHeight="800" minWidth="1000" prefHeight="800" prefWidth="1000" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="frc4277.galacticvision.controllers.MainApplication">
+   <padding><Insets bottom="25" left="25" right="25" top="25" /></padding>
+   <left>
+      <GridPane hgap="10" BorderPane.alignment="CENTER">
+         <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" prefWidth="150.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="150.0" prefWidth="150.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+         </rowConstraints>
+         <Label text="Blur W" GridPane.halignment="CENTER" />
+         <Label text="Blur H" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+         <TextField fx:id="blurW" text="15" GridPane.rowIndex="1" />
+         <TextField fx:id="blurH" text="15" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+         <Label text="Gaussian Blur W" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+         <Label text="Gaussian Blur H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+         <TextField fx:id="gaussianBlurW" text="0" GridPane.rowIndex="3" />
+         <TextField fx:id="gaussianBlurH" text="0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+         <Label text="H Min" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+         <Label text="H Max" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="4" />
+         <TextField fx:id="hMin" text="20" GridPane.rowIndex="5" />
+         <TextField fx:id="hMax" text="35" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+         <Label text="S Min" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+         <Label text="S Max" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="6" />
+         <TextField fx:id="sMin" text="60" GridPane.rowIndex="7" />
+         <TextField fx:id="sMax" text="255" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+         <Label text="V Min" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+         <Label text="V Max" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="8" />
+         <TextField fx:id="vMin" text="0" GridPane.rowIndex="9" />
+         <TextField fx:id="vMax" text="255" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+         <Label text="Erosion W" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+         <Label text="Erosion H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="10" />
+         <TextField fx:id="erosionW" text="0" GridPane.rowIndex="11" />
+         <TextField fx:id="erosionH" text="0" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+         <Label text="Dilation W" GridPane.halignment="CENTER" GridPane.rowIndex="12" />
+         <Label text="Dilation H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="12" />
+         <TextField fx:id="dilationW" text="0" GridPane.rowIndex="13" />
+         <TextField fx:id="dilationH" text="0" GridPane.columnIndex="1" GridPane.rowIndex="13" />
+         <Label text="Open W" GridPane.halignment="CENTER" GridPane.rowIndex="14" />
+         <Label text="Open H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="14" />
+         <Label text="Close W" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
+         <Label text="Close H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="16" />
+         <TextField fx:id="closeW" text="0" GridPane.rowIndex="17" />
+         <TextField fx:id="closeH" text="0" GridPane.columnIndex="1" GridPane.rowIndex="17" />
+         <TextField fx:id="openW" text="7" GridPane.rowIndex="15" />
+         <TextField fx:id="openH" text="7" GridPane.columnIndex="1" GridPane.rowIndex="15" />
+         <Label text="Erosion2 W" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
+         <Label text="Erosion2 H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="18" />
+         <TextField fx:id="erosion2W" text="0" GridPane.rowIndex="19" />
+         <TextField fx:id="erosion2H" text="0" GridPane.columnIndex="1" GridPane.rowIndex="19" />
+         <Label text="Dilation2 W" GridPane.halignment="CENTER" GridPane.rowIndex="20" />
+         <Label text="Dilation2 H" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="20" />
+         <TextField fx:id="dilation2W" text="5" GridPane.rowIndex="21" />
+         <TextField fx:id="dilation2H" text="5" GridPane.columnIndex="1" GridPane.rowIndex="21" />
+      </GridPane>
+   </left>
+   <top>
+      <Label text="FRC 4277 - Galactic Search Autonomous Computer Vision" BorderPane.alignment="CENTER">
+         <font>
+            <Font size="17.0" />
+         </font></Label>
+   </top>
+   <center>
+      <BorderPane prefHeight="600.0" prefWidth="600.0" BorderPane.alignment="CENTER">
+         <center>
+            <StackPane BorderPane.alignment="CENTER">
+               <padding>
+                  <Insets bottom="15" left="15" right="15" />
+               </padding>
+               <ImageView fx:id="video" fitHeight="600.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" BorderPane.alignment="CENTER" />
+            </StackPane>
+         </center>
+         <bottom>
+            <HBox alignment="CENTER">
+               <Label text="View: " />
+               <ChoiceBox fx:id="viewChoiceBox" prefWidth="500.0" BorderPane.alignment="CENTER" />
+            </HBox>
+         </bottom>
+      </BorderPane>
+   </center>
+</BorderPane>

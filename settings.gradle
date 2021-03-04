@@ -28,3 +28,5 @@ pluginManagement {
 
 include 'recharge-plugin'
 include 'recharge-vision'
+include 'galactic-search-vision'
+

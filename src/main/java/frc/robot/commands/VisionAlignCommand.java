@@ -12,8 +12,8 @@ import java.util.Optional;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.VisionSystem;
-import frc.robot.util.limelight.Target;
+import frc.robot.subsystems.vision.VisionSystem;
+import frc.robot.subsystems.vision.limelight.Target;
 
 public class VisionAlignCommand extends CommandBase {
   private static final double ROTATE_P = 0.01d;

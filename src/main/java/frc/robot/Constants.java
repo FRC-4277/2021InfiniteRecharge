@@ -102,9 +102,33 @@ public final class Constants {
         public static final double WIDTH = 0.69596;
     }
 
-    public static class GalacticSearch {
+    public static class GalacticSearchVideo {
         // Area threshold for ball to be considered CLOSE (Pixy camera)
         public static final int PIXY_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL = 3445; // todo: change
+
+        /* https://www.desmos.com/calculator/sxcsdbgjfv */
+        // Robot Start X
+        public static final double ROBOT_START_X = Units.feetToMeters(3.15);
+        // Distance to CLOSE ball
+        public static final double CLOSE_BALL_DISTANCE = Units.feetToMeters(3.68);
+        // Distance to FAR ball
+        public static final double FAR_BALL_DISTANCE = Units.feetToMeters(11.18);
+        // How close to get to the balls, FROM front of robot (hence adding half of length of obt)
+        public static final double DESIRED_DISTANCE_TO_BALL = Units.inchesToMeters(12 + 12) + (RobotDimensions.LENGTH / 2d);
+        // Speed to go when driving towards ball to intake
+        public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.15;
+        // Time to wait before moving again after ball is detected at intake sensor
+        public static final double WAIT_AFTER_INTAKE_SECONDS = 0.5;
+
+        // X of end zone, https://www.desmos.com/calculator/yijiq0dal9
+        public static final double ROBOT_END_X = Units.feetToMeters(27.5);
+    }
+
+    public static class GalacticSearch {
+        // Area threshold for ball to be considered CLOSE (Pixy camera)
+        public static final int VISION_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL = 3445; // todo: change
+        //
+        public static final int VISION_DIFFERENT_X_THRESHOLD = 30;
 
         /* https://www.desmos.com/calculator/sxcsdbgjfv */
         // Robot Start X

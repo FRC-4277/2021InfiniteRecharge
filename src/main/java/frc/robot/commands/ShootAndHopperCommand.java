@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.VerticalHopper;
-import frc.robot.subsystems.VisionSystem;
+import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
 
 public class ShootAndHopperCommand extends CommandBase {

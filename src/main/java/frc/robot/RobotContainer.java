@@ -7,7 +7,7 @@
 
 package frc.robot;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
@@ -32,15 +32,19 @@ import frc.robot.commands.autonomous.BarrelAutoCommand;
 import frc.robot.commands.autonomous.BounceAutoCommand;
 import frc.robot.commands.autonomous.DriveStraightXCommand;
 import frc.robot.commands.autonomous.SlalomAutoCommand;
-import frc.robot.commands.autonomous.galactic.GalacticAutoCommand;
-import frc.robot.commands.autonomous.galactic.GalacticPath;
+import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
+import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
+import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.vision.GalacticVision;
+import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.util.CooperSendable;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 import static edu.wpi.first.wpilibj.XboxController.Button.*;
@@ -161,6 +165,8 @@ public class RobotContainer {
     autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
+    autoChooser.addOption("Galactic Search (for video)",
+            new GalacticAutoVideoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
     autoChooser.addOption("Galactic Search",
             new GalacticAutoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
 
@@ -184,6 +190,16 @@ public class RobotContainer {
             new AimShootPickupShootAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));*/
 
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
+
+    NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous/Autonomous Command")
+            .getEntry("selected")
+            .addListener(notification -> {
+              if (Objects.equals(notification.value.getString(), "Galactic Search")) {
+                System.out.println("GALACTIC SEARCH!");
+                cameraSystem.switchToIntake();
+              }
+            },
+            EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate);
 
     autonomousMessageEntry = autonomousTab
             .add("Autonomous Message", "...")

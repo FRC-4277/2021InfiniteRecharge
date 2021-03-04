@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
-import frc.robot.commands.autonomous.galactic.GalacticPath;
+import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
 
 import java.util.List;
 import java.util.Map;

@@ -7,6 +7,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RunVerificationsCommand;
+import frc.robot.subsystems.vision.VisionSystem;
 
 import java.util.HashMap;
 import java.util.List;

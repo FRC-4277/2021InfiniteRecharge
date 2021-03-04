@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.subsystems.VisionSystem;
+import frc.robot.subsystems.vision.VisionSystem;
 
 public class IntakeLineUpCommand extends CommandBase {
   private static final double TURN_P = 0.025d;

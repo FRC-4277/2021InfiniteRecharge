@@ -14,7 +14,7 @@ import frc.robot.commands.*;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.VerticalHopper;
-import frc.robot.subsystems.VisionSystem;
+import frc.robot.subsystems.vision.VisionSystem;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
