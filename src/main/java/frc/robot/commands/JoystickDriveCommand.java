@@ -52,6 +52,9 @@ public class JoystickDriveCommand extends CommandBase {
       y *= -1;
     }
 
+    // Rotation factor
+    x *= driveTrain.getRotationFactor();
+
     driveTrain.joystickDrive(y, x);
   }
 

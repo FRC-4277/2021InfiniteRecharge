@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.VerticalHopper;
 
 public class AutoHopperMoveInCommand extends CommandBase {
-  private VerticalHopper hopper;
+  private final VerticalHopper hopper;
   private boolean pulsing = false;
   private Long lastBallInTime = null;
   private boolean waitingBetween = false;

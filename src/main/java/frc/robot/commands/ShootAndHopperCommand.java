@@ -12,7 +12,7 @@ public class ShootAndHopperCommand extends CommandBase {
     private static final int RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT = 10; // 20 ms * 10 = 200ms
     private static final double HOPPER_UP_TO_TOP_SPEED = 0.5; // Speed of hopper when moving ball to top
     private static final double HOPPER_UP_TO_SHOOTER_SPEED = 0.5; // Speed of hopper when moving ball from top to shooter
-    private static final double BALL_PAUSE_AT_TOP_SECONDS = 0.1; // Time to ensure ball is stationary at top before shooting.
+    private static final double BALL_PAUSE_AT_TOP_SECONDS = 0.5; // Time to ensure ball is stationary at top before shooting.
     private Shooter shooter;
     private VerticalHopper hopper;
     private VisionSystem visionSystem;
@@ -25,7 +25,7 @@ public class ShootAndHopperCommand extends CommandBase {
     private int ballCount = 0;
     private boolean runForever = false;
     private boolean finished = false;
-    private int desiredRPM;
+    private double desiredRPM;
     private Timer finishTimer = null;
 
     public ShootAndHopperCommand(Shooter shooter, VerticalHopper hopper, VisionSystem visionSystem,
@@ -81,17 +81,12 @@ public class ShootAndHopperCommand extends CommandBase {
         ballCount = 0;
         finished = false;
         finishTimer = null;
-    }
 
-    @Override
-    public void execute() {
         // Get desired RPM from user
         RPMSource rpmSource = this.rpmSource;
         if (rpmSource == RPMSource.FROM_SELECTOR) {
             rpmSource = shooter.getSelectedRPMSource();
         }
-
-        double desiredRPM;
         switch (rpmSource) {
             case DRIVER_PROVIDED:
                 desiredRPM = shooter.getDriverDesiredRPM();
@@ -106,7 +101,10 @@ public class ShootAndHopperCommand extends CommandBase {
             default:
                 return;
         }
+    }
 
+    @Override
+    public void execute() {
         // Spin up shooter & set velocityIsStable to true when velocity is stable
         shooter.holdVelocityRPM(desiredRPM);
         if (shooter.hasReachedRPM(desiredRPM)) {
@@ -141,6 +139,7 @@ public class ShootAndHopperCommand extends CommandBase {
                 }
                 // Do nothing until ball on top is there for specified time (makes sure ball is still at the top first)
                 if (!ballAtTopTimer.hasElapsed(BALL_PAUSE_AT_TOP_SECONDS)) {
+                    hopper.stopMoving();
                     return;
                 }
 

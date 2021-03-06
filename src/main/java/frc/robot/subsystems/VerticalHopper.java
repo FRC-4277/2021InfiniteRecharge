@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
-  private static final int DEFAULT_INDEX_RUN_TIME = 10;
+  private static final int DEFAULT_INDEX_RUN_TIME = 300;
   private static final int DEFAULT_INDEX_BETWEEN_TIME = 400;
   private final NetworkTableEntry UP_SPEED_ENTRY;
   private final NetworkTableEntry INDEX_RUN_TIME_MS_ENTRY;

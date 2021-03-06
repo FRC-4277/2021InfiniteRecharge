@@ -14,6 +14,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
+import edu.wpi.first.networktables.EntryListenerFlags;
+import edu.wpi.first.networktables.EntryNotification;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
 import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.DifferentialDrivetrainSim;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -47,6 +52,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static frc.robot.Constants.DriveTrain.*;
 
@@ -62,6 +68,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private final SpeedControllerGroup rightGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
   
   private final AHRS navX = new AHRS();
+  private final NetworkTableEntry rotationFactor;
 
   private DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
@@ -78,15 +85,17 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private TalonSRXSimCollection frontLeftSimSensors, frontRightSimSensors, backLeftSimSensors, backRightSimSensors;
   private final Field2d fieldSim = new Field2d();
   private ShuffleboardTab simulationTab;
+  private ShuffleboardTab settingsTab;
   private SendableChooser<Translation2d> startingPositionChooser;
 
   /**
    * Creates a new DriveTrain.
    */
-  public DriveTrain(ShuffleboardTab testTab, ShuffleboardTab simulationTab, ShuffleboardTab autonomousTab) {
+  public DriveTrain(ShuffleboardTab testTab, ShuffleboardTab simulationTab, ShuffleboardTab autonomousTab, ShuffleboardTab settingsTab) {
     //this.testTab = testTab;
     this.simulationTab = simulationTab;
     this.autonomousTab = autonomousTab;
+    this.settingsTab = settingsTab;
 
     // Reset TalonSRX config
     frontLeftMotor.configFactoryDefault();
@@ -127,6 +136,28 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     .withWidget(BuiltInWidgets.kTextView);
     testTab.add(new ZeroNavXCommand(this));
     testTab.add(new RotateToCommand(this, 90));
+
+    SendableChooser<NeutralMode> chooser = new SendableChooser<>();
+    SendableRegistry.setName(chooser, "Neutral Mode");
+    chooser.setDefaultOption("Coast", NeutralMode.Coast);
+    chooser.addOption("Brake", NeutralMode.Brake);
+    settingsTab.add(chooser).withSize(2, 1).withPosition(0, 1);
+    NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Settings").getSubTable("Neutral Mode")
+            .getEntry("active")
+    .addListener(entryNotification -> {
+      NeutralMode neutralMode = chooser.getSelected();
+      System.out.println("New Neutral Mode: " + neutralMode.name());
+      frontLeftMotor.setNeutralMode(neutralMode);
+      frontRightMotor.setNeutralMode(neutralMode);
+      backLeftMotor.setNeutralMode(neutralMode);
+      backRightMotor.setNeutralMode(neutralMode);
+    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
+
+    rotationFactor = settingsTab.add("Rotation Factor", 0.75)
+            .withPosition(0, 2)
+            .withSize(2, 1)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
 
     if (RobotBase.isSimulation()) {
       frontLeftSimMotor = new WPI_TalonSRX(FRONT_LEFT);
@@ -226,6 +257,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   public DifferentialDriveOdometry getOdometry() {
     return odometry;
+  }
+
+  public double getRotationFactor() {
+    return rotationFactor.getDouble(1.0);
   }
 
   private void configureTalon(TalonFX talonFX) {

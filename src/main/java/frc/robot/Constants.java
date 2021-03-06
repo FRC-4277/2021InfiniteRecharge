@@ -195,8 +195,11 @@ public final class Constants {
             public static final LinearSystem<N1, N1, N1> PLANT =
                     LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, kaVoltRadiansPerSecond);
         }
-        public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = meters -> {
-            return meters * 247; // todo: Empirically find a formula
+        public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = x -> {
+            return -30.7828 * Math.pow(x,3) +
+                    561.778 * Math.pow(x,2) +
+                    -3191.47 * x +
+                    7827.1; // todo: Empirically find a formula
         };
     }
 

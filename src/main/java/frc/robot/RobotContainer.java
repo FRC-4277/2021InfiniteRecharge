@@ -73,7 +73,7 @@ public class RobotContainer {
   private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
 
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab, autonomousTab);
+  private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab, autonomousTab, settingsTab);
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
