@@ -63,7 +63,13 @@ public class DriveToNextBallCommand extends CommandBase {
 
         galacticAutoCommand.setMessage("[Next Ball] Target pos: " + targetPosition);
 
-        Trajectory trajectory = driveTrain.generateTrajectory(currentPosition, targetPosition, 1, 0.5, false, false);
+        double velocity = 3;
+        double acceleration = 2;
+        if (ballIndex == 2) {
+            velocity = 1;
+            acceleration = 0.5;
+        }
+        Trajectory trajectory = driveTrain.generateTrajectory(currentPosition, targetPosition, velocity, acceleration, false, false);
         ramseteCommand = driveTrain.generateRamseteCommand(trajectory, false);
         ramseteCommand.initialize();
     }

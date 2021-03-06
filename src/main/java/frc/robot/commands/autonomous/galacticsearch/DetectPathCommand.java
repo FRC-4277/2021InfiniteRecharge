@@ -38,13 +38,40 @@ public class DetectPathCommand extends CommandBase {
 
         GalacticVision galacticVision = visionSystem.getGalacticVision();
         List<GalacticVision.PowerCellTarget> targets = galacticVision.getLargestPowerCells();
-        if (targets.size() < 3) {
+        if (targets.size() < 2) {
+            galacticAutoCommand.setMessage("[Detect Path] need to detect at least 2, waiting...");
+            return;
+        }
+
+        GalacticVision.PowerCellTarget largestTarget = targets.get(0);
+
+        GalacticPath path;
+        if (targets.size() == 3) {
+            if (largestTarget.getArea() > 300) {
+                path = GalacticPaths.A_RED;
+            } else {
+                path = GalacticPaths.B_BLUE;
+            }
+        } else {
+            // A Blue or B Red
+            double differenceInX = Math.abs(targets.get(0).getX() - targets.get(1).getX());
+            if (differenceInX <= 20) {
+                path = GalacticPaths.B_RED;
+            } else {
+                path = GalacticPaths.A_BLUE;
+            }
+        }
+
+        SmartDashboard.putString("GS Path", path.toString());
+        galacticAutoCommand.setPathDetected(path);
+
+        /*if (targets.size() < 3) {
             galacticAutoCommand.setMessage("[Detect Path] Only found " + targets.size() + " power cells, waiting...");
             return;
         }
-        GalacticVision.PowerCellTarget largestPowerCell = targets.get(0);
+        GalacticVision.PowerCellTarget largestPowerCell = targets.get(0);*/
 
-        // TRUE for red, FALSE for blue
+        /*// TRUE for red, FALSE for blue
         boolean powerCellClose = largestPowerCell.getArea() > GalacticSearch.VISION_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL;
         SmartDashboard.putNumber("[GS] Area", largestPowerCell.getArea());
         // TRUE for A, FALSE for B
@@ -58,7 +85,7 @@ public class DetectPathCommand extends CommandBase {
             if (RobotBase.isReal()) {
                 galacticAutoCommand.setPathDetected(detectedPath); // Found the path!!!!
             }
-        }
+        }*/
     }
 
     private boolean areXCoordinatesDifferent(List<GalacticVision.PowerCellTarget> targets) {

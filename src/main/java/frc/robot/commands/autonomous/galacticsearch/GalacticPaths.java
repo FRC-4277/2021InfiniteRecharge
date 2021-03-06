@@ -28,7 +28,7 @@ public class GalacticPaths {
             PathLetter.B,
             new Translation2d(7.5, 10.0),
             new Translation2d(12.5+.75, 5.0),
-            new Translation2d(17.5+.75, 10.0)
+            new Translation2d(17.5+.75+.5, 10.0)
     );
 
     public static final GalacticPath B_BLUE = GalacticPath.fromFeet(
