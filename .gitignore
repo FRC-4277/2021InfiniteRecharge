@@ -279,4 +279,6 @@ recharge-plugin/.settings
 recharge-plugin/bin
 recharge-vision/.settings
 recharge-vision/bin
+!galactic-search-vision/opencv/opencv-347.jar
+!galactic-search-vision/opencv/opencv_java347.dll
 ## End of Andrew
