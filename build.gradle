@@ -85,3 +85,17 @@ jar {
     from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
     manifest edu.wpi.first.gradlerio.GradleRIOPlugin.javaManifest(ROBOT_MAIN_CLASS)
 }
+
+task copyPathFiles(type: Copy) {
+    from 'PathWeaver'
+    into 'src/main/deploy/waypoints'
+    include '**/*.path'
+    eachFile { details ->
+        details.setRelativePath new RelativePath(true, details.name)
+    }
+    includeEmptyDirs = false
+}
+
+processResources {
+    dependsOn copyPathFiles
+}

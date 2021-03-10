@@ -41,7 +41,7 @@ public final class Constants {
         public static final double kS = 0.62; // kS
         public static final double kV = 2.42; // kV
         public static final double kA = 0.165; // kA
-        public static final double kVAngular = 1.654294727;
+        public static final double kVAngular = 1.654294727 * 2;
         public static final double kAAngular = kA; // ???????
         public static final double TRACK_WIDTH_METERS = 0.5757943419; // About 22.6" from characterization, was 22" from CAD
         public static final DifferentialDriveKinematics KINEMATICS = new DifferentialDriveKinematics(TRACK_WIDTH_METERS);

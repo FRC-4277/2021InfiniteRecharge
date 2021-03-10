@@ -15,7 +15,6 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.hal.simulation.SimDeviceDataJNI;
 import edu.wpi.first.networktables.EntryListenerFlags;
-import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.*;
@@ -46,13 +45,13 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
 import frc.robot.subsystems.vision.limelight.LimelightSim;
+import frc.robot.util.path.WaypointReader;
 
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static frc.robot.Constants.DriveTrain.*;
 
@@ -78,6 +77,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private double yawOffset = 0;
   //private ShuffleboardTab testTab;
   private boolean joystickUsed = false;
+
+  private NetworkTableEntry neutralModeEntry, autoPathMessageEntry;
 
   // Simulation stuff
   private DifferentialDrivetrainSim drivetrainSim;
@@ -142,11 +143,12 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     chooser.setDefaultOption("Coast", NeutralMode.Coast);
     chooser.addOption("Brake", NeutralMode.Brake);
     settingsTab.add(chooser).withSize(2, 1).withPosition(0, 1);
-    NetworkTableInstance.getDefault().getTable("Shuffleboard").getSubTable("Settings").getSubTable("Neutral Mode")
-            .getEntry("active")
-    .addListener(entryNotification -> {
+
+    neutralModeEntry = NetworkTableInstance.getDefault()
+            .getTable("Shuffleboard").getSubTable("Settings").getSubTable("Neutral Mode")
+            .getEntry("active");
+    neutralModeEntry.addListener(entryNotification -> {
       NeutralMode neutralMode = chooser.getSelected();
-      System.out.println("New Neutral Mode: " + neutralMode.name());
       frontLeftMotor.setNeutralMode(neutralMode);
       frontRightMotor.setNeutralMode(neutralMode);
       backLeftMotor.setNeutralMode(neutralMode);
@@ -156,6 +158,12 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     rotationFactor = settingsTab.add("Rotation Factor", 0.75)
             .withPosition(0, 2)
             .withSize(2, 1)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+
+    autoPathMessageEntry = autonomousTab.add("Custom Autonomous Paths", "")
+            .withPosition(0, 2)
+            .withSize(8, 1)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
 
@@ -257,6 +265,15 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   public DifferentialDriveOdometry getOdometry() {
     return odometry;
+  }
+
+  public void setNeutralMode(NeutralMode neutralMode) {
+    neutralModeEntry.setString(neutralMode.name());
+    frontLeftMotor.setNeutralMode(neutralMode);
+    frontRightMotor.setNeutralMode(neutralMode);
+    backLeftMotor.setNeutralMode(neutralMode);
+    backRightMotor.setNeutralMode(neutralMode);
+
   }
 
   public double getRotationFactor() {
@@ -490,7 +507,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory from file
-   * @param pathFileName Specify the {THIS} in src/main/deploy/paths.{THIS}.wpilib.json.
+   * @param pathFileName Specify the {THIS} in src/main/deploy/paths/{THIS}.wpilib.json.
    * @return Trajectory from loaded file
    */
   public Trajectory generateTrajectory(String pathFileName) {
@@ -521,9 +538,6 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return toOrigin.relativeTo(startPose);
   }
 
-  /**
-   *
-   */
   public Trajectory generateTrajectoryFromFileFromOrigin(String pathFileName) {
     return translateToOrigin(generateTrajectory(pathFileName));
   }
@@ -659,6 +673,41 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
             .setReversed(reversed);
 
     return TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, trajectoryConfig);
+  }
+
+  /**
+   * Creates a trajectory from control vectors. <b>Differential drive constraint will be automatically added.</b>
+   * @param controlVectors The control vectors that define the trajectory path
+   * @param trajectoryConfig The trajectory config
+   * @return the generated trajectory
+   */
+  private Trajectory generateCustomTrajectory(TrajectoryGenerator.ControlVectorList controlVectors, TrajectoryConfig trajectoryConfig) {
+    trajectoryConfig.setKinematics(KINEMATICS);
+    return TrajectoryGenerator.generateTrajectory(controlVectors, trajectoryConfig);
+  }
+
+  public Trajectory generateCustomTrajectory(String pathName, TrajectoryConfig trajectoryConfig) {
+    try {
+      Trajectory trajectory = generateCustomTrajectory(WaypointReader.getControlVectors(pathName), trajectoryConfig);
+
+      // Add path time to ShuffleBoard for reference
+      String currentMessage = autoPathMessageEntry.getString("");
+      autoPathMessageEntry.setString(currentMessage +
+              String.format("%s%s: %.2fs", (currentMessage.equals("") ? "" : ", "),
+                      pathName, trajectory.getTotalTimeSeconds()));
+
+      /* TEMPORARY, just to see values
+      var constraint = new DifferentialDriveVoltageConstraint(motorFeedforward, KINEMATICS, 10);
+      var minMax = constraint.getMinMaxAccelerationMetersPerSecondSq(new Pose2d(), 5, 0.9);
+      System.out.println("Min: " + minMax.minAccelerationMetersPerSecondSq);
+      System.out.println("Max: " + minMax.maxAccelerationMetersPerSecondSq);*/
+
+      return trajectory;
+    } catch (Exception e) {
+      System.err.println("Failed to generate custom trajectory for path name " + pathName);
+      e.printStackTrace();
+    }
+    return null;
   }
 
   /**

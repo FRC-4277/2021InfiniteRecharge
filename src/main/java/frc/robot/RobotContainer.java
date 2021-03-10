@@ -28,10 +28,7 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.*;
-import frc.robot.commands.autonomous.BarrelAutoCommand;
-import frc.robot.commands.autonomous.BounceAutoCommand;
-import frc.robot.commands.autonomous.DriveStraightXCommand;
-import frc.robot.commands.autonomous.SlalomAutoCommand;
+import frc.robot.commands.autonomous.*;
 import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
@@ -163,6 +160,7 @@ public class RobotContainer {
     autoChooser.addOption("Drive Straight (2m)", new DriveStraightXCommand(driveTrain, 2.0));
 
     autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
+    autoChooser.addOption("AutoNav - Barrel (new)", new Barrel2AutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
     autoChooser.addOption("Galactic Search (for video)",
