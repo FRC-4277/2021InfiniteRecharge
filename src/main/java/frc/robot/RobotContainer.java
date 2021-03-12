@@ -291,6 +291,18 @@ public class RobotContainer {
       JoystickButton button6 = new JoystickButton(driveStick, 6);
       button6.whileActiveOnce(moveHopperDownCommand);
 
+      JoystickButton button9 = new JoystickButton(driveStick, 9);
+      button9.whenPressed(new DriveStorePosition(driveTrain, 0));
+
+      JoystickButton button10 = new JoystickButton(driveStick, 10);
+      button10.toggleWhenPressed(new DriveRecallPosition(driveTrain, 0));
+
+      JoystickButton button11 = new JoystickButton(driveStick, 11);
+      button11.whenPressed(new DriveStorePosition(driveTrain, 1));
+
+      JoystickButton button12 = new JoystickButton(driveStick, 12);
+      button12.toggleWhenPressed(new DriveRecallPosition(driveTrain, 1));
+
       POVButton upPOV = new POVButton(driveStick, 0);
       upPOV.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 

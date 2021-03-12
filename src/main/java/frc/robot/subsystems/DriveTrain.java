@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static frc.robot.Constants.DriveTrain.*;
@@ -88,6 +89,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private ShuffleboardTab simulationTab;
   private ShuffleboardTab settingsTab;
   private SendableChooser<Translation2d> startingPositionChooser;
+
+  private Map<Integer, Pose2d> storedPositions;
 
   /**
    * Creates a new DriveTrain.
@@ -278,6 +281,14 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   public double getRotationFactor() {
     return rotationFactor.getDouble(1.0);
+  }
+
+  public Pose2d getStoredPosition(int index) {
+    return storedPositions.get(index);
+  }
+
+  public void setStoredPosition(int index, Pose2d storedPosition) {
+    this.storedPositions.put(index, storedPosition);
   }
 
   private void configureTalon(TalonFX talonFX) {
