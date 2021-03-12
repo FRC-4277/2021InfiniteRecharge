@@ -21,6 +21,7 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.util.interpolation.InterpolatingDouble;
 import frc.robot.util.interpolation.InterpolatingTreeMap;
 
+import java.util.Comparator;
 import java.util.function.Function;
 
 /**
@@ -201,17 +202,25 @@ public final class Constants {
         // Linear Interpolation version of Meters to RPM
         public static final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> METERS_TO_RPM_MAP =
                 new InterpolatingTreeMap<>();
+        private static final double minX, maxX, minY, maxY;
         static {
+            // Empirical values collected on 3/6/21
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.50), new InterpolatingDouble(4200.0));
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.55), new InterpolatingDouble(2200.0));
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.76), new InterpolatingDouble(2200.0));
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.6), new InterpolatingDouble(2350.0));
+
+            //noinspection OptionalGetWithoutIsPresent (All guaranteed to be present)
+            minX = METERS_TO_RPM_MAP.keySet().stream().min(Comparator.comparing(d -> d.value)).get().value;
+            maxX = METERS_TO_RPM_MAP.keySet().stream().max(Comparator.comparing(d -> d.value)).get().value;
+            minY = METERS_TO_RPM_MAP.values().stream().min(Comparator.comparing(d -> d.value)).get().value;
+            maxY = METERS_TO_RPM_MAP.values().stream().max(Comparator.comparing(d -> d.value)).get().value;
         }
         public static Function<Double, Double> METERS_TO_RPM_LINEAR_FUNCTION = x -> {
-            if (x < 1.50) {
-                return 4200.0;
-            } else if (x > 8.6) {
-                return 2350.0;
+            if (x <= minX) {
+                return minY;
+            } else if (x >= maxX) {
+                return maxY;
             }
             return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };
