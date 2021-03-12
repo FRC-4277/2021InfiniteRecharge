@@ -18,6 +18,8 @@ import edu.wpi.first.wpilibj.trajectory.constraint.DifferentialDriveVoltageConst
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
+import frc.robot.util.interpolation.InterpolatingDouble;
+import frc.robot.util.interpolation.InterpolatingTreeMap;
 
 import java.util.function.Function;
 
@@ -195,12 +197,32 @@ public final class Constants {
             public static final LinearSystem<N1, N1, N1> PLANT =
                     LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, kaVoltRadiansPerSecond);
         }
-        public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = x -> {
-            return -30.7828 * Math.pow(x,3) +
-                    561.778 * Math.pow(x,2) +
-                    -3191.47 * x +
-                    7827.1; // todo: Empirically find a formula
+
+        // Linear Interpolation version of Meters to RPM
+        public static final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble> METERS_TO_RPM_MAP =
+                new InterpolatingTreeMap<>();
+        static {
+            METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.50), new InterpolatingDouble(4200.0));
+            METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.55), new InterpolatingDouble(2200.0));
+            METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.76), new InterpolatingDouble(2200.0));
+            METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.6), new InterpolatingDouble(2350.0));
+        }
+        public static Function<Double, Double> METERS_TO_RPM_LINEAR_FUNCTION = x -> {
+            if (x < 1.50) {
+                return 4200.0;
+            } else if (x > 8.6) {
+                return 2350.0;
+            }
+            return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };
+
+        // Polynomial Regression version of Meters to RPM
+        // Desmos: https://www.desmos.com/calculator/5byzpup30b
+        public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = x ->
+                -30.7828 * Math.pow(x,3) +
+                561.778 * Math.pow(x,2) +
+                -3191.47 * x +
+                7827.1;
     }
 
     public static class Winch {
