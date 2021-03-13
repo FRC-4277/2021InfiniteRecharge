@@ -216,6 +216,8 @@ public class RobotContainer {
             .withSize(2, 1)
             .getEntry();
     autonomousTab.add(intakeCommand);
+    autonomousTab.add(new DriveStorePosition(driveTrain, 0));
+    autonomousTab.add(new DriveRecallPosition(driveTrain, 0));
   }
 
   public void setAutonomousMessage(String message) {

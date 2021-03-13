@@ -224,7 +224,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     calculateDistanceIfNeeded();
 
     setPixyColor(usingPixy ? Color.GREEN : Color.RED);
-    if (usingPixy) {
+    if (usingPixy && RobotBase.isReal()) {
       int blockCount = pixy2.getCCC().getBlocks(false, Pixy2CCC.CCC_SIG_ALL, 8);
       SmartDashboard.putNumber("Block Count", blockCount);
       blocksList = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2

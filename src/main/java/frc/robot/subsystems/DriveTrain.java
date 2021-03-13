@@ -54,6 +54,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import static frc.robot.Constants.DriveTrain.*;
 
@@ -560,6 +561,14 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   public Trajectory generateTrajectoryFromFileFromCurrent(String pathFileName) {
     return generateTrajectoryFromFileWithStart(pathFileName, getPose());
+  }
+
+  public void drawTrajectory(Trajectory trajectory) {
+    fieldSim.getObject("trajectory").setPoses(
+      trajectory.getStates().stream()
+        .map(state -> state.poseMeters)
+        .collect(Collectors.toList())
+    );
   }
 
   /**

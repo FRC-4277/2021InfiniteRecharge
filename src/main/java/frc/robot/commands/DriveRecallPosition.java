@@ -1,7 +1,6 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
@@ -34,25 +33,28 @@ public class DriveRecallPosition extends CommandBase {
             return;
         }
 
-        System.out.println("Stored position was " + storedPosition);
-        System.out.println("Current position: " + driveTrain.getPose());
+        //System.out.println("Stored position was " + storedPosition);
+        //System.out.println("Current position: " + driveTrain.getPose());
 
         // Figure out whether to use forward or backward trajectory, depending on whether they generate properly
         // , and which one is faster (if both generate properly)
         Trajectory forwardTrajectory = generateTrajectory(storedPosition, false);
         Trajectory backwardTrajectory = generateTrajectory(storedPosition, true);
         Trajectory trajectory;
+        boolean forwards;
         if (forwardTrajectory != null && backwardTrajectory != null) {
             // Find quicker trajectory
-            trajectory = forwardTrajectory.getTotalTimeSeconds() < backwardTrajectory.getTotalTimeSeconds()
-                    ? forwardTrajectory : backwardTrajectory;
-            System.out.println("USING DETECTED TRAJECTORY: " + (forwardTrajectory.getTotalTimeSeconds() < backwardTrajectory.getTotalTimeSeconds()));
+            forwards = forwardTrajectory.getTotalTimeSeconds() < backwardTrajectory.getTotalTimeSeconds();
+            trajectory = forwards ? forwardTrajectory : backwardTrajectory;
+            //System.out.println("USING DETECTED TRAJECTORY: " + (forwardTrajectory.getTotalTimeSeconds() < backwardTrajectory.getTotalTimeSeconds()));
         } else if (forwardTrajectory != null) {
             trajectory = forwardTrajectory;
-            System.out.println("Using forward");
+            forwards = true;
+            //System.out.println("Using forward");
         } else if (backwardTrajectory != null) {
             trajectory = backwardTrajectory;
-            System.out.println("Using backwards");
+            forwards = false;
+            //System.out.println("Using backwards");
         } else {
             // If all failed to generate, end command
             finished = true;
@@ -60,8 +62,17 @@ public class DriveRecallPosition extends CommandBase {
         }
 
         ramseteCommand = driveTrain.generateRamseteCommand(trajectory, false);
+        driveTrain.drawTrajectory(trajectory);
+        ramseteCommand.initialize();
 
-        System.out.println("Ramsete trajectory time: " + trajectory.getTotalTimeSeconds());
+        System.out.println("=== RECALL === (" + index + ")");
+        System.out.println("Current: " + driveTrain.getPose());
+        System.out.println("Target: " + storedPosition);
+        System.out.println("Direction: " + (forwards ? "Forward" : "Reverse"));
+        System.out.println("Time: " + trajectory.getTotalTimeSeconds() + "s");
+        System.out.println("===        ====");
+
+        //System.out.println("Ramsete trajectory time: " + trajectory.getTotalTimeSeconds());
 
         // Use brake mode for driving
         driveTrain.setNeutralMode(NeutralMode.Brake);
@@ -69,8 +80,10 @@ public class DriveRecallPosition extends CommandBase {
 
     private Trajectory generateTrajectory(Pose2d targetPosition, boolean reversed) {
         try {
+            /*return driveTrain.generateTrajectory(
+                    driveTrain.getPose(), targetPosition, 2.0, 0.5, false, reversed);*/
             return driveTrain.generateTrajectory(
-                    driveTrain.getPose(), targetPosition, 2.0, 0.5, false, reversed);
+                    driveTrain.getPose(), targetPosition, false, reversed);
         } catch (Exception e) {
             System.out.println("Failed to generate trajectory to stored position." +
                             " (reversed=" + reversed + ")");
