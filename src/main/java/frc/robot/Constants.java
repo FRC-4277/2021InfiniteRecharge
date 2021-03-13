@@ -204,7 +204,7 @@ public final class Constants {
                 new InterpolatingTreeMap<>();
         private static final double minX, maxX, minY, maxY;
         static {
-            // Empirical values collected on 3/6/21
+            // Empirical values collected on 3/13/21
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.50), new InterpolatingDouble(4200.0));
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.5), new InterpolatingDouble(2200.0));
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.76), new InterpolatingDouble(2200.0));
