@@ -158,9 +158,13 @@ public class RobotContainer {
     autoChooser.setDefaultOption("Nothing", null);
 
     autoChooser.addOption("Drive Straight (2m)", new DriveStraightXCommand(driveTrain, 2.0));
+    autoChooser.addOption("Drive Straight (-2m)", new DriveStraightXCommand(driveTrain, -2.0));
+
+    autoChooser.addOption("AutoNav - Barrel (new)", new Barrel2AutoCommand(driveTrain));
+    autoChooser.addOption("AutoNav - Slalom (new)", new Slalom2AutoCommand(driveTrain));
+    autoChooser.addOption("AutoNav - Bounce (new)", new Bounce2AutoCommand(driveTrain));
 
     autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
-    autoChooser.addOption("AutoNav - Barrel (new)", new Barrel2AutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
     autoChooser.addOption("Galactic Search (for video)",

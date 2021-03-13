@@ -629,7 +629,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
                 double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
                 double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
                 double rightTicksPerDs = rightTicksPerSecond / 10;
-                if (!HAS_ENCODERS) {
+                if (!HAS_ENCODERS || RobotBase.isSimulation()) {
                   rightGroup.set(rightFeedforward);
                 } else {
                   velocityDriveRight(rightTicksPerDs, rightFeedforward);
