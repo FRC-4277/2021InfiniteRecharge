@@ -206,9 +206,9 @@ public final class Constants {
         static {
             // Empirical values collected on 3/6/21
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.50), new InterpolatingDouble(4200.0));
-            METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.55), new InterpolatingDouble(2200.0));
+            METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.5), new InterpolatingDouble(2200.0));
             METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.76), new InterpolatingDouble(2200.0));
-            METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.6), new InterpolatingDouble(2350.0));
+            METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.94), new InterpolatingDouble(2350.0));
 
             //noinspection OptionalGetWithoutIsPresent (All guaranteed to be present)
             minX = METERS_TO_RPM_MAP.keySet().stream().min(Comparator.comparing(d -> d.value)).get().value;
@@ -216,18 +216,18 @@ public final class Constants {
             minY = METERS_TO_RPM_MAP.values().stream().min(Comparator.comparing(d -> d.value)).get().value;
             maxY = METERS_TO_RPM_MAP.values().stream().max(Comparator.comparing(d -> d.value)).get().value;
         }
-        public static Function<Double, Double> METERS_TO_RPM_LINEAR_FUNCTION = x -> {
-            if (x <= minX) {
-                return minY;
-            } else if (x >= maxX) {
-                return maxY;
+        public static Function<Double, Double> METERS_TO_RPM_FUNCTION = x -> {
+            if (x <= 1.50) {
+                return 4200.0;
+            } else if (x >= 7.94) {
+                return 2350.0;
             }
             return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };
 
         // Polynomial Regression version of Meters to RPM
         // Desmos: https://www.desmos.com/calculator/5byzpup30b
-        public static final Function<Double, Double> METERS_TO_RPM_FUNCTION = x ->
+        public static final Function<Double, Double> METERS_TO_RPM_POLY_FUNCTION = x ->
                 -30.7828 * Math.pow(x,3) +
                 561.778 * Math.pow(x,2) +
                 -3191.47 * x +

@@ -5,6 +5,9 @@ import frc.robot.subsystems.DriveTrain;
 
 public class DriveStorePosition extends InstantCommand {
     public DriveStorePosition(DriveTrain driveTrain, int index) {
-        super(() -> driveTrain.setStoredPosition(index, driveTrain.getPose()), driveTrain);
+        super(() -> {
+            driveTrain.setStoredPosition(index, driveTrain.getPose());
+            System.out.println("Stored position: " + driveTrain.getPose());
+        }, driveTrain);
     }
 }

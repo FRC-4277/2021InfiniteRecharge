@@ -34,6 +34,9 @@ public class DriveRecallPosition extends CommandBase {
             return;
         }
 
+        System.out.println("Stored position was " + storedPosition);
+        System.out.println("Current position: " + driveTrain.getPose());
+
         // Figure out whether to use forward or backward trajectory, depending on whether they generate properly
         // , and which one is faster (if both generate properly)
         Trajectory forwardTrajectory = generateTrajectory(storedPosition, false);
@@ -43,17 +46,22 @@ public class DriveRecallPosition extends CommandBase {
             // Find quicker trajectory
             trajectory = forwardTrajectory.getTotalTimeSeconds() < backwardTrajectory.getTotalTimeSeconds()
                     ? forwardTrajectory : backwardTrajectory;
+            System.out.println("USING DETECTED TRAJECTORY: " + (forwardTrajectory.getTotalTimeSeconds() < backwardTrajectory.getTotalTimeSeconds()));
         } else if (forwardTrajectory != null) {
             trajectory = forwardTrajectory;
+            System.out.println("Using forward");
         } else if (backwardTrajectory != null) {
             trajectory = backwardTrajectory;
+            System.out.println("Using backwards");
         } else {
             // If all failed to generate, end command
             finished = true;
             return;
         }
 
-        ramseteCommand = driveTrain.generateRamseteCommand(trajectory);
+        ramseteCommand = driveTrain.generateRamseteCommand(trajectory, false);
+
+        System.out.println("Ramsete trajectory time: " + trajectory.getTotalTimeSeconds());
 
         // Use brake mode for driving
         driveTrain.setNeutralMode(NeutralMode.Brake);
@@ -62,10 +70,11 @@ public class DriveRecallPosition extends CommandBase {
     private Trajectory generateTrajectory(Pose2d targetPosition, boolean reversed) {
         try {
             return driveTrain.generateTrajectory(
-                    driveTrain.getPose(), targetPosition, false, reversed);
+                    driveTrain.getPose(), targetPosition, 2.0, 0.5, false, reversed);
         } catch (Exception e) {
-            DriverStation.reportError("Failed to generate trajectory to stored position." +
-                            " (reversed=" + reversed + ")", e.getStackTrace());
+            System.out.println("Failed to generate trajectory to stored position." +
+                            " (reversed=" + reversed + ")");
+            e.printStackTrace();
         }
         return null;
     }
@@ -75,17 +84,19 @@ public class DriveRecallPosition extends CommandBase {
         if (ramseteCommand != null) {
             // Drive with RAMSETE
             ramseteCommand.execute();
+            System.out.println("Executing");
 
             // Start end timer if ramsete command has finished, and it hasn't been started yet
             if (ramseteCommand.isFinished() && endTimer == null) {
                 endTimer = new Timer();
                 endTimer.reset();
                 endTimer.start();
+                System.out.println("End timer started");
             }
 
             // Set finished to true when end timer has ran for PAUSE_SECONDS_AT_END seconds
-            if (endTimer != null) {
-                finished |= endTimer.hasElapsed(PAUSE_SECONDS_AT_END);
+            if (endTimer != null && endTimer.hasElapsed(PAUSE_SECONDS_AT_END)) {
+                finished = true;
             }
         }
     }
@@ -93,6 +104,7 @@ public class DriveRecallPosition extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         driveTrain.stopDrive();
+        System.out.println("END");
         // Go back to coast mode
         driveTrain.setNeutralMode(NeutralMode.Coast);
         if (ramseteCommand != null) {
