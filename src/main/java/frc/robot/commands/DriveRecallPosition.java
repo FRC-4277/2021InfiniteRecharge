@@ -97,14 +97,14 @@ public class DriveRecallPosition extends CommandBase {
         if (ramseteCommand != null) {
             // Drive with RAMSETE
             ramseteCommand.execute();
-            System.out.println("Executing");
+            //System.out.println("Executing");
 
             // Start end timer if ramsete command has finished, and it hasn't been started yet
             if (ramseteCommand.isFinished() && endTimer == null) {
                 endTimer = new Timer();
                 endTimer.reset();
                 endTimer.start();
-                System.out.println("End timer started");
+                //System.out.println("End timer started");
             }
 
             // Set finished to true when end timer has ran for PAUSE_SECONDS_AT_END seconds
@@ -117,7 +117,7 @@ public class DriveRecallPosition extends CommandBase {
     @Override
     public void end(boolean interrupted) {
         driveTrain.stopDrive();
-        System.out.println("END");
+        //System.out.println("END");
         // Go back to coast mode
         driveTrain.setNeutralMode(NeutralMode.Coast);
         if (ramseteCommand != null) {
