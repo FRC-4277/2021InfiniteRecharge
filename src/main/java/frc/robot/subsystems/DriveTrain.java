@@ -42,6 +42,7 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.commands.JoystickDriveCommand;
 import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
 import frc.robot.subsystems.vision.limelight.LimelightSim;
@@ -70,6 +71,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private final SpeedControllerGroup rightGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
   
   private final AHRS navX = new AHRS();
+  private final SendableChooser<JoystickDriveCommand.Mode> drivingModeSelector;
   private final NetworkTableEntry rotationFactor;
 
   private DifferentialDrive drive;
@@ -165,6 +167,12 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
             .withSize(2, 1)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
+
+    drivingModeSelector = new SendableChooser<>();
+    SendableRegistry.setName(drivingModeSelector, "Driving Mode");
+    drivingModeSelector.setDefaultOption("Arcade (default)", JoystickDriveCommand.Mode.ARCADE);
+    drivingModeSelector.addOption("Curvature", JoystickDriveCommand.Mode.CURVATURE);
+    settingsTab.add(drivingModeSelector).withSize(2, 1).withPosition(0 , 3);
 
     autoPathMessageEntry = autonomousTab.add("Custom Autonomous Paths", "")
             .withPosition(0, 2)
@@ -283,6 +291,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   public double getRotationFactor() {
     return rotationFactor.getDouble(1.0);
+  }
+
+  public JoystickDriveCommand.Mode getDrivingMode() {
+    return drivingModeSelector.getSelected();
   }
 
   public Pose2d getStoredPosition(int index) {
@@ -488,10 +500,16 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     SmartDashboard.putNumber("Right position", getRightPosition());
   }
   
-  public void joystickDrive(double forwardSpeed, double rotation) {
+  public void joystickDrive(double forwardSpeed, double rotation, boolean quickTurn) {
     joystickUsed = true;
-    //drive.curvatureDrive(forwardSpeed, rotation, quick);
-    drive.arcadeDrive(forwardSpeed, rotation);
+    switch (getDrivingMode()) {
+      case ARCADE:
+        drive.arcadeDrive(forwardSpeed, rotation);
+        break;
+      case CURVATURE:
+        drive.curvatureDrive(forwardSpeed, rotation, quickTurn);
+        break;
+    }
   }
 
   /**

@@ -21,6 +21,7 @@ public class JoystickDriveCommand extends CommandBase {
   private DriveTrain driveTrain;
   private Supplier<Boolean> invertControls = () -> false;
   private Supplier<Double> yControllerSupplier, xControllerSupplier;
+  private Supplier<Boolean> quickTurn = () -> false;
 
 
   /**
@@ -55,7 +56,7 @@ public class JoystickDriveCommand extends CommandBase {
     // Rotation factor
     x *= driveTrain.getRotationFactor();
 
-    driveTrain.joystickDrive(y, x);
+    driveTrain.joystickDrive(y, x, quickTurn.get());
   }
 
   public void setYControllerSupplier(Supplier<Double> yControllerSupplier) {
@@ -70,9 +71,17 @@ public class JoystickDriveCommand extends CommandBase {
     this.invertControls = invertControls;
   }
 
+  public void setQuickTurn(Supplier<Boolean> quickTurn) {
+    this.quickTurn = quickTurn;
+  }
+
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public enum Mode {
+    ARCADE, CURVATURE;
   }
 }

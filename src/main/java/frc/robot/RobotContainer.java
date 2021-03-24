@@ -283,7 +283,11 @@ public class RobotContainer {
       button2.whileActiveOnce(shootAndHopperCommand);
 
       JoystickButton triggerButton = new JoystickButton(driveStick, 1);
-      triggerButton.whileActiveOnce(moveHopperUpCommand);
+      triggerButton
+              // This button will be used when curvature drive is enabled, so
+              // only make hopper up work for this button with arcade drive
+              .and(new Trigger(() -> driveTrain.getDrivingMode() == JoystickDriveCommand.Mode.ARCADE))
+              .whileActiveOnce(moveHopperUpCommand);
 
       JoystickButton button3 = new JoystickButton(driveStick, 3);
       button3.whileActiveOnce(intakeCommand);
@@ -315,19 +319,18 @@ public class RobotContainer {
       // Drive with Logitech
       driveCommand.setYControllerSupplier(() -> -driveStick.getY(Hand.kLeft));
       driveCommand.setXControllerSupplier(() -> driveStick.getRawAxis(2));
+      driveCommand.setQuickTurn(triggerButton::get);
     } else {
       // Drive with Xbox Controller
       driveCommand.setYControllerSupplier(() -> -xboxController.getY(Hand.kLeft));
       driveCommand.setXControllerSupplier(() -> xboxController.getX(Hand.kRight));
+      driveCommand.setQuickTurn(() -> xboxController.getStickButton(Hand.kLeft));
 
       // Invert controls via START button
       JoystickButton startButton = new JoystickButton(xboxController, kStart.value);
-      startButton.whileActiveOnce(new InstantCommand(new Runnable() {
-        @Override
-        public void run() {
-          System.out.println("Inverted to " + !drivingFromHomeInverted);
-          drivingFromHomeInverted = !drivingFromHomeInverted;
-        }
+      startButton.whileActiveOnce(new InstantCommand(() -> {
+        System.out.println("Inverted to " + !drivingFromHomeInverted);
+        drivingFromHomeInverted = !drivingFromHomeInverted;
       }));
       invertControls = () -> drivingFromHomeInverted;
     }
