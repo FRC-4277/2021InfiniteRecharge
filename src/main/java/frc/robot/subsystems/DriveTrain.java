@@ -93,6 +93,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private ShuffleboardTab simulationTab;
   private ShuffleboardTab settingsTab;
   private SendableChooser<Translation2d> startingPositionChooser;
+  private NetworkTableEntry sendRamseteTelemetry;
 
   private Map<Integer, Pose2d> storedPositions = new HashMap<>();
 
@@ -232,6 +233,12 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
       return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
     })
     .withPosition(4, 0);
+    sendRamseteTelemetry = autonomousTab
+            .add("Send Ramsete Telemetry", false)
+            .withWidget(BuiltInWidgets.kToggleSwitch)
+            .withPosition(4, 1)
+            .withSize(2, 1)
+            .getEntry();
   }
 
   @Override
@@ -636,7 +643,6 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
                   wasFirstRun = true;
                 }
 
-
                 double dt = currentTime - prevTime;
 
                 // Avoid division by zero by having 0 accel in the first run of the command
@@ -662,6 +668,36 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
                 } else {
                   velocityDriveRight(rightTicksPerDs, rightFeedforward);
                   //System.out.println("Right ff: " + rightFeedforward);
+                }
+
+                // Send telemetry if needed
+                if (sendRamseteTelemetry.getBoolean(false)) {
+                  DifferentialDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
+                  // Real vs Target velocities
+                  SmartDashboard.putNumber("Left Velocity", wheelSpeeds.leftMetersPerSecond);
+                  SmartDashboard.putNumber("Right Velocity", wheelSpeeds.rightMetersPerSecond);
+                  SmartDashboard.putNumber("Left Target Velocity", prevLeftMPS);
+                  SmartDashboard.putNumber("Right Target Velocity", prevRightMPS);
+
+                  // Combined
+                  SmartDashboard.putNumber("Velocity",
+                          (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2.0);
+                  SmartDashboard.putNumber("Target Velocity",
+                          (prevLeftMPS + prevRightMPS) / 2.0);
+
+                  // Positions
+                  Trajectory.State targetState = trajectory.sample(timer.get());
+                  SmartDashboard.putNumber("Robot X", getPose().getX());
+                  SmartDashboard.putNumber("Target Robot X", targetState.poseMeters.getX());
+                  SmartDashboard.putNumber("Robot Y", getPose().getY());
+                  SmartDashboard.putNumber("Target Robot Y", targetState.poseMeters.getY());
+                  SmartDashboard.putNumber("Robot Heading", getHeading());
+                  SmartDashboard.putNumber("Target Robot Heading", targetState.poseMeters.getRotation().getDegrees());
+                  // a_c = v^2/r
+                  // r = 1/c
+                  // a_c = v^2 * c
+                  SmartDashboard.putNumber("Target Centripetal Acceleration",
+                          Math.pow(targetState.velocityMetersPerSecond, 2) * targetState.curvatureRadPerMeter);
                 }
 
                 //System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
