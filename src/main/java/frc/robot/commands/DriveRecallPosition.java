@@ -80,10 +80,10 @@ public class DriveRecallPosition extends CommandBase {
 
     private Trajectory generateTrajectory(Pose2d targetPosition, boolean reversed) {
         try {
-            /*return driveTrain.generateTrajectory(
-                    driveTrain.getPose(), targetPosition, 2.0, 0.5, false, reversed);*/
             return driveTrain.generateTrajectory(
-                    driveTrain.getPose(), targetPosition, false, reversed);
+                    driveTrain.getPose(), targetPosition, 2.0, 0.5, false, reversed);
+            /*return driveTrain.generateTrajectory(
+                    driveTrain.getPose(), targetPosition, false, reversed);*/
         } catch (Exception e) {
             System.out.println("Failed to generate trajectory to stored position." +
                             " (reversed=" + reversed + ")");

@@ -9,7 +9,7 @@ import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
 
 public class ShootAndHopperCommand extends CommandBase {
-    private static final int RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT = 10; // 20 ms * 10 = 200ms
+    private static final int RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT = 40; // 20 ms * 10 = 200ms
     private static final double HOPPER_UP_TO_TOP_SPEED = 0.5; // Speed of hopper when moving ball to top
     private static final double HOPPER_UP_TO_SHOOTER_SPEED = 0.5; // Speed of hopper when moving ball from top to shooter
     private static final double BALL_PAUSE_AT_TOP_SECONDS = 0.5; // Time to ensure ball is stationary at top before shooting.
