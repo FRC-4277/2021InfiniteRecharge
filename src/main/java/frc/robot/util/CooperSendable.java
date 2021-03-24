@@ -5,8 +5,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 
 public class CooperSendable implements Sendable {
 
-    @Override
-    public void initSendable(SendableBuilder builder) {
-        builder.setSmartDashboardType("Cooper");
-    }
+  @Override
+  public void initSendable(SendableBuilder builder) {
+    builder.setSmartDashboardType("Cooper");
+  }
 }

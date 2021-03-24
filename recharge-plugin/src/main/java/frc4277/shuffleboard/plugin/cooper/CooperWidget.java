@@ -9,11 +9,10 @@ import javafx.scene.layout.Pane;
 @Description(name = "Cooper", dataTypes = Cooper.class)
 @ParametrizedController("Cooper.fxml")
 public class CooperWidget extends SimpleAnnotatedWidget<Double> {
-    @FXML
-    public Pane root;
+  @FXML public Pane root;
 
-    @Override
-    public Pane getView() {
-        return root;
-    }
+  @Override
+  public Pane getView() {
+    return root;
+  }
 }

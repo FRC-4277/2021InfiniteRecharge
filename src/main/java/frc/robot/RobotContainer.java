@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import static edu.wpi.first.wpilibj.XboxController.Button.*;
+
 import edu.wpi.first.networktables.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -33,28 +35,24 @@ import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.vision.GalacticVision;
 import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.util.CooperSendable;
 import frc.robot.util.GameTimer;
 import frc.robot.util.LogitechButton;
 import frc.robot.util.XboxTrigger;
-
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-import static edu.wpi.first.wpilibj.XboxController.Button.*;
-
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
+ * This class is where the bulk of the robot should be declared. Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * periodic methods (other than the scheduler calls). Instead, the structure of the robot (including
+ * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // Pneumatics
-  //private Compressor compressor = new Compressor(0);
+  // private Compressor compressor = new Compressor(0);
   // todo : uncomment when compressor added
 
   // Controllers
@@ -64,47 +62,58 @@ public class RobotContainer {
   private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
-  //private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
+  // private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
   private final ShuffleboardTab verificationTab = Shuffleboard.getTab("Verification");
   private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
 
   // The robot's subsystems and commands are defined here...
-  private final DriveTrain driveTrain = new DriveTrain(testTab, simulationTab, autonomousTab, settingsTab);
+  private final DriveTrain driveTrain =
+      new DriveTrain(testTab, simulationTab, autonomousTab, settingsTab);
   private final Intake intake = new Intake();
-  private final VerticalHopper hopper = new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
+  private final VerticalHopper hopper =
+      new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
-  //private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
-  //private final Gate gate = new Gate();
+  // private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
+  // private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
-  private final VisionSystem visionSystem = new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
-  //private final Winch winch = new Winch();
-  //private final HookElevator hookElevator = new HookElevator();
+  private final VisionSystem visionSystem =
+      new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
+  // private final Winch winch = new Winch();
+  // private final HookElevator hookElevator = new HookElevator();
   /*private final VerificationSystem verificationSystem = new VerificationSystem(
-          driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
-          verificationTab);*/
+  driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
+  verificationTab);*/
 
   private final JoystickDriveCommand driveCommand = new JoystickDriveCommand(driveTrain);
   private final IntakeCommand intakeCommand = new IntakeCommand(intake, hopper);
   private final ReverseIntakeCommand reverseIntakeCommand = new ReverseIntakeCommand(intake);
   private final MoveHopperUpCommand moveHopperUpCommand = new MoveHopperUpCommand(hopper);
   private final MoveHopperDownCommand moveHopperDownCommand = new MoveHopperDownCommand(hopper);
-  //private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
-  private final ShooterBackwardsCommand shooterBackwardsCommand = new ShooterBackwardsCommand(shooter);
+  // private final ShooterForwardCommand shooterForwardCommand = new ShooterForwardCommand(shooter);
+  private final ShooterBackwardsCommand shooterBackwardsCommand =
+      new ShooterBackwardsCommand(shooter);
   private final ShooterHoldVelocityCommand shooterHoldVelocityViaVisionCommand =
-  new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
-  private final ShootAndHopperCommand shootAndHopperCommand = new ShootAndHopperCommand(shooter, hopper, visionSystem,
-          ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
-          //private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
+      new ShooterHoldVelocityCommand(
+          shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
+  private final ShootAndHopperCommand shootAndHopperCommand =
+      new ShootAndHopperCommand(
+          shooter, hopper, visionSystem, ShooterHoldVelocityCommand.RPMSource.FROM_SELECTOR, true);
+  // private final ToggleGateCommand toggleGateCommand = new ToggleGateCommand(gate);
   private final ToggleCameraCommand toggleCameraCommand = new ToggleCameraCommand(cameraSystem);
-  private final UseShooterCameraCommand useShooterCameraCommand = new UseShooterCameraCommand(cameraSystem);
-  private final UseIntakeCameraCommand useIntakeCameraCommand = new UseIntakeCameraCommand(cameraSystem);
-  private final VisionAlignCommand visionAlignCommand = new VisionAlignCommand(driveTrain, visionSystem, true, true);
-  private final AutoHopperMoveInCommand autoHopperMoveInCommand = new AutoHopperMoveInCommand(hopper);
-  //private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
-  //private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
-  //private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
-  private final IntakeLineUpCommand intakeLineUpCommand = new IntakeLineUpCommand(driveTrain, visionSystem);
+  private final UseShooterCameraCommand useShooterCameraCommand =
+      new UseShooterCameraCommand(cameraSystem);
+  private final UseIntakeCameraCommand useIntakeCameraCommand =
+      new UseIntakeCameraCommand(cameraSystem);
+  private final VisionAlignCommand visionAlignCommand =
+      new VisionAlignCommand(driveTrain, visionSystem, true, true);
+  private final AutoHopperMoveInCommand autoHopperMoveInCommand =
+      new AutoHopperMoveInCommand(hopper);
+  // private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
+  // private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
+  // private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
+  private final IntakeLineUpCommand intakeLineUpCommand =
+      new IntakeLineUpCommand(driveTrain, visionSystem);
 
   private SendableChooser<Command> autoChooser;
   private NetworkTableEntry resetOdometryOnAuto;
@@ -115,24 +124,22 @@ public class RobotContainer {
   private boolean drivingFromHome = false;
   private boolean drivingFromHomeInverted = false;
 
-  //private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
-  /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
-   */
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Subsystems
     SmartDashboard.putData(driveTrain);
     SmartDashboard.putData(intake);
     SmartDashboard.putData(hopper);
     SmartDashboard.putData(shooter);
-    //SmartDashboard.putData(colorWheel);
-    //SmartDashboard.putData(gate);
+    // SmartDashboard.putData(colorWheel);
+    // SmartDashboard.putData(gate);
     SmartDashboard.putData(cameraSystem);
     SmartDashboard.putData(visionSystem);
-    //SmartDashboard.putData(winch);
-    //SmartDashboard.putData(hookElevator);
-    //SmartDashboard.putData(verificationSystem);
+    // SmartDashboard.putData(winch);
+    // SmartDashboard.putData(hookElevator);
+    // SmartDashboard.putData(verificationSystem);
 
     // Configure the button bindings
     configureButtonBindings();
@@ -167,10 +174,12 @@ public class RobotContainer {
     autoChooser.addOption("AutoNav - Barrel", new BarrelAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Slalom", new SlalomAutoCommand(driveTrain));
     autoChooser.addOption("AutoNav - Bounce", new BounceAutoCommand(driveTrain));
-    autoChooser.addOption("Galactic Search (for video)",
-            new GalacticAutoVideoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
-    autoChooser.addOption("Galactic Search",
-            new GalacticAutoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
+    autoChooser.addOption(
+        "Galactic Search (for video)",
+        new GalacticAutoVideoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
+    autoChooser.addOption(
+        "Galactic Search",
+        new GalacticAutoCommand(this, driveTrain, visionSystem, hopper, intake, shooter));
 
     /*// = Move Off Line
     autoChooser.addOption("Move Off Line", new LazyRamseteCommand(driveTrain, () -> {
@@ -193,9 +202,11 @@ public class RobotContainer {
 
     autonomousTab.add(autoChooser).withPosition(0, 0).withSize(2, 1);
 
-    NetworkTableInstance.getDefault().getTable("Shuffleboard/Autonomous/Autonomous Command")
-            .getEntry("selected")
-            .addListener(notification -> {
+    NetworkTableInstance.getDefault()
+        .getTable("Shuffleboard/Autonomous/Autonomous Command")
+        .getEntry("selected")
+        .addListener(
+            notification -> {
               if (Objects.equals(notification.value.getString(), "Galactic Search")) {
                 System.out.println("GALACTIC SEARCH!");
                 cameraSystem.switchToIntake();
@@ -203,14 +214,17 @@ public class RobotContainer {
             },
             EntryListenerFlags.kUpdate | EntryListenerFlags.kImmediate);
 
-    autonomousMessageEntry = autonomousTab
+    autonomousMessageEntry =
+        autonomousTab
             .add("Autonomous Message", "...")
             .withPosition(0, 3)
             .withSize(5, 1)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
 
-    resetOdometryOnAuto = autonomousTab.add("Reset Odometry on Auto", true)
+    resetOdometryOnAuto =
+        autonomousTab
+            .add("Reset Odometry on Auto", true)
             .withWidget(BuiltInWidgets.kToggleSwitch)
             .withPosition(0, 1)
             .withSize(2, 1)
@@ -236,25 +250,23 @@ public class RobotContainer {
     .withSize(3, 2);*/
     GameTimer gameTimer = new GameTimer(this);
     SendableRegistry.add(gameTimer, "GameTimer");
-    driverTab.add(gameTimer)
-    .withWidget("GameTimer")
-    .withProperties(Map.of("Font Color", "black"))
-    .withPosition(7, 0)
-    .withSize(2, 1);
+    driverTab
+        .add(gameTimer)
+        .withWidget("GameTimer")
+        .withProperties(Map.of("Font Color", "black"))
+        .withPosition(7, 0)
+        .withSize(2, 1);
 
     CooperSendable cooperSendable = new CooperSendable();
     SendableRegistry.add(cooperSendable, "Cooper");
-    driverTab.add(cooperSendable)
-    .withWidget("Cooper")
-    .withPosition(10, 4)
-    .withSize(1, 1);
+    driverTab.add(cooperSendable).withWidget("Cooper").withPosition(10, 4).withSize(1, 1);
   }
 
   /**
-   * Use this method to define your button->command mappings.  Buttons can be created by
+   * Use this method to define your button->command mappings. Buttons can be created by
    * instantiating a {@link GenericHID} or one of its subclasses ({@link
-   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a
-   * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
+   * edu.wpi.first.wpilibj.Joystick} or {@link XboxController}), and then passing it to a {@link
+   * edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
 
@@ -276,7 +288,8 @@ public class RobotContainer {
       JoystickButton pointerButton = new JoystickButton(driveStick, LogitechButton.POINTER);
       pointerButton.whenPressed(toggleCameraCommand);
 
-      invertControls = () -> driveStick.getRawAxis(3) <= .5; // Invert controls when throttle is negative value
+      invertControls =
+          () -> driveStick.getRawAxis(3) <= .5; // Invert controls when throttle is negative value
 
       // Buttons
       JoystickButton button2 = new JoystickButton(driveStick, 2);
@@ -284,10 +297,10 @@ public class RobotContainer {
 
       JoystickButton triggerButton = new JoystickButton(driveStick, 1);
       triggerButton
-              // This button will be used when curvature drive is enabled, so
-              // only make hopper up work for this button with arcade drive
-              .and(new Trigger(() -> driveTrain.getDrivingMode() == JoystickDriveCommand.Mode.ARCADE))
-              .whileActiveOnce(moveHopperUpCommand);
+          // This button will be used when curvature drive is enabled, so
+          // only make hopper up work for this button with arcade drive
+          .and(new Trigger(() -> driveTrain.getDrivingMode() == JoystickDriveCommand.Mode.ARCADE))
+          .whileActiveOnce(moveHopperUpCommand);
 
       JoystickButton button3 = new JoystickButton(driveStick, 3);
       button3.whileActiveOnce(intakeCommand);
@@ -328,10 +341,12 @@ public class RobotContainer {
 
       // Invert controls via START button
       JoystickButton startButton = new JoystickButton(xboxController, kStart.value);
-      startButton.whileActiveOnce(new InstantCommand(() -> {
-        System.out.println("Inverted to " + !drivingFromHomeInverted);
-        drivingFromHomeInverted = !drivingFromHomeInverted;
-      }));
+      startButton.whileActiveOnce(
+          new InstantCommand(
+              () -> {
+                System.out.println("Inverted to " + !drivingFromHomeInverted);
+                drivingFromHomeInverted = !drivingFromHomeInverted;
+              }));
       invertControls = () -> drivingFromHomeInverted;
     }
 
@@ -366,16 +381,16 @@ public class RobotContainer {
     aButton.whileActiveOnce(visionAlignCommand);
 
     POVButton upPOVButton = new POVButton(xboxController, 0);
-    //upPOVButton.whileActiveOnce(winchClimbCommand);
+    // upPOVButton.whileActiveOnce(winchClimbCommand);
     upPOVButton.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 
-    //POVButton downPOVButton = new POVButton(xboxController, 180);
+    // POVButton downPOVButton = new POVButton(xboxController, 180);
 
     POVButton leftPOVButton = new POVButton(xboxController, 270);
-    //leftPOVButton.whileActiveOnce(hookDownCommand);
+    // leftPOVButton.whileActiveOnce(hookDownCommand);
 
     POVButton rightPOVButton = new POVButton(xboxController, 90);
-    //rightPOVButton.whileActiveOnce(hookUpCommand);
+    // rightPOVButton.whileActiveOnce(hookUpCommand);
 
     JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
     backButton.whileActiveOnce(intakeLineUpCommand);
@@ -430,11 +445,12 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
     return (autoChooser == null ? null : autoChooser.getSelected());
-    //return m_autoCommand;
+    // return m_autoCommand;
   }
 
   public void simulationPeriodic() {
     double current = driveTrain.getSimDrawnCurrentAmps(); // Add other power loads here...
-    RoboRioSim.setVInVoltage(Math.min(BatterySim.calculateDefaultBatteryLoadedVoltage(current), 12.0));
+    RoboRioSim.setVInVoltage(
+        Math.min(BatterySim.calculateDefaultBatteryLoadedVoltage(current), 12.0));
   }
 }

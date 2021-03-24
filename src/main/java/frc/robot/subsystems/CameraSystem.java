@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
 import java.util.List;
 
 public class CameraSystem extends SubsystemBase implements VerifiableSystem {
@@ -31,22 +30,22 @@ public class CameraSystem extends SubsystemBase implements VerifiableSystem {
   private MjpegServer server;
   private NetworkTableEntry nameEntry;
 
-  /**
-   * Creates a new CameraSystem.
-   */
+  /** Creates a new CameraSystem. */
   public CameraSystem(ShuffleboardTab driverTab) {
     this.driverTab = driverTab;
 
-    nameEntry = driverTab.add("[Camera]", "limelight")
-    .withWidget(BuiltInWidgets.kTextView)
-    .withPosition(6, 0)
-    .withSize(1, 1)
-    .getEntry();
+    nameEntry =
+        driverTab
+            .add("[Camera]", "limelight")
+            .withWidget(BuiltInWidgets.kTextView)
+            .withPosition(6, 0)
+            .withSize(1, 1)
+            .getEntry();
 
-    backCamera = CameraServer.getInstance().startAutomaticCapture("back", 0); //todo: name them?
+    backCamera = CameraServer.getInstance().startAutomaticCapture("back", 0); // todo: name them?
     setupCamera(backCamera);
-    //camera2 = new UsbCamera("2", 1);
-    //setupCamera(camera2);
+    // camera2 = new UsbCamera("2", 1);
+    // setupCamera(camera2);
 
     // Make MjpegServer which uses dummy source
     server = CameraServer.getInstance().addSwitchedCamera(SERVER_NAME);
@@ -56,17 +55,18 @@ public class CameraSystem extends SubsystemBase implements VerifiableSystem {
     } else {
       limelightStream = new UsbCamera("limelight", 1);
     }
-    this.driverTab.add(WIDGET_NAME, server.getSource())
-            .withWidget(BuiltInWidgets.kCameraStream)
-            .withPosition(0,0)
-            .withSize(6, 6);
+    this.driverTab
+        .add(WIDGET_NAME, server.getSource())
+        .withWidget(BuiltInWidgets.kCameraStream)
+        .withPosition(0, 0)
+        .withSize(6, 6);
     server.setSource(limelightStream);
     // Set source of widget to use URI of switched camera, just in case!
     /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
-            .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
-            //.setString("camera_server://" + SERVER_NAME);
-            .setString("10.42.77.11:5800");*/
-            // Allow edit of widget to change camera
+    .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
+    //.setString("camera_server://" + SERVER_NAME);
+    .setString("10.42.77.11:5800");*/
+    // Allow edit of widget to change camera
     /*nameEntry.addListener(notification -> {
       String value;
       if (notification.value.isString() && ((value = notification.value.getString()) != null)) {
@@ -85,51 +85,48 @@ public class CameraSystem extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Switches displayed camera in the Driver tab
-   * @param useLimelightStream <code>true</code> for Limelight PIP, <code>false</code> for using intake
+   *
+   * @param useLimelightStream <code>true</code> for Limelight PIP, <code>false</code> for using
+   *     intake
    */
   public void switchCamera(boolean useLimelightStream) {
     this.useLimelightStream = useLimelightStream;
     if (useLimelightStream) {
       /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
-            .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
-            //.setString("camera_server://" + SERVER_NAME);
-            .setString("camera_server://limelight");*/
+      .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
+      //.setString("camera_server://" + SERVER_NAME);
+      .setString("camera_server://limelight");*/
       switchToShooter();
     } else {
       /*NetworkTableInstance.getDefault().getTable("Shuffleboard")
-            .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
-            //.setString("camera_server://" + SERVER_NAME);
-            .setString("camera_server://back");*/
+      .getSubTable(driverTab.getTitle()).getSubTable(WIDGET_NAME).getEntry(".ShuffleboardURI")
+      //.setString("camera_server://" + SERVER_NAME);
+      .setString("camera_server://back");*/
       switchToIntake();
     }
     /*this.firstCamera = firstCamera;
     UsbCamera camera = firstCamera ? camera1 : camera2;
     server.setSource(camera);
     nameEntry.setString(camera.getName());*/
-    //driverTab.add("Driver Switching Camera", server.getSource()).withPosition(0, 0).withSize(4, 4);
+    // driverTab.add("Driver Switching Camera", server.getSource()).withPosition(0, 0).withSize(4,
+    // 4);
   }
 
-  /**
-   * Switches stream to the Limelight PIP, which is on the shooter side of the bot
-   */
+  /** Switches stream to the Limelight PIP, which is on the shooter side of the bot */
   public void switchToShooter() {
     this.useLimelightStream = true;
     server.setSource(limelightStream);
     nameEntry.setString("limelight");
   }
 
-  /**
-   * Switches stream to the intake camera, which is on the intake (front) side of the bot
-   */
+  /** Switches stream to the intake camera, which is on the intake (front) side of the bot */
   public void switchToIntake() {
     this.useLimelightStream = false;
     server.setSource(backCamera);
     nameEntry.setString("back");
   }
 
-  /**
-   * Toggle stream (Limelight PIP to Intake or Intake to Limelight PIP).
-   */
+  /** Toggle stream (Limelight PIP to Intake or Intake to Limelight PIP). */
   public void toggleCamera() {
     switchCamera(!useLimelightStream);
   }

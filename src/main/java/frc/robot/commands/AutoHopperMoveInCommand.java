@@ -17,9 +17,7 @@ public class AutoHopperMoveInCommand extends CommandBase {
   private boolean waitingBetween = false;
   private Long startOfWaitTime = null;
 
-  /**
-   * Creates a new AutoHopperMoveInCommand.
-   */
+  /** Creates a new AutoHopperMoveInCommand. */
   public AutoHopperMoveInCommand(VerticalHopper hopper) {
     this.hopper = hopper;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -47,8 +45,10 @@ public class AutoHopperMoveInCommand extends CommandBase {
       this.pulsing = true;
       this.lastBallInTime = System.currentTimeMillis();
     }
-    
-    if (ballPresent && pulsing && (System.currentTimeMillis() - this.lastBallInTime <= hopper.getIndexRunTimeMs())) {
+
+    if (ballPresent
+        && pulsing
+        && (System.currentTimeMillis() - this.lastBallInTime <= hopper.getIndexRunTimeMs())) {
       hopper.moveUp();
     } else {
       hopper.stopMoving();
@@ -61,8 +61,9 @@ public class AutoHopperMoveInCommand extends CommandBase {
       startOfWaitTime = System.currentTimeMillis();
     }
 
-    if (waitingBetween && (startOfWaitTime != null &&
-            (System.currentTimeMillis() - startOfWaitTime >= hopper.getIndexBetweenBallMs()))) {
+    if (waitingBetween
+        && (startOfWaitTime != null
+            && (System.currentTimeMillis() - startOfWaitTime >= hopper.getIndexBetweenBallMs()))) {
       this.pulsing = false;
       this.lastBallInTime = null;
       this.waitingBetween = false;
@@ -71,8 +72,7 @@ public class AutoHopperMoveInCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

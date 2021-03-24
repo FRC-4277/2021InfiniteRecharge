@@ -11,9 +11,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.vision.VisionSystem;
-//import frc.robot.subsystems.vision.limelight.Target;
+// import frc.robot.subsystems.vision.limelight.Target;
 
-//import java.util.Optional;
+// import java.util.Optional;
 
 public class ShooterHoldVelocityCommand extends CommandBase {
   private Shooter shooter;
@@ -23,7 +23,8 @@ public class ShooterHoldVelocityCommand extends CommandBase {
   private int loopsReachedRPM = 0;
   private boolean runForever, finished;
 
-  public ShooterHoldVelocityCommand(Shooter shooter, VisionSystem visionSystem, RPMSource rpmSource, boolean runForever) {
+  public ShooterHoldVelocityCommand(
+      Shooter shooter, VisionSystem visionSystem, RPMSource rpmSource, boolean runForever) {
     this.shooter = shooter;
     this.visionSystem = visionSystem;
     this.rpmSource = rpmSource;
@@ -56,7 +57,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
     }
 
     double desiredRPM;
-    switch(rpmSource) {
+    switch (rpmSource) {
       case CONSTANT:
         desiredRPM = rpm;
         break;

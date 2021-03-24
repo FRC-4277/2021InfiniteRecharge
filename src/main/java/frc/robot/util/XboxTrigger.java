@@ -7,31 +7,29 @@
 
 package frc.robot.util;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
-/**
- * Add your docs here.
- */
+/** Add your docs here. */
 public class XboxTrigger extends Trigger {
-    private static final double DEFAULT_THRESHOLD = 0.05;
-    private XboxController controller;
-    private Hand hand;
-    private double threshold;
+  private static final double DEFAULT_THRESHOLD = 0.05;
+  private XboxController controller;
+  private Hand hand;
+  private double threshold;
 
-    public XboxTrigger(XboxController controller, Hand hand) {
-        this(controller, hand, DEFAULT_THRESHOLD);
-    }
+  public XboxTrigger(XboxController controller, Hand hand) {
+    this(controller, hand, DEFAULT_THRESHOLD);
+  }
 
-    public XboxTrigger(XboxController controller, Hand hand, double threshold) {
-        this.controller = controller;
-        this.hand = hand;
-        this.threshold = threshold;
-    }
+  public XboxTrigger(XboxController controller, Hand hand, double threshold) {
+    this.controller = controller;
+    this.hand = hand;
+    this.threshold = threshold;
+  }
 
-    @Override
-    public boolean get() {
-        return controller.getTriggerAxis(hand) >= threshold;
-    }
+  @Override
+  public boolean get() {
+    return controller.getTriggerAxis(hand) >= threshold;
+  }
 }

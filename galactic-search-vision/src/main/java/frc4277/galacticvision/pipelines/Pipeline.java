@@ -4,8 +4,7 @@ import frc4277.galacticvision.controllers.MainApplication;
 import org.opencv.core.Mat;
 
 public abstract class Pipeline {
-    public Pipeline() {
-    }
+  public Pipeline() {}
 
-    public abstract Mat processImage(MainApplication app, Mat mat, MainPipeline mainPipeline);
+  public abstract Mat processImage(MainApplication app, Mat mat, MainPipeline mainPipeline);
 }

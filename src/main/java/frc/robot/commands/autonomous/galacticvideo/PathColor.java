@@ -1,14 +1,15 @@
 package frc.robot.commands.autonomous.galacticvideo;
 
 public enum PathColor {
-    RED(true), BLUE(false);
-    private boolean powerCellClose;
+  RED(true),
+  BLUE(false);
+  private boolean powerCellClose;
 
-    PathColor(boolean powerCellClose) {
-        this.powerCellClose = powerCellClose;
-    }
+  PathColor(boolean powerCellClose) {
+    this.powerCellClose = powerCellClose;
+  }
 
-    public boolean isPowerCellClose() {
-        return powerCellClose;
-    }
+  public boolean isPowerCellClose() {
+    return powerCellClose;
+  }
 }

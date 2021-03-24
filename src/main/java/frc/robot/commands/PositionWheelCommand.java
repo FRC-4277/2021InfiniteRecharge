@@ -16,9 +16,7 @@ public class PositionWheelCommand extends CommandBase {
   private ColorWheel.WheelColor targetColor = null;
   private Boolean clockwise = null;
 
-  /**
-   * Creates a new PositionWheelCommand.
-   */
+  /** Creates a new PositionWheelCommand. */
   public PositionWheelCommand(ColorWheel colorWheel) {
     this.colorWheel = colorWheel;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -61,7 +59,7 @@ public class PositionWheelCommand extends CommandBase {
     }
 
     ColorWheel.WheelColor currentColor = colorWheel.getFilteredColor();
-    
+
     if (currentColor == targetColor) {
       colorWheel.stopWheel();
       colorWheel.setPositionStatus("!!!!FINISHED!!!!");
@@ -71,7 +69,8 @@ public class PositionWheelCommand extends CommandBase {
       if (clockwise == null) {
         clockwise = colorWheel.shouldSpinClockwise(currentColor, targetColor);
       }
-      colorWheel.setPositionStatus((clockwise ? "CW" : "CCW") + ", T = " + targetColor + ", C = " + currentColor);
+      colorWheel.setPositionStatus(
+          (clockwise ? "CW" : "CCW") + ", T = " + targetColor + ", C = " + currentColor);
       if (clockwise) {
         colorWheel.spinClockwise();
       } else {

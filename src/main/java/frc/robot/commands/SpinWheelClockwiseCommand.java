@@ -13,9 +13,7 @@ import frc.robot.subsystems.ColorWheel;
 public class SpinWheelClockwiseCommand extends CommandBase {
   private ColorWheel colorWheel;
 
-  /**
-   * Creates a new SpinWheelClockwiseCommand.
-   */
+  /** Creates a new SpinWheelClockwiseCommand. */
   public SpinWheelClockwiseCommand(ColorWheel colorWheel) {
     this.colorWheel = colorWheel;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -24,8 +22,7 @@ public class SpinWheelClockwiseCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

@@ -13,9 +13,7 @@ import frc.robot.subsystems.Shooter;
 public class ShooterForwardCommand extends CommandBase {
   private Shooter shooter;
 
-  /**
-   * Creates a new ShooterForwardCommand.
-   */
+  /** Creates a new ShooterForwardCommand. */
   public ShooterForwardCommand(Shooter shooter) {
     this.shooter = shooter;
     // Use addRequirements() here to declare subsystem dependencies.
@@ -24,8 +22,7 @@ public class ShooterForwardCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

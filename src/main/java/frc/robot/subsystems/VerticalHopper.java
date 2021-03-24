@@ -12,7 +12,6 @@ import static frc.robot.Constants.VerticalHopper.*;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
-
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -26,7 +25,6 @@ import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
-
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +39,7 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   private VictorSPX rightMotor = new VictorSPX(RIGHT_MOTOR_ID);
 
   private boolean gateClosed = true;
-  private boolean[] cellsPresent = new boolean[]{false, false, false, false, false};
+  private boolean[] cellsPresent = new boolean[] {false, false, false, false, false};
   private double speedRunning = 0.0;
   private VerticalHopperSendable sendable = new VerticalHopperSendable();
 
@@ -52,10 +50,12 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
 
   public ShuffleboardTab driverTab;
 
-  /**
-   * Creates a new VerticalHopper.
-   */
-  public VerticalHopper(RobotContainer robotContainer, DigitalInput intakeSensor, ShuffleboardTab driverTab, ShuffleboardTab settingsTab) {
+  /** Creates a new VerticalHopper. */
+  public VerticalHopper(
+      RobotContainer robotContainer,
+      DigitalInput intakeSensor,
+      ShuffleboardTab driverTab,
+      ShuffleboardTab settingsTab) {
     this.robotContainer = robotContainer;
     this.intakeSensor = intakeSensor;
     this.driverTab = driverTab;
@@ -65,29 +65,34 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     rightMotor.follow(leftMotor);
     rightMotor.setInverted(InvertType.OpposeMaster);
 
-    UP_SPEED_ENTRY = settingsTab
+    UP_SPEED_ENTRY =
+        settingsTab
             .add("Hopper Up Speed", 1.0)
             .withWidget(BuiltInWidgets.kNumberSlider)
             .withProperties(Map.of("min", 0, "max", 1))
             .getEntry();
-    INDEX_RUN_TIME_MS_ENTRY = settingsTab
+    INDEX_RUN_TIME_MS_ENTRY =
+        settingsTab
             .add("Index Run Time (ms)", DEFAULT_INDEX_RUN_TIME)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
-    INDEX_TIME_BETWEEN_BALL_ENTRY = settingsTab
+    INDEX_TIME_BETWEEN_BALL_ENTRY =
+        settingsTab
             .add("Index Time Between Balls (ms)", DEFAULT_INDEX_BETWEEN_TIME)
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
 
-
-    driverTab.addBoolean("Ball At Top", this::isBallPresentTop).withWidget(BuiltInWidgets.kBooleanBox)
-    .withPosition(9, 0).withSize(2, 1);
+    driverTab
+        .addBoolean("Ball At Top", this::isBallPresentTop)
+        .withWidget(BuiltInWidgets.kBooleanBox)
+        .withPosition(9, 0)
+        .withSize(2, 1);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //System.out.println(intakeSensor.get());
+    // System.out.println(intakeSensor.get());
   }
 
   public int getIndexRunTimeMs() {

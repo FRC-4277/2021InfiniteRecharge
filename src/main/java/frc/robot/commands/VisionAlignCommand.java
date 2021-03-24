@@ -7,13 +7,12 @@
 
 package frc.robot.commands;
 
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.subsystems.vision.limelight.Target;
+import java.util.Optional;
 
 public class VisionAlignCommand extends CommandBase {
   private static final double ROTATE_P = 0.01d;
@@ -33,14 +32,18 @@ public class VisionAlignCommand extends CommandBase {
     this(driveTrain, visionSystem, runForever, null, false);
   }
 
-  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, boolean vibrate) {
+  public VisionAlignCommand(
+      DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, boolean vibrate) {
     this(driveTrain, visionSystem, runForever, null, vibrate);
   }
 
-  /**
-   * Creates a new VisionAlignCommand.
-   */
-  public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, Boolean seekRight, boolean vibrate) {
+  /** Creates a new VisionAlignCommand. */
+  public VisionAlignCommand(
+      DriveTrain driveTrain,
+      VisionSystem visionSystem,
+      boolean runForever,
+      Boolean seekRight,
+      boolean vibrate) {
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
     this.runForever = runForever;

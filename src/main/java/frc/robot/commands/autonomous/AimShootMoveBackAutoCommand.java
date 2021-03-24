@@ -24,32 +24,35 @@ public class AimShootMoveBackAutoCommand extends SequentialCommandGroup {
 
   // TODO: Have a backup for if the vision system can't find the target
 
-  /**
-   * Creates a new AimShootBackAutoCommand.
-   */
-  public AimShootMoveBackAutoCommand(DriveTrain driveTrain, VisionSystem visionSystem,
-                                     Shooter shooter, VerticalHopper verticalHopper, boolean seekRight) {
+  /** Creates a new AimShootBackAutoCommand. */
+  public AimShootMoveBackAutoCommand(
+      DriveTrain driveTrain,
+      VisionSystem visionSystem,
+      Shooter shooter,
+      VerticalHopper verticalHopper,
+      boolean seekRight) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super(
-      new VisionAlignCommand(driveTrain, visionSystem, false, seekRight).withTimeout(4.0),
-      new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
-              .withTimeout(3.0),
-      new ParallelCommandGroup(
-        new ShooterHoldVelocityCommand(shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
-        new MoveHopperUpCommand(verticalHopper)
-      ).withTimeout(6.0),
-      new ParallelCommandGroup(
-        new StopShooterCommand(shooter),
-        new StopHopperCommand(verticalHopper),
-        new SequentialCommandGroup(
-          new RotateToCommand(driveTrain, 0).withTimeout(2.0),
-          new LazyRamseteCommand(driveTrain, () -> {
-            Pose2d currentPose = driveTrain.getPose();
-            return driveTrain.generateXTrajectory(currentPose, TO_SWITCH_DISTANCE_M);
-          })
-        )
-      )
-    );
+        new VisionAlignCommand(driveTrain, visionSystem, false, seekRight).withTimeout(4.0),
+        new ShooterHoldVelocityCommand(
+                shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, false)
+            .withTimeout(3.0),
+        new ParallelCommandGroup(
+                new ShooterHoldVelocityCommand(
+                    shooter, visionSystem, ShooterHoldVelocityCommand.RPMSource.VISION, true),
+                new MoveHopperUpCommand(verticalHopper))
+            .withTimeout(6.0),
+        new ParallelCommandGroup(
+            new StopShooterCommand(shooter),
+            new StopHopperCommand(verticalHopper),
+            new SequentialCommandGroup(
+                new RotateToCommand(driveTrain, 0).withTimeout(2.0),
+                new LazyRamseteCommand(
+                    driveTrain,
+                    () -> {
+                      Pose2d currentPose = driveTrain.getPose();
+                      return driveTrain.generateXTrajectory(currentPose, TO_SWITCH_DISTANCE_M);
+                    }))));
   }
 }

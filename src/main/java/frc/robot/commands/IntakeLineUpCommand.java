@@ -7,11 +7,10 @@
 
 package frc.robot.commands;
 
-import java.util.Optional;
-
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 import frc.robot.subsystems.vision.VisionSystem;
+import java.util.Optional;
 
 public class IntakeLineUpCommand extends CommandBase {
   private static final double TURN_P = 0.025d;
@@ -20,9 +19,7 @@ public class IntakeLineUpCommand extends CommandBase {
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
 
-  /**
-   * Creates a new IntakeLineUpCommand.
-   */
+  /** Creates a new IntakeLineUpCommand. */
   public IntakeLineUpCommand(DriveTrain driveTrain, VisionSystem visionSystem) {
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;

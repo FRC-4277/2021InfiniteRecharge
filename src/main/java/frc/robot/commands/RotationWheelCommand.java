@@ -18,9 +18,7 @@ public class RotationWheelCommand extends CommandBase {
   private ColorWheel.WheelColor lastColor = null;
   private int colorChanges = 0;
 
-  /**
-   * Creates a new SpinWheelClockwiseCommand.
-   */
+  /** Creates a new SpinWheelClockwiseCommand. */
   public RotationWheelCommand(ColorWheel colorWheel) {
     this.colorWheel = colorWheel;
     // Use addRequirements() here to declare subsystem dependencies.

@@ -8,7 +8,6 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.RunVerificationsCommand;
 import frc.robot.subsystems.vision.VisionSystem;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +30,17 @@ public class VerificationSystem extends SubsystemBase {
   private NetworkTableEntry errorsEntry;
   private String errors = "";
 
-  public VerificationSystem(DriveTrain driveTrain, Intake intake, VerticalHopper verticalHopper, Shooter shooter,
-                            ColorWheel colorWheel, CameraSystem cameraSystem, VisionSystem visionSystem, Winch winch,
-                            HookElevator hookElevator, ShuffleboardTab tab) {
+  public VerificationSystem(
+      DriveTrain driveTrain,
+      Intake intake,
+      VerticalHopper verticalHopper,
+      Shooter shooter,
+      ColorWheel colorWheel,
+      CameraSystem cameraSystem,
+      VisionSystem visionSystem,
+      Winch winch,
+      HookElevator hookElevator,
+      ShuffleboardTab tab) {
     this.driveTrain = driveTrain;
     this.intake = intake;
     this.verticalHopper = verticalHopper;
@@ -44,8 +51,17 @@ public class VerificationSystem extends SubsystemBase {
     this.winch = winch;
     this.hookElevator = hookElevator;
     this.tab = tab;
-    this.systems = List.of(driveTrain, intake, verticalHopper, shooter, colorWheel, cameraSystem, visionSystem,
-            winch, hookElevator);
+    this.systems =
+        List.of(
+            driveTrain,
+            intake,
+            verticalHopper,
+            shooter,
+            colorWheel,
+            cameraSystem,
+            visionSystem,
+            winch,
+            hookElevator);
     initializeTab();
   }
 
@@ -58,13 +74,16 @@ public class VerificationSystem extends SubsystemBase {
 
       // Generate layout and add to map
       String name = system.getClass().getSimpleName();
-      ShuffleboardLayout layout = tab
-              .getLayout(name, BuiltInLayouts.kGrid)
-              .withProperties(Map.of(
-            "Label position", "TOP",
-            "Number of columns", (verifications == null ? 0 : verifications.size()),
-            "Number of rows", 1
-              ))
+      ShuffleboardLayout layout =
+          tab.getLayout(name, BuiltInLayouts.kGrid)
+              .withProperties(
+                  Map.of(
+                      "Label position",
+                      "TOP",
+                      "Number of columns",
+                      (verifications == null ? 0 : verifications.size()),
+                      "Number of rows",
+                      1))
               .withPosition(columnIndex, rowIndex)
               .withSize(4, 1);
       layoutMap.put(system, layout);
@@ -72,10 +91,12 @@ public class VerificationSystem extends SubsystemBase {
       // Generate widgets
       if (verifications != null) {
         for (Verification verification : verifications) {
-          NetworkTableEntry entry = layout.add(verification.getName(), false)
-            .withWidget(BuiltInWidgets.kBooleanBox)
-            .withSize(1, 1)
-            .getEntry();
+          NetworkTableEntry entry =
+              layout
+                  .add(verification.getName(), false)
+                  .withWidget(BuiltInWidgets.kBooleanBox)
+                  .withSize(1, 1)
+                  .getEntry();
           verification.setWidgetEntry(entry);
         }
       }
@@ -92,15 +113,14 @@ public class VerificationSystem extends SubsystemBase {
       rowIndex++;
     }
 
-    tab.add("Run", new RunVerificationsCommand(this))
-    .withPosition(0, rowIndex)
-    .withSize(1, 1);
+    tab.add("Run", new RunVerificationsCommand(this)).withPosition(0, rowIndex).withSize(1, 1);
 
-    errorsEntry = tab.add("Errors", "NOT RAN YET")
-    .withWidget(BuiltInWidgets.kTextView)
-    .withPosition(1, rowIndex)
-    .withSize(7, 1)
-    .getEntry();
+    errorsEntry =
+        tab.add("Errors", "NOT RAN YET")
+            .withWidget(BuiltInWidgets.kTextView)
+            .withPosition(1, rowIndex)
+            .withSize(7, 1)
+            .getEntry();
   }
 
   public void error(String msg) {

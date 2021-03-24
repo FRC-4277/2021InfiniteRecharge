@@ -18,9 +18,7 @@ public class RotateToCommand extends CommandBase {
   private double targetHeading;
   private int correctLoops;
 
-  /**
-   * Creates a new RotateToCommand.
-   */
+  /** Creates a new RotateToCommand. */
   public RotateToCommand(DriveTrain driveTrain, double targetHeading) {
     this.driveTrain = driveTrain;
     addRequirements(driveTrain);
@@ -42,7 +40,7 @@ public class RotateToCommand extends CommandBase {
     // If error is positive, we must spin counterclockwise
     // If turning power is positive, we turn clockwise, so invert
     double turningPower = -error;
-    turningPower *= 0.015; //P loop
+    turningPower *= 0.015; // P loop
     if (Math.abs(turningPower) < MIN_POWER) {
       turningPower = Math.copySign(MIN_POWER, turningPower);
     }
@@ -58,8 +56,7 @@ public class RotateToCommand extends CommandBase {
 
   // Called once the command ends or is interrupted.
   @Override
-  public void end(boolean interrupted) {
-  }
+  public void end(boolean interrupted) {}
 
   // Returns true when the command should end.
   @Override

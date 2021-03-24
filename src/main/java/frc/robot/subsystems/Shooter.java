@@ -10,14 +10,10 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.Shooter.*;
 import static frc.robot.Constants.Shooter.Characteristics.*;
 
-import java.util.List;
-import java.util.Map;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
-
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotBase;
@@ -32,12 +28,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
+import java.util.List;
+import java.util.Map;
 
 public class Shooter extends SubsystemBase implements VerifiableSystem {
-  //public static final double FORWARDS_SPEED = 0.5;
-  //public static final double BACKWARDS_SPEED = -0.5; 
-  
-  //private ShuffleboardTab settingsTab;
+  // public static final double FORWARDS_SPEED = 0.5;
+  // public static final double BACKWARDS_SPEED = -0.5;
+
+  // private ShuffleboardTab settingsTab;
   private WPI_TalonSRX leftMotor = new WPI_TalonSRX(LEFT_MOTOR_ID);
   private WPI_TalonSRX rightMotor = new WPI_TalonSRX(RIGHT_MOTOR_ID);
 
@@ -48,16 +46,15 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   private SendableChooser<RPMSource> rpmSourceSendableChooser;
   private NetworkTableEntry shooterDesiredRPMSourceEntry;
 
-  private SimpleMotorFeedforward feedforward = new SimpleMotorFeedforward(ksVolts, kvVoltRotationsPerSecond);
+  private SimpleMotorFeedforward feedforward =
+      new SimpleMotorFeedforward(ksVolts, kvVoltRotationsPerSecond);
 
   private FlywheelSim flywheelSim;
   private TalonSRXSimCollection leftTalonSim, rightTalonSim;
 
-  /**
-   * Creates a new Shooter.
-   */
+  /** Creates a new Shooter. */
   public Shooter(ShuffleboardTab settingsTab, ShuffleboardTab driverTab) {
-    //this.settingsTab = settingsTab;
+    // this.settingsTab = settingsTab;
     leftMotor.configFactoryDefault();
     leftMotor.setInverted(LEFT_MOTOR_INVERTED);
     leftMotor.setSensorPhase(LEFT_SENSOR_PHASE);
@@ -79,38 +76,32 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
       rightMotor.configAllowableClosedloopError(0, 0, 10);
     }
 
-    ShuffleboardLayout layout = driverTab.getLayout("Shooter", BuiltInLayouts.kGrid)
-    .withSize(5, 1)
-    .withPosition(6, 2)
-    .withProperties(
-      Map.of(
-    "Label position", "TOP",
-    "Number of columns", 4,
-    "Number of rows", 1
-      )
-    );
+    ShuffleboardLayout layout =
+        driverTab
+            .getLayout("Shooter", BuiltInLayouts.kGrid)
+            .withSize(5, 1)
+            .withPosition(6, 2)
+            .withProperties(
+                Map.of(
+                    "Label position", "TOP",
+                    "Number of columns", 4,
+                    "Number of rows", 1));
 
     // ShuffleBoard
-    shooterSpeedEntry = settingsTab
-    .add("Shooter Speed (do not use)", 0.75)
-    .withWidget(BuiltInWidgets.kNumberSlider)
-    .withProperties(Map.of("min", 0, "max", 1))
-    .getEntry();
+    shooterSpeedEntry =
+        settingsTab
+            .add("Shooter Speed (do not use)", 0.75)
+            .withWidget(BuiltInWidgets.kNumberSlider)
+            .withProperties(Map.of("min", 0, "max", 1))
+            .getEntry();
 
-    shooterRPMDisplayEntry = layout
-    .add("RPM", "")
-    .withWidget(BuiltInWidgets.kTextView)
-    .getEntry();
+    shooterRPMDisplayEntry = layout.add("RPM", "").withWidget(BuiltInWidgets.kTextView).getEntry();
 
-    shooterDesiredRPMEntry = layout
-    .add("Desired RPM", 4000.0)
-    .withWidget(BuiltInWidgets.kTextView)
-    .getEntry();
+    shooterDesiredRPMEntry =
+        layout.add("Desired RPM", 4000.0).withWidget(BuiltInWidgets.kTextView).getEntry();
 
-    shooterReachedRPMEntry = layout
-    .add("At Target RPM", false)
-    .withWidget(BuiltInWidgets.kBooleanBox)
-    .getEntry();
+    shooterReachedRPMEntry =
+        layout.add("At Target RPM", false).withWidget(BuiltInWidgets.kBooleanBox).getEntry();
 
     rpmSourceSendableChooser = new SendableChooser<>();
     rpmSourceSendableChooser.setDefaultOption("Vision", RPMSource.VISION);
@@ -120,13 +111,9 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
 
     // Simulation
     if (RobotBase.isSimulation()) {
-       flywheelSim = new FlywheelSim(
-          PLANT,
-          DCMotor.getVex775Pro(1),
-          4
-       );
-       leftTalonSim = leftMotor.getSimCollection();
-       rightTalonSim = rightMotor.getSimCollection();
+      flywheelSim = new FlywheelSim(PLANT, DCMotor.getVex775Pro(1), 4);
+      leftTalonSim = leftMotor.getSimCollection();
+      rightTalonSim = rightMotor.getSimCollection();
     }
   }
 
@@ -140,8 +127,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void runForward() {
-    leftMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble()); 
-    rightMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble()); 
+    leftMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble());
+    rightMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble());
   }
 
   public void holdVelocityRPM(double rpm) {
@@ -154,8 +141,10 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     double rps = rpm / 60d;
     double feedForwardVolts = feedforward.calculate(rps);
     double feedForwardNormalized = feedForwardVolts / MAX_BATTERY_V;
-    leftMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedForwardNormalized);
-    rightMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedForwardNormalized);
+    leftMotor.set(
+        ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedForwardNormalized);
+    rightMotor.set(
+        ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedForwardNormalized);
   }
 
   public double getVelocity() {
@@ -213,18 +202,18 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    //shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
+    // shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
     shooterRPMDisplayEntry.setString(String.format("%.2f | %.2f", getLeftRPM(), getRightRPM()));
   }
 
   @Override
   public void simulationPeriodic() {
     flywheelSim.setInputVoltage(leftMotor.getMotorOutputVoltage());
-    //System.out.println("Left Motor Voltage: " + leftMotor.getMotorOutputVoltage());
+    // System.out.println("Left Motor Voltage: " + leftMotor.getMotorOutputVoltage());
     flywheelSim.update(0.020);
-    //System.out.println("rad/s from sim: " + flywheelSim.getAngularVelocityRadPerSec());
+    // System.out.println("rad/s from sim: " + flywheelSim.getAngularVelocityRadPerSec());
     double rpm = flywheelSim.getAngularVelocityRPM();
-    //System.out.println("RPM from sim: " + rpm);
+    // System.out.println("RPM from sim: " + rpm);
     double ticksPerDs = rpmToTicksPerDs(rpm);
 
     leftTalonSim.setQuadratureVelocity((int) ticksPerDs);

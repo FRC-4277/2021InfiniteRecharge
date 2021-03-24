@@ -17,32 +17,31 @@ import frc.robot.subsystems.VerticalHopper;
 // information, see:
 // https://docs.wpilib.org/en/latest/docs/software/commandbased/convenience-features.html
 public class ShootAutoCommand extends SequentialCommandGroup {
-  /**
-   * Creates a new ShootAutoCommand.
-   */
+  /** Creates a new ShootAutoCommand. */
   public ShootAutoCommand(VerticalHopper hopper, Shooter shooter) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(new ParallelCommandGroup(new ShooterForwardCommand(shooter), 
-    new SequentialCommandGroup(
-      new WaitCommand(1.0),
-      new MoveHopperUpCommand(hopper),
-      new WaitCommand(0.4),
-      new StopHopperCommand(hopper),
-      new WaitCommand(0.4),
-      new MoveHopperUpCommand(hopper),
-      new WaitCommand(0.4),
-      new StopHopperCommand(hopper),
-      new WaitCommand(0.4),
-      new MoveHopperUpCommand(hopper),
-      new WaitCommand(0.4),
-      new StopHopperCommand(hopper),
-      new WaitCommand(0.4),
-      new MoveHopperUpCommand(hopper),
-      new WaitCommand(0.4),
-      new StopHopperCommand(hopper),
-      new WaitCommand(0.4),
-      new StopShooterCommand(shooter)
-    )));
+    super(
+        new ParallelCommandGroup(
+            new ShooterForwardCommand(shooter),
+            new SequentialCommandGroup(
+                new WaitCommand(1.0),
+                new MoveHopperUpCommand(hopper),
+                new WaitCommand(0.4),
+                new StopHopperCommand(hopper),
+                new WaitCommand(0.4),
+                new MoveHopperUpCommand(hopper),
+                new WaitCommand(0.4),
+                new StopHopperCommand(hopper),
+                new WaitCommand(0.4),
+                new MoveHopperUpCommand(hopper),
+                new WaitCommand(0.4),
+                new StopHopperCommand(hopper),
+                new WaitCommand(0.4),
+                new MoveHopperUpCommand(hopper),
+                new WaitCommand(0.4),
+                new StopHopperCommand(hopper),
+                new WaitCommand(0.4),
+                new StopShooterCommand(shooter))));
   }
 }

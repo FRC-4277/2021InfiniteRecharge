@@ -4,7 +4,6 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.VerificationSystem;
 
-
 public class RunVerificationsCommand extends CommandBase {
   private final VerificationSystem verificationSystem;
   private boolean firstRun;
@@ -12,7 +11,8 @@ public class RunVerificationsCommand extends CommandBase {
 
   public RunVerificationsCommand(VerificationSystem verificationSystem) {
     this.verificationSystem = verificationSystem;
-    // each subsystem used by the command must be passed into the addRequirements() method (which takes a vararg of Subsystem)
+    // each subsystem used by the command must be passed into the addRequirements() method (which
+    // takes a vararg of Subsystem)
     addRequirements(this.verificationSystem);
   }
 
@@ -44,7 +44,5 @@ public class RunVerificationsCommand extends CommandBase {
   }
 
   @Override
-  public void end(boolean interrupted) {
-
-  }
+  public void end(boolean interrupted) {}
 }

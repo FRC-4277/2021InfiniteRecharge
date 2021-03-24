@@ -1,7 +1,6 @@
 package frc.robot.subsystems;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
-
 import java.util.function.Supplier;
 
 public class Verification {

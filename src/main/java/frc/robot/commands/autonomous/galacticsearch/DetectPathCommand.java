@@ -6,109 +6,106 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.GalacticSearch;
 import frc.robot.subsystems.vision.GalacticVision;
 import frc.robot.subsystems.vision.VisionSystem;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 public class DetectPathCommand extends CommandBase {
-    private final GalacticAutoCommand galacticAutoCommand;
-    private final VisionSystem visionSystem;
+  private final GalacticAutoCommand galacticAutoCommand;
+  private final VisionSystem visionSystem;
 
-    public DetectPathCommand(GalacticAutoCommand galacticAutoCommand, VisionSystem visionSystem) {
-        this.galacticAutoCommand = galacticAutoCommand;
-        this.visionSystem = visionSystem;
-        addRequirements(visionSystem);
+  public DetectPathCommand(GalacticAutoCommand galacticAutoCommand, VisionSystem visionSystem) {
+    this.galacticAutoCommand = galacticAutoCommand;
+    this.visionSystem = visionSystem;
+    addRequirements(visionSystem);
+  }
+
+  @Override
+  public void initialize() {
+    galacticAutoCommand.setPathDetected(null);
+  }
+
+  @Override
+  public void execute() {
+    if (RobotBase.isSimulation()) {
+      GalacticPath path = visionSystem.getSimPathSelected2();
+      if (path == null) {
+        galacticAutoCommand.setMessage("[Detect Path] Please select simulation path");
+      }
+      galacticAutoCommand.setPathDetected(path);
     }
 
-    @Override
-    public void initialize() {
-        galacticAutoCommand.setPathDetected(null);
+    GalacticVision galacticVision = visionSystem.getGalacticVision();
+    List<GalacticVision.PowerCellTarget> targets = galacticVision.getLargestPowerCells();
+    if (targets.size() < 2) {
+      galacticAutoCommand.setMessage("[Detect Path] need to detect at least 2, waiting...");
+      return;
     }
 
-    @Override
-    public void execute() {
-        if (RobotBase.isSimulation()) {
-            GalacticPath path = visionSystem.getSimPathSelected2();
-            if (path == null) {
-                galacticAutoCommand.setMessage("[Detect Path] Please select simulation path");
-            }
-            galacticAutoCommand.setPathDetected(path);
+    GalacticVision.PowerCellTarget largestTarget = targets.get(0);
+
+    GalacticPath path;
+    if (targets.size() == 3) {
+      if (largestTarget.getArea() > 300) {
+        path = GalacticPaths.A_RED;
+      } else {
+        path = GalacticPaths.B_BLUE;
+      }
+    } else {
+      // A Blue or B Red
+      double differenceInX = Math.abs(targets.get(0).getX() - targets.get(1).getX());
+      if (differenceInX <= 20) {
+        path = GalacticPaths.B_RED;
+      } else {
+        path = GalacticPaths.A_BLUE;
+      }
+    }
+
+    SmartDashboard.putString("GS Path", path.toString());
+    galacticAutoCommand.setPathDetected(path);
+
+    /*if (targets.size() < 3) {
+        galacticAutoCommand.setMessage("[Detect Path] Only found " + targets.size() + " power cells, waiting...");
+        return;
+    }
+    GalacticVision.PowerCellTarget largestPowerCell = targets.get(0);*/
+
+    /*// TRUE for red, FALSE for blue
+    boolean powerCellClose = largestPowerCell.getArea() > GalacticSearch.VISION_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL;
+    SmartDashboard.putNumber("[GS] Area", largestPowerCell.getArea());
+    // TRUE for A, FALSE for B
+    boolean threeBallsDifferentX = areXCoordinatesDifferent(targets);
+    galacticAutoCommand.setMessage("[Detect Path] Power cell close: " + powerCellClose + ", diff x: " + threeBallsDifferentX);
+
+    GalacticPath detectedPath = GalacticPaths.findPath(powerCellClose, threeBallsDifferentX);
+    if (detectedPath != null) {
+        galacticAutoCommand.setMessage("[Detect Path] Detected path is " + detectedPath);
+        SmartDashboard.putString("[GS] Path", detectedPath.toString());
+        if (RobotBase.isReal()) {
+            galacticAutoCommand.setPathDetected(detectedPath); // Found the path!!!!
         }
+    }*/
+  }
 
-        GalacticVision galacticVision = visionSystem.getGalacticVision();
-        List<GalacticVision.PowerCellTarget> targets = galacticVision.getLargestPowerCells();
-        if (targets.size() < 2) {
-            galacticAutoCommand.setMessage("[Detect Path] need to detect at least 2, waiting...");
-            return;
-        }
+  private boolean areXCoordinatesDifferent(List<GalacticVision.PowerCellTarget> targets) {
+    List<GalacticVision.PowerCellTarget> targetsXSorted = new ArrayList<>(targets);
+    // Ascending order: left to right
+    targetsXSorted.sort(Comparator.comparingDouble(GalacticVision.PowerCellTarget::getX));
+    double distanceLeftToMiddle = Math.abs(targets.get(1).getX() - targets.get(0).getX());
+    double distanceRightToMiddle = Math.abs(targets.get(2).getX() - targets.get(1).getX());
+    galacticAutoCommand.setMessage("[Detect Path] Left distance to mid: " + distanceLeftToMiddle);
+    SmartDashboard.putNumber("[GS] Left Distance", distanceLeftToMiddle);
+    galacticAutoCommand.setMessage("[Detect Path] Right distance to mid: " + distanceRightToMiddle);
+    SmartDashboard.putNumber("[GS] Right Distance", distanceRightToMiddle);
+    return distanceLeftToMiddle >= GalacticSearch.VISION_DIFFERENT_X_THRESHOLD
+        && distanceRightToMiddle >= GalacticSearch.VISION_DIFFERENT_X_THRESHOLD;
+  }
 
-        GalacticVision.PowerCellTarget largestTarget = targets.get(0);
+  @Override
+  public void end(boolean interrupted) {}
 
-        GalacticPath path;
-        if (targets.size() == 3) {
-            if (largestTarget.getArea() > 300) {
-                path = GalacticPaths.A_RED;
-            } else {
-                path = GalacticPaths.B_BLUE;
-            }
-        } else {
-            // A Blue or B Red
-            double differenceInX = Math.abs(targets.get(0).getX() - targets.get(1).getX());
-            if (differenceInX <= 20) {
-                path = GalacticPaths.B_RED;
-            } else {
-                path = GalacticPaths.A_BLUE;
-            }
-        }
-
-        SmartDashboard.putString("GS Path", path.toString());
-        galacticAutoCommand.setPathDetected(path);
-
-        /*if (targets.size() < 3) {
-            galacticAutoCommand.setMessage("[Detect Path] Only found " + targets.size() + " power cells, waiting...");
-            return;
-        }
-        GalacticVision.PowerCellTarget largestPowerCell = targets.get(0);*/
-
-        /*// TRUE for red, FALSE for blue
-        boolean powerCellClose = largestPowerCell.getArea() > GalacticSearch.VISION_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL;
-        SmartDashboard.putNumber("[GS] Area", largestPowerCell.getArea());
-        // TRUE for A, FALSE for B
-        boolean threeBallsDifferentX = areXCoordinatesDifferent(targets);
-        galacticAutoCommand.setMessage("[Detect Path] Power cell close: " + powerCellClose + ", diff x: " + threeBallsDifferentX);
-
-        GalacticPath detectedPath = GalacticPaths.findPath(powerCellClose, threeBallsDifferentX);
-        if (detectedPath != null) {
-            galacticAutoCommand.setMessage("[Detect Path] Detected path is " + detectedPath);
-            SmartDashboard.putString("[GS] Path", detectedPath.toString());
-            if (RobotBase.isReal()) {
-                galacticAutoCommand.setPathDetected(detectedPath); // Found the path!!!!
-            }
-        }*/
-    }
-
-    private boolean areXCoordinatesDifferent(List<GalacticVision.PowerCellTarget> targets) {
-        List<GalacticVision.PowerCellTarget> targetsXSorted = new ArrayList<>(targets);
-        // Ascending order: left to right
-        targetsXSorted.sort(Comparator.comparingDouble(GalacticVision.PowerCellTarget::getX));
-        double distanceLeftToMiddle = Math.abs(targets.get(1).getX() - targets.get(0).getX());
-        double distanceRightToMiddle = Math.abs(targets.get(2).getX() - targets.get(1).getX());
-        galacticAutoCommand.setMessage("[Detect Path] Left distance to mid: " + distanceLeftToMiddle);
-        SmartDashboard.putNumber("[GS] Left Distance", distanceLeftToMiddle);
-        galacticAutoCommand.setMessage("[Detect Path] Right distance to mid: " + distanceRightToMiddle);
-        SmartDashboard.putNumber("[GS] Right Distance", distanceRightToMiddle);
-        return distanceLeftToMiddle >= GalacticSearch.VISION_DIFFERENT_X_THRESHOLD &&
-                distanceRightToMiddle >= GalacticSearch.VISION_DIFFERENT_X_THRESHOLD;
-    }
-
-    @Override
-    public void end(boolean interrupted) {
-
-    }
-
-    @Override
-    public boolean isFinished() {
-        return galacticAutoCommand.getPathDetected() != null;
-    }
+  @Override
+  public boolean isFinished() {
+    return galacticAutoCommand.getPathDetected() != null;
+  }
 }

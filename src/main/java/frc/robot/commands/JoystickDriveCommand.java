@@ -7,26 +7,19 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.Joystick;
-import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
-import frc.robot.util.LogitechButton;
-
 import java.util.function.Supplier;
 
 public class JoystickDriveCommand extends CommandBase {
-  //private static final double TURN_DEADBAND = 0.1;
+  // private static final double TURN_DEADBAND = 0.1;
 
   private DriveTrain driveTrain;
   private Supplier<Boolean> invertControls = () -> false;
   private Supplier<Double> yControllerSupplier, xControllerSupplier;
   private Supplier<Boolean> quickTurn = () -> false;
 
-
-  /**
-   * Creates a new JoystickDriveCommand.
-   */
+  /** Creates a new JoystickDriveCommand. */
   public JoystickDriveCommand(DriveTrain driveTrain) {
     this.driveTrain = driveTrain;
     addRequirements(driveTrain);
@@ -40,9 +33,9 @@ public class JoystickDriveCommand extends CommandBase {
       return;
     }
     // y is inverted on Xbox Controller
-    //double y = -controller.getY(Hand.kLeft); // Forward/backwards (axis inverted)
+    // double y = -controller.getY(Hand.kLeft); // Forward/backwards (axis inverted)
     double y = yControllerSupplier.get();
-    //double x = controller.getRawAxis(2); // Logitech Twist
+    // double x = controller.getRawAxis(2); // Logitech Twist
     double x = xControllerSupplier.get();
 
     /*if (Math.abs(z) >= TURN_DEADBAND) {
@@ -82,6 +75,7 @@ public class JoystickDriveCommand extends CommandBase {
   }
 
   public enum Mode {
-    ARCADE, CURVATURE;
+    ARCADE,
+    CURVATURE;
   }
 }

@@ -7,19 +7,16 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.Gate.*;
+
 import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import static frc.robot.Constants.Gate.*;
 
 public class Gate extends SubsystemBase {
   private Solenoid solenoid = new Solenoid(SOLENOID_ID);
 
-  /**
-   * Creates a new Gate.
-   */
-  public Gate() {
-    
-  }
+  /** Creates a new Gate. */
+  public Gate() {}
 
   @Override
   public void periodic() {

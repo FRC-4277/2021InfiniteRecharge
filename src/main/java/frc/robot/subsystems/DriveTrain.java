@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.DriveTrain.*;
+
 import com.ctre.phoenix.motorcontrol.*;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
@@ -47,7 +49,6 @@ import frc.robot.commands.RotateToCommand;
 import frc.robot.commands.ZeroNavXCommand;
 import frc.robot.subsystems.vision.limelight.LimelightSim;
 import frc.robot.util.path.WaypointReader;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -57,30 +58,28 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import static frc.robot.Constants.DriveTrain.*;
-
-
 public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private final ShuffleboardTab autonomousTab;
   private final WPI_TalonFX frontLeftMotor = new WPI_TalonFX(FRONT_LEFT);
   private final WPI_TalonFX frontRightMotor = new WPI_TalonFX(FRONT_RIGHT);
   private final WPI_TalonFX backLeftMotor = new WPI_TalonFX(BACK_LEFT);
   private final WPI_TalonFX backRightMotor = new WPI_TalonFX(BACK_RIGHT);
-  
-  private final SpeedControllerGroup leftGroup = new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
-  private final SpeedControllerGroup rightGroup = new SpeedControllerGroup(frontRightMotor, backRightMotor);
-  
+
+  private final SpeedControllerGroup leftGroup =
+      new SpeedControllerGroup(frontLeftMotor, backLeftMotor);
+  private final SpeedControllerGroup rightGroup =
+      new SpeedControllerGroup(frontRightMotor, backRightMotor);
+
   private final AHRS navX = new AHRS();
   private final SendableChooser<JoystickDriveCommand.Mode> drivingModeSelector;
   private final NetworkTableEntry rotationFactor;
 
   private DifferentialDrive drive;
   private final DifferentialDriveOdometry odometry;
-  private final SimpleMotorFeedforward motorFeedforward
-          = new SimpleMotorFeedforward(kS, kV, kA);
+  private final SimpleMotorFeedforward motorFeedforward = new SimpleMotorFeedforward(kS, kV, kA);
 
   private double yawOffset = 0;
-  //private ShuffleboardTab testTab;
+  // private ShuffleboardTab testTab;
   private boolean joystickUsed = false;
 
   private NetworkTableEntry neutralModeEntry, autoPathMessageEntry;
@@ -88,7 +87,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   // Simulation stuff
   private DifferentialDrivetrainSim drivetrainSim;
   private WPI_TalonSRX frontLeftSimMotor, frontRightSimMotor, backLeftSimMotor, backRightSimMotor;
-  private TalonSRXSimCollection frontLeftSimSensors, frontRightSimSensors, backLeftSimSensors, backRightSimSensors;
+  private TalonSRXSimCollection frontLeftSimSensors,
+      frontRightSimSensors,
+      backLeftSimSensors,
+      backRightSimSensors;
   private final Field2d fieldSim = new Field2d();
   private ShuffleboardTab simulationTab;
   private ShuffleboardTab settingsTab;
@@ -97,11 +99,13 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   private Map<Integer, Pose2d> storedPositions = new HashMap<>();
 
-  /**
-   * Creates a new DriveTrain.
-   */
-  public DriveTrain(ShuffleboardTab testTab, ShuffleboardTab simulationTab, ShuffleboardTab autonomousTab, ShuffleboardTab settingsTab) {
-    //this.testTab = testTab;
+  /** Creates a new DriveTrain. */
+  public DriveTrain(
+      ShuffleboardTab testTab,
+      ShuffleboardTab simulationTab,
+      ShuffleboardTab autonomousTab,
+      ShuffleboardTab settingsTab) {
+    // this.testTab = testTab;
     this.simulationTab = simulationTab;
     this.autonomousTab = autonomousTab;
     this.settingsTab = settingsTab;
@@ -126,7 +130,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
     if (RobotBase.isReal()) {
       drive = new DifferentialDrive(leftGroup, rightGroup);
-      // Don't let WPI invert, we already did through TalonFX APIs. We want forward to be a green LED on the controllers.
+      // Don't let WPI invert, we already did through TalonFX APIs. We want forward to be a green
+      // LED on the controllers.
       drive.setRightSideInverted(false);
     }
 
@@ -141,8 +146,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     SmartDashboard.putData(backLeftMotor);
     SmartDashboard.putData(backRightMotor);
 
-    testTab.addNumber("NavX Adjusted Yaw", this::getHeading)
-    .withWidget(BuiltInWidgets.kTextView);
+    testTab.addNumber("NavX Adjusted Yaw", this::getHeading).withWidget(BuiltInWidgets.kTextView);
     testTab.add(new ZeroNavXCommand(this));
     testTab.add(new RotateToCommand(this, 90));
 
@@ -152,18 +156,25 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     chooser.addOption("Brake", NeutralMode.Brake);
     settingsTab.add(chooser).withSize(2, 1).withPosition(0, 1);
 
-    neutralModeEntry = NetworkTableInstance.getDefault()
-            .getTable("Shuffleboard").getSubTable("Settings").getSubTable("Neutral Mode")
+    neutralModeEntry =
+        NetworkTableInstance.getDefault()
+            .getTable("Shuffleboard")
+            .getSubTable("Settings")
+            .getSubTable("Neutral Mode")
             .getEntry("active");
-    neutralModeEntry.addListener(entryNotification -> {
-      NeutralMode neutralMode = chooser.getSelected();
-      frontLeftMotor.setNeutralMode(neutralMode);
-      frontRightMotor.setNeutralMode(neutralMode);
-      backLeftMotor.setNeutralMode(neutralMode);
-      backRightMotor.setNeutralMode(neutralMode);
-    }, EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
+    neutralModeEntry.addListener(
+        entryNotification -> {
+          NeutralMode neutralMode = chooser.getSelected();
+          frontLeftMotor.setNeutralMode(neutralMode);
+          frontRightMotor.setNeutralMode(neutralMode);
+          backLeftMotor.setNeutralMode(neutralMode);
+          backRightMotor.setNeutralMode(neutralMode);
+        },
+        EntryListenerFlags.kImmediate | EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
 
-    rotationFactor = settingsTab.add("Rotation Factor", 0.75)
+    rotationFactor =
+        settingsTab
+            .add("Rotation Factor", 0.75)
             .withPosition(0, 2)
             .withSize(2, 1)
             .withWidget(BuiltInWidgets.kTextView)
@@ -173,9 +184,11 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     SendableRegistry.setName(drivingModeSelector, "Driving Mode");
     drivingModeSelector.setDefaultOption("Arcade (default)", JoystickDriveCommand.Mode.ARCADE);
     drivingModeSelector.addOption("Curvature", JoystickDriveCommand.Mode.CURVATURE);
-    settingsTab.add(drivingModeSelector).withSize(2, 1).withPosition(0 , 3);
+    settingsTab.add(drivingModeSelector).withSize(2, 1).withPosition(0, 3);
 
-    autoPathMessageEntry = autonomousTab.add("Custom Autonomous Paths", "")
+    autoPathMessageEntry =
+        autonomousTab
+            .add("Custom Autonomous Paths", "")
             .withPosition(0, 2)
             .withSize(8, 1)
             .withWidget(BuiltInWidgets.kTextView)
@@ -191,17 +204,20 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
       backLeftSimSensors = backLeftSimMotor.getSimCollection();
       backRightSimSensors = backRightSimMotor.getSimCollection();
 
-      drive = new DifferentialDrive(new SpeedControllerGroup(frontLeftMotor, backLeftMotor),
+      drive =
+          new DifferentialDrive(
+              new SpeedControllerGroup(frontLeftMotor, backLeftMotor),
               new SpeedControllerGroup(frontRightMotor, backRightMotor));
       drive.setRightSideInverted(false);
-      drivetrainSim = new DifferentialDrivetrainSim(
+      drivetrainSim =
+          new DifferentialDrivetrainSim(
               PLANT,
               DCMotor.getFalcon500(2),
               DRIVE_GEARING,
               TRACK_WIDTH_METERS,
               WHEEL_RADIUS_METERS,
-              null //VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005)
-      );
+              null // VecBuilder.fill(0, 0, 0.0001, 0.1, 0.1, 0.005, 0.005)
+              );
     }
 
     resetEncoders();
@@ -212,28 +228,60 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     fieldSim.getObject("Power Port").setPose(LimelightSim.POWER_PORT_LOCATION_GLASS);
 
     // Autonomous Shuffleboard Tab
-    autonomousTab.addString("Odometry X (m)", () -> {
-      DifferentialDriveOdometry odometry = getOdometry();
-      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getX());
-    }).withPosition(2, 0);
-    autonomousTab.addString("Odometry Y (m)", () -> {
-      DifferentialDriveOdometry odometry = getOdometry();
-      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getTranslation().getY());
-    }).withPosition(3, 0);
-    autonomousTab.addString("Odometry X (ft)", () -> {
-      DifferentialDriveOdometry odometry = getOdometry();
-      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getX()));
-    }).withPosition(2, 1);
-    autonomousTab.addString("Odometry Y (ft)", () -> {
-      DifferentialDriveOdometry odometry = getOdometry();
-      return odometry == null ? "null" : Double.toString(Units.metersToFeet(odometry.getPoseMeters().getTranslation().getY()));
-    }).withPosition(3, 1);
-    autonomousTab.addString("Odometry Deg", () -> {
-      DifferentialDriveOdometry odometry = getOdometry();
-      return odometry == null ? "null" : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
-    })
-    .withPosition(4, 0);
-    sendRamseteTelemetry = autonomousTab
+    autonomousTab
+        .addString(
+            "Odometry X (m)",
+            () -> {
+              DifferentialDriveOdometry odometry = getOdometry();
+              return odometry == null
+                  ? "null"
+                  : Double.toString(odometry.getPoseMeters().getTranslation().getX());
+            })
+        .withPosition(2, 0);
+    autonomousTab
+        .addString(
+            "Odometry Y (m)",
+            () -> {
+              DifferentialDriveOdometry odometry = getOdometry();
+              return odometry == null
+                  ? "null"
+                  : Double.toString(odometry.getPoseMeters().getTranslation().getY());
+            })
+        .withPosition(3, 0);
+    autonomousTab
+        .addString(
+            "Odometry X (ft)",
+            () -> {
+              DifferentialDriveOdometry odometry = getOdometry();
+              return odometry == null
+                  ? "null"
+                  : Double.toString(
+                      Units.metersToFeet(odometry.getPoseMeters().getTranslation().getX()));
+            })
+        .withPosition(2, 1);
+    autonomousTab
+        .addString(
+            "Odometry Y (ft)",
+            () -> {
+              DifferentialDriveOdometry odometry = getOdometry();
+              return odometry == null
+                  ? "null"
+                  : Double.toString(
+                      Units.metersToFeet(odometry.getPoseMeters().getTranslation().getY()));
+            })
+        .withPosition(3, 1);
+    autonomousTab
+        .addString(
+            "Odometry Deg",
+            () -> {
+              DifferentialDriveOdometry odometry = getOdometry();
+              return odometry == null
+                  ? "null"
+                  : Double.toString(odometry.getPoseMeters().getRotation().getDegrees());
+            })
+        .withPosition(4, 0);
+    sendRamseteTelemetry =
+        autonomousTab
             .add("Send Ramsete Telemetry", false)
             .withWidget(BuiltInWidgets.kToggleSwitch)
             .withPosition(4, 1)
@@ -243,33 +291,43 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   @Override
   public void simulationPeriodic() {
-    double leftInputVoltage = (frontLeftSimMotor.getMotorOutputVoltage() +
-            backLeftSimMotor.getMotorOutputVoltage()) / 2.0d;
-    double rightInputVoltage = (frontRightSimMotor.getMotorOutputVoltage() +
-            backRightSimMotor.getMotorOutputVoltage()) / 2.0d;
-    //System.out.println("L: " + leftInputVoltage + "R:" + rightInputVoltage);
-    //System.out.println("BUS VOLTAGE: " + frontLeftSimMotor.getBusVoltage());
+    double leftInputVoltage =
+        (frontLeftSimMotor.getMotorOutputVoltage() + backLeftSimMotor.getMotorOutputVoltage())
+            / 2.0d;
+    double rightInputVoltage =
+        (frontRightSimMotor.getMotorOutputVoltage() + backRightSimMotor.getMotorOutputVoltage())
+            / 2.0d;
+    // System.out.println("L: " + leftInputVoltage + "R:" + rightInputVoltage);
+    // System.out.println("BUS VOLTAGE: " + frontLeftSimMotor.getBusVoltage());
     drivetrainSim.setInputs(leftInputVoltage, rightInputVoltage);
     drivetrainSim.update(0.020);
-    //System.out.println("Navx Set to: " + -drivetrainSim.getHeading().getDegrees());
+    // System.out.println("Navx Set to: " + -drivetrainSim.getHeading().getDegrees());
 
     // From NavX example
     int dev = SimDeviceDataJNI.getSimDeviceHandle("navX-Sensor[0]");
     SimDouble angle = new SimDouble(SimDeviceDataJNI.getSimValueHandle(dev, "Yaw"));
     // NavX expects clockwise positive, but sim outputs clockwise negative
     angle.set(Math.IEEEremainder(-drivetrainSim.getHeading().getDegrees(), 360));
-    //navxSimAngle = -drivetrainSim.getHeading().getDegrees();
+    // navxSimAngle = -drivetrainSim.getHeading().getDegrees();
 
     // Encoders
-    frontLeftSimSensors.setQuadratureVelocity((int) (metersToTicks(drivetrainSim.getLeftVelocityMetersPerSecond()) / 10d));
-    backLeftSimSensors.setQuadratureVelocity((int) (metersToTicks(drivetrainSim.getLeftVelocityMetersPerSecond()) / 10d));
-    frontLeftSimSensors.setQuadratureRawPosition((int) metersToTicks(drivetrainSim.getLeftPositionMeters()));
-    backLeftSimSensors.setQuadratureRawPosition((int) metersToTicks(drivetrainSim.getLeftPositionMeters()));
+    frontLeftSimSensors.setQuadratureVelocity(
+        (int) (metersToTicks(drivetrainSim.getLeftVelocityMetersPerSecond()) / 10d));
+    backLeftSimSensors.setQuadratureVelocity(
+        (int) (metersToTicks(drivetrainSim.getLeftVelocityMetersPerSecond()) / 10d));
+    frontLeftSimSensors.setQuadratureRawPosition(
+        (int) metersToTicks(drivetrainSim.getLeftPositionMeters()));
+    backLeftSimSensors.setQuadratureRawPosition(
+        (int) metersToTicks(drivetrainSim.getLeftPositionMeters()));
 
-    frontRightSimSensors.setQuadratureVelocity((int) (metersToTicks(drivetrainSim.getRightVelocityMetersPerSecond()) / 10d));
-    backRightSimSensors.setQuadratureVelocity((int) (metersToTicks(drivetrainSim.getRightVelocityMetersPerSecond()) / 10d));
-    frontRightSimSensors.setQuadratureRawPosition((int) metersToTicks(drivetrainSim.getRightPositionMeters()));
-    backRightSimSensors.setQuadratureRawPosition((int) metersToTicks(drivetrainSim.getRightPositionMeters()));
+    frontRightSimSensors.setQuadratureVelocity(
+        (int) (metersToTicks(drivetrainSim.getRightVelocityMetersPerSecond()) / 10d));
+    backRightSimSensors.setQuadratureVelocity(
+        (int) (metersToTicks(drivetrainSim.getRightVelocityMetersPerSecond()) / 10d));
+    frontRightSimSensors.setQuadratureRawPosition(
+        (int) metersToTicks(drivetrainSim.getRightPositionMeters()));
+    backRightSimSensors.setQuadratureRawPosition(
+        (int) metersToTicks(drivetrainSim.getRightPositionMeters()));
 
     frontLeftSimSensors.setBusVoltage(RobotController.getBatteryVoltage());
     backLeftSimSensors.setBusVoltage(RobotController.getBatteryVoltage());
@@ -293,7 +351,6 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     frontRightMotor.setNeutralMode(neutralMode);
     backLeftMotor.setNeutralMode(neutralMode);
     backRightMotor.setNeutralMode(neutralMode);
-
   }
 
   public double getRotationFactor() {
@@ -314,7 +371,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   private void configureTalon(TalonFX talonFX) {
     // Encoder
-    talonFX.configSelectedFeedbackSensor(TalonFXFeedbackDevice.IntegratedSensor, VELOCITY_PID_IDX, DEFAULT_SETTING_TIMEOUT_MS);
+    talonFX.configSelectedFeedbackSensor(
+        TalonFXFeedbackDevice.IntegratedSensor, VELOCITY_PID_IDX, DEFAULT_SETTING_TIMEOUT_MS);
     // Velocity PID
     talonFX.config_kP(VELOCITY_PID_IDX, VELOCITY_P);
     talonFX.config_kI(VELOCITY_PID_IDX, VELOCITY_I);
@@ -322,15 +380,13 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     // Brake Mode
     talonFX.setNeutralMode(NeutralMode.Coast);
     // CAN Status Frames
-    //talonFX.configVelocityMeasurementWindow(ROLLING_VELOCITY_SAMPLES);
-    //talonFX.configVelocityMeasurementPeriod(VELOCITY_MEAS_PERIOD);
+    // talonFX.configVelocityMeasurementWindow(ROLLING_VELOCITY_SAMPLES);
+    // talonFX.configVelocityMeasurementPeriod(VELOCITY_MEAS_PERIOD);
     talonFX.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, STATUS_2_FEEDBACK_MS);
     talonFX.setStatusFramePeriod(StatusFrameEnhanced.Status_3_Quadrature, STATUS_3_QUADRATURE_MS);
   }
 
-  /**
-   * Zero all encoders
-   */
+  /** Zero all encoders */
   public void resetEncoders() {
     if (RobotBase.isSimulation()) {
       frontLeftSimMotor.setSelectedSensorPosition(0);
@@ -346,6 +402,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Get current pose from odometry
+   *
    * @return Pose representing position and rotation on field
    */
   public Pose2d getPose() {
@@ -376,20 +433,28 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   public double getLeftVelocityTicksPerDs() {
     if (RobotBase.isSimulation()) {
-      return (frontLeftSimMotor.getSelectedSensorVelocity() + backLeftSimMotor.getSelectedSensorVelocity()) / 2.0d;
+      return (frontLeftSimMotor.getSelectedSensorVelocity()
+              + backLeftSimMotor.getSelectedSensorVelocity())
+          / 2.0d;
     }
-    return (frontLeftMotor.getSelectedSensorVelocity() + backLeftMotor.getSelectedSensorVelocity()) / 2.0d;
+    return (frontLeftMotor.getSelectedSensorVelocity() + backLeftMotor.getSelectedSensorVelocity())
+        / 2.0d;
   }
 
   public double getRightVelocityTicksPerDs() {
     if (RobotBase.isSimulation()) {
-      return (frontRightSimMotor.getSelectedSensorVelocity() + backRightSimMotor.getSelectedSensorVelocity()) / 2.0d;
+      return (frontRightSimMotor.getSelectedSensorVelocity()
+              + backRightSimMotor.getSelectedSensorVelocity())
+          / 2.0d;
     }
-    return (frontRightMotor.getSelectedSensorVelocity() + backRightMotor.getSelectedSensorVelocity()) / 2.0d;
+    return (frontRightMotor.getSelectedSensorVelocity()
+            + backRightMotor.getSelectedSensorVelocity())
+        / 2.0d;
   }
 
   /**
    * Get current wheel speeds, using encoder velocity values
+   *
    * @return Wheel speeds in m/s
    */
   public DifferentialDriveWheelSpeeds getWheelSpeeds() {
@@ -402,15 +467,14 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return new DifferentialDriveWheelSpeeds(leftMetersPerSecond, rightMetersPerSecond);
   }
 
-  /**
-   * Reset odometry pose to 0, 0 facing 0 degrees. Also resets encoders.
-   */
+  /** Reset odometry pose to 0, 0 facing 0 degrees. Also resets encoders. */
   public void resetOdometry() {
     resetOdometry(new Pose2d(0, 0, new Rotation2d(0)));
   }
 
   /**
    * Reset odometry to desired pose, while resetting encoders.
+   *
    * @param translationPose Desired state of odometry
    */
   public void resetOdometry(Pose2d translationPose) {
@@ -420,20 +484,28 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   private double getLeftPosition() {
     if (RobotBase.isSimulation()) {
-      return (backLeftSimMotor.getSelectedSensorPosition() + frontLeftSimMotor.getSelectedSensorPosition()) / 2.0d;
+      return (backLeftSimMotor.getSelectedSensorPosition()
+              + frontLeftSimMotor.getSelectedSensorPosition())
+          / 2.0d;
     }
-    return (backLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition()) / 2.0d;
+    return (backLeftMotor.getSelectedSensorPosition() + frontLeftMotor.getSelectedSensorPosition())
+        / 2.0d;
   }
 
   private double getRightPosition() {
     if (RobotBase.isSimulation()) {
-      return (backRightSimMotor.getSelectedSensorPosition() + frontRightSimMotor.getSelectedSensorPosition()) / 2.0d;
+      return (backRightSimMotor.getSelectedSensorPosition()
+              + frontRightSimMotor.getSelectedSensorPosition())
+          / 2.0d;
     }
-    return (backRightMotor.getSelectedSensorPosition() + frontRightMotor.getSelectedSensorPosition()) / 2.0d;
+    return (backRightMotor.getSelectedSensorPosition()
+            + frontRightMotor.getSelectedSensorPosition())
+        / 2.0d;
   }
 
   /**
    * Get distance travelled by the left side
+   *
    * @return Distance in meters
    */
   public double getLeftDistanceM() {
@@ -443,6 +515,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Get distance travelled by the right side
+   *
    * @return Distance in meters
    */
   public double getRightDistanceM() {
@@ -450,24 +523,23 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return ticksToMeters(rightTicks);
   }
 
-
   /**
    * Get average distance travelled by both sides
+   *
    * @return Average distance travelled by both sides
    */
   public double getAverageEncoderDistanceM() {
     return (getLeftDistanceM() + getRightDistanceM()) / 2.0; // average of both sides
   }
 
-  /**
-   * Zero the gyroscope to 0
-   */
+  /** Zero the gyroscope to 0 */
   public void zeroHeading() {
     zeroHeading(0);
   }
 
   /**
    * Zero the gyroscope to specified offset
+   *
    * @param heading Desired heading for gyro to read at
    */
   public void zeroHeading(int heading) {
@@ -477,6 +549,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Inverts NavX yaw as Odometry takes CCW as positive
+   *
    * @return -180..180
    */
   public double getHeading() {
@@ -489,6 +562,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Retrieve rate of rotation
+   *
    * @return Rate of rotation in deg/s
    */
   public double getTurnRate() {
@@ -497,8 +571,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   @Override
   public void periodic() {
-    //System.out.println("LEFT DISTANCE M:" + getLeftDistanceM());
-    //System.out.println("LEFT DISTANCE M:" + getLeftDistanceM());
+    // System.out.println("LEFT DISTANCE M:" + getLeftDistanceM());
+    // System.out.println("LEFT DISTANCE M:" + getLeftDistanceM());
     odometry.update(Rotation2d.fromDegrees(getHeading()), getLeftDistanceM(), getRightDistanceM());
 
     fieldSim.setRobotPose(getPose());
@@ -506,7 +580,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     SmartDashboard.putNumber("Left position", getLeftPosition());
     SmartDashboard.putNumber("Right position", getRightPosition());
   }
-  
+
   public void joystickDrive(double forwardSpeed, double rotation, boolean quickTurn) {
     joystickUsed = true;
     switch (getDrivingMode()) {
@@ -521,6 +595,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Drive drive train by specifying percent output for each side
+   *
    * @param leftSpeed Left speed in percent output
    * @param rightSpeed Right speed in percent output
    */
@@ -536,6 +611,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate a ramsete command from a file
+   *
    * @param pathFileName Specify the {THIS} in src/main/deploy/paths.{THIS}.wpilib.json.
    * @return Ramsete command that follows trajectory loaded from file
    */
@@ -545,6 +621,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory from file
+   *
    * @param pathFileName Specify the {THIS} in src/main/deploy/paths/{THIS}.wpilib.json.
    * @return Trajectory from loaded file
    */
@@ -561,6 +638,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Translate a trajectory so that its first state is at 0,0 facing 0 degrees
+   *
    * @param trajectory Trajectory to translate
    * @return Translated trajectory
    */
@@ -568,9 +646,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return trajectory.relativeTo(trajectory.getInitialPose());
   }
 
-  /**
-   * Transform trajectory to new starting point
-   */
+  /** Transform trajectory to new starting point */
   public Trajectory transformToNewStart(Trajectory trajectory, Pose2d startPose) {
     Trajectory toOrigin = translateToOrigin(trajectory);
     return toOrigin.relativeTo(startPose);
@@ -589,15 +665,17 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   }
 
   public void drawTrajectory(Trajectory trajectory) {
-    fieldSim.getObject("trajectory").setPoses(
-      trajectory.getStates().stream()
-        .map(state -> state.poseMeters)
-        .collect(Collectors.toList())
-    );
+    fieldSim
+        .getObject("trajectory")
+        .setPoses(
+            trajectory.getStates().stream()
+                .map(state -> state.poseMeters)
+                .collect(Collectors.toList()));
   }
 
   /**
    * Translate a ramsete command that depends on this subsystem
+   *
    * @param trajectory Trajectory to use
    * @return Ramsete command that follows the trajectory
    */
@@ -606,133 +684,148 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   }
 
   /**
-   * Translate a ramsete command, specifying whether or not it depends on this subsystem (useful in complex groups).
+   * Translate a ramsete command, specifying whether or not it depends on this subsystem (useful in
+   * complex groups).
+   *
    * @param trajectory Trajectory to use
    * @param dependOnDrive Whether or not this subsystem is a dependency of the generated command
    * @return Ramsete command that follows the trajectory
    */
   public RamseteCommand generateRamseteCommand(Trajectory trajectory, boolean dependOnDrive) {
-    Subsystem[] requirements = dependOnDrive ? new Subsystem[]{this} : new Subsystem[]{};
+    Subsystem[] requirements = dependOnDrive ? new Subsystem[] {this} : new Subsystem[] {};
     return new RamseteCommand(
-            trajectory,
-            this::getPose,
-            new RamseteController(kRamseteB, kRamseteZeta),
-            KINEMATICS,
-            new BiConsumer<>() {
-              private double prevLeftMPS, prevRightMPS;
-              private double prevTime;
-              private boolean firstRun = true;
-              private final Timer timer = new Timer();
+        trajectory,
+        this::getPose,
+        new RamseteController(kRamseteB, kRamseteZeta),
+        KINEMATICS,
+        new BiConsumer<>() {
+          private double prevLeftMPS, prevRightMPS;
+          private double prevTime;
+          private boolean firstRun = true;
+          private final Timer timer = new Timer();
 
-              @Override
-              public void accept(Double leftMetersPerSecond, Double rightMetersPerSecond) {
-                //System.out.println("LEFT MPS: " + leftMetersPerSecond);
-                //System.out.println("RIGHT MPS: " + rightMetersPerSecond);
-                double currentTime = timer.get();
-                boolean wasFirstRun = false;
-                if (firstRun) {
-                  DifferentialDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
-                  prevLeftMPS = wheelSpeeds.leftMetersPerSecond;
-                  prevRightMPS = wheelSpeeds.rightMetersPerSecond;
+          @Override
+          public void accept(Double leftMetersPerSecond, Double rightMetersPerSecond) {
+            // System.out.println("LEFT MPS: " + leftMetersPerSecond);
+            // System.out.println("RIGHT MPS: " + rightMetersPerSecond);
+            double currentTime = timer.get();
+            boolean wasFirstRun = false;
+            if (firstRun) {
+              DifferentialDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
+              prevLeftMPS = wheelSpeeds.leftMetersPerSecond;
+              prevRightMPS = wheelSpeeds.rightMetersPerSecond;
 
-                  timer.reset();
-                  timer.start();
+              timer.reset();
+              timer.start();
 
-                  prevTime = currentTime;
-                  firstRun = false;
-                  wasFirstRun = true;
-                }
+              prevTime = currentTime;
+              firstRun = false;
+              wasFirstRun = true;
+            }
 
-                double dt = currentTime - prevTime;
+            double dt = currentTime - prevTime;
 
-                // Avoid division by zero by having 0 accel in the first run of the command
-                double leftAcceleration = wasFirstRun ? 0 : (leftMetersPerSecond - prevLeftMPS) / dt;
-                double leftFeedforwardVolts = motorFeedforward.calculate(leftMetersPerSecond, leftAcceleration);
-                double leftFeedforward = leftFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
-                double leftTicksPerSecond = metersToTicks(leftMetersPerSecond);
-                double leftTicksPerDs = leftTicksPerSecond / 10;
-                if (!HAS_ENCODERS || RobotBase.isSimulation()) {
-                  leftGroup.set(leftFeedforward);
-                } else {
-                  velocityDriveLeft(leftTicksPerDs, leftFeedforward);
-                  //System.out.println("Left ff: " + leftFeedforward);
-                }
+            // Avoid division by zero by having 0 accel in the first run of the command
+            double leftAcceleration = wasFirstRun ? 0 : (leftMetersPerSecond - prevLeftMPS) / dt;
+            double leftFeedforwardVolts =
+                motorFeedforward.calculate(leftMetersPerSecond, leftAcceleration);
+            double leftFeedforward = leftFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
+            double leftTicksPerSecond = metersToTicks(leftMetersPerSecond);
+            double leftTicksPerDs = leftTicksPerSecond / 10;
+            if (!HAS_ENCODERS || RobotBase.isSimulation()) {
+              leftGroup.set(leftFeedforward);
+            } else {
+              velocityDriveLeft(leftTicksPerDs, leftFeedforward);
+              // System.out.println("Left ff: " + leftFeedforward);
+            }
 
-                double rightAcceleration = wasFirstRun ? 0 : (rightMetersPerSecond - prevRightMPS) / dt;
-                double rightFeedforwardVolts = motorFeedforward.calculate(rightMetersPerSecond, rightAcceleration);
-                double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
-                double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
-                double rightTicksPerDs = rightTicksPerSecond / 10;
-                if (!HAS_ENCODERS || RobotBase.isSimulation()) {
-                  rightGroup.set(rightFeedforward);
-                } else {
-                  velocityDriveRight(rightTicksPerDs, rightFeedforward);
-                  //System.out.println("Right ff: " + rightFeedforward);
-                }
+            double rightAcceleration = wasFirstRun ? 0 : (rightMetersPerSecond - prevRightMPS) / dt;
+            double rightFeedforwardVolts =
+                motorFeedforward.calculate(rightMetersPerSecond, rightAcceleration);
+            double rightFeedforward = rightFeedforwardVolts / MAX_BATTERY_V; // Normalize to 0..1
+            double rightTicksPerSecond = metersToTicks(rightMetersPerSecond);
+            double rightTicksPerDs = rightTicksPerSecond / 10;
+            if (!HAS_ENCODERS || RobotBase.isSimulation()) {
+              rightGroup.set(rightFeedforward);
+            } else {
+              velocityDriveRight(rightTicksPerDs, rightFeedforward);
+              // System.out.println("Right ff: " + rightFeedforward);
+            }
 
-                // Send telemetry if needed
-                if (sendRamseteTelemetry.getBoolean(false)) {
-                  DifferentialDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
-                  // Real vs Target velocities
-                  SmartDashboard.putNumber("Left Velocity", wheelSpeeds.leftMetersPerSecond);
-                  SmartDashboard.putNumber("Right Velocity", wheelSpeeds.rightMetersPerSecond);
-                  SmartDashboard.putNumber("Left Target Velocity", prevLeftMPS);
-                  SmartDashboard.putNumber("Right Target Velocity", prevRightMPS);
+            // Send telemetry if needed
+            if (sendRamseteTelemetry.getBoolean(false)) {
+              DifferentialDriveWheelSpeeds wheelSpeeds = getWheelSpeeds();
+              // Real vs Target velocities
+              SmartDashboard.putNumber("Left Velocity", wheelSpeeds.leftMetersPerSecond);
+              SmartDashboard.putNumber("Right Velocity", wheelSpeeds.rightMetersPerSecond);
+              SmartDashboard.putNumber("Left Target Velocity", prevLeftMPS);
+              SmartDashboard.putNumber("Right Target Velocity", prevRightMPS);
 
-                  // Combined
-                  SmartDashboard.putNumber("Velocity",
-                          (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2.0);
-                  SmartDashboard.putNumber("Target Velocity",
-                          (prevLeftMPS + prevRightMPS) / 2.0);
+              // Combined
+              SmartDashboard.putNumber(
+                  "Velocity",
+                  (wheelSpeeds.leftMetersPerSecond + wheelSpeeds.rightMetersPerSecond) / 2.0);
+              SmartDashboard.putNumber("Target Velocity", (prevLeftMPS + prevRightMPS) / 2.0);
 
-                  // Positions
-                  Trajectory.State targetState = trajectory.sample(timer.get());
-                  SmartDashboard.putNumber("Robot X", getPose().getX());
-                  SmartDashboard.putNumber("Target Robot X", targetState.poseMeters.getX());
-                  SmartDashboard.putNumber("Robot Y", getPose().getY());
-                  SmartDashboard.putNumber("Target Robot Y", targetState.poseMeters.getY());
-                  SmartDashboard.putNumber("Robot Heading", getHeading());
-                  SmartDashboard.putNumber("Target Robot Heading", targetState.poseMeters.getRotation().getDegrees());
-                  // a_c = v^2/r
-                  // r = 1/c
-                  // a_c = v^2 * c
-                  SmartDashboard.putNumber("Target Centripetal Acceleration",
-                          Math.pow(targetState.velocityMetersPerSecond, 2) * targetState.curvatureRadPerMeter);
-                }
+              // Positions
+              Trajectory.State targetState = trajectory.sample(timer.get());
+              SmartDashboard.putNumber("Robot X", getPose().getX());
+              SmartDashboard.putNumber("Target Robot X", targetState.poseMeters.getX());
+              SmartDashboard.putNumber("Robot Y", getPose().getY());
+              SmartDashboard.putNumber("Target Robot Y", targetState.poseMeters.getY());
+              SmartDashboard.putNumber("Robot Heading", getHeading());
+              SmartDashboard.putNumber(
+                  "Target Robot Heading", targetState.poseMeters.getRotation().getDegrees());
+              // a_c = v^2/r
+              // r = 1/c
+              // a_c = v^2 * c
+              SmartDashboard.putNumber(
+                  "Target Centripetal Acceleration",
+                  Math.pow(targetState.velocityMetersPerSecond, 2)
+                      * targetState.curvatureRadPerMeter);
+            }
 
-                //System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
+            // System.out.println("L: " + leftMetersPerSecond + " R:" + rightMetersPerSecond);
 
-                prevLeftMPS = leftMetersPerSecond;
-                prevRightMPS = rightMetersPerSecond;
-                prevTime = currentTime;
+            prevLeftMPS = leftMetersPerSecond;
+            prevRightMPS = rightMetersPerSecond;
+            prevTime = currentTime;
 
-                drive.feed(); //So safety watchdog won't kill it
-              }
-            },
-            requirements
-    );
+            drive.feed(); // So safety watchdog won't kill it
+          }
+        },
+        requirements);
   }
 
   public void velocityDriveLeft(double ticksPerDs, double feedforward) {
     if (RobotBase.isSimulation()) {
-      frontLeftSimMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
-      backLeftSimMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+      frontLeftSimMotor.set(
+          ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+      backLeftSimMotor.set(
+          ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
     }
-    frontLeftMotor.set(TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
-    backLeftMotor.set(TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+    frontLeftMotor.set(
+        TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+    backLeftMotor.set(
+        TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
   }
 
   public void velocityDriveRight(double ticksPerDs, double feedforward) {
     if (RobotBase.isSimulation()) {
-      frontRightSimMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
-      backRightSimMotor.set(ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+      frontRightSimMotor.set(
+          ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+      backRightSimMotor.set(
+          ControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
     }
-    frontRightMotor.set(TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
-    backRightMotor.set(TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+    frontRightMotor.set(
+        TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
+    backRightMotor.set(
+        TalonFXControlMode.Velocity, ticksPerDs, DemandType.ArbitraryFeedForward, feedforward);
   }
-  
+
   /**
    * Generate trajectory from start, end, interior waypoints and other constraints.
+   *
    * @param start Starting pose
    * @param end Ending pose
    * @param interiorWaypoints Interior positions of path
@@ -740,9 +833,15 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @param maxAccel Maximum acceleration in m/s^2
    * @return
    */
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, List<Translation2d> interiorWaypoints, double maxVelocity,
-                                       double maxAccel, boolean reversed) {
-    var trajectoryConfig = new TrajectoryConfig(maxVelocity, maxAccel)
+  public Trajectory generateTrajectory(
+      Pose2d start,
+      Pose2d end,
+      List<Translation2d> interiorWaypoints,
+      double maxVelocity,
+      double maxAccel,
+      boolean reversed) {
+    var trajectoryConfig =
+        new TrajectoryConfig(maxVelocity, maxAccel)
             .setKinematics(KINEMATICS)
             .addConstraint(VOLTAGE_CONSTRAINT)
             .setReversed(reversed);
@@ -751,25 +850,33 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   }
 
   /**
-   * Creates a trajectory from control vectors. <b>Differential drive constraint will be automatically added.</b>
+   * Creates a trajectory from control vectors. <b>Differential drive constraint will be
+   * automatically added.</b>
+   *
    * @param controlVectors The control vectors that define the trajectory path
    * @param trajectoryConfig The trajectory config
    * @return the generated trajectory
    */
-  private Trajectory generateCustomTrajectory(TrajectoryGenerator.ControlVectorList controlVectors, TrajectoryConfig trajectoryConfig) {
+  private Trajectory generateCustomTrajectory(
+      TrajectoryGenerator.ControlVectorList controlVectors, TrajectoryConfig trajectoryConfig) {
     trajectoryConfig.setKinematics(KINEMATICS);
     return TrajectoryGenerator.generateTrajectory(controlVectors, trajectoryConfig);
   }
 
   public Trajectory generateCustomTrajectory(String pathName, TrajectoryConfig trajectoryConfig) {
     try {
-      Trajectory trajectory = generateCustomTrajectory(WaypointReader.getControlVectors(pathName), trajectoryConfig);
+      Trajectory trajectory =
+          generateCustomTrajectory(WaypointReader.getControlVectors(pathName), trajectoryConfig);
 
       // Add path time to ShuffleBoard for reference
       String currentMessage = autoPathMessageEntry.getString("");
-      autoPathMessageEntry.setString(currentMessage +
-              String.format("%s%s: %.2fs", (currentMessage.equals("") ? "" : ", "),
-                      pathName, trajectory.getTotalTimeSeconds()));
+      autoPathMessageEntry.setString(
+          currentMessage
+              + String.format(
+                  "%s%s: %.2fs",
+                  (currentMessage.equals("") ? "" : ", "),
+                  pathName,
+                  trajectory.getTotalTimeSeconds()));
 
       /* TEMPORARY, just to see values
       var constraint = new DifferentialDriveVoltageConstraint(motorFeedforward, KINEMATICS, 10);
@@ -787,32 +894,43 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory from only a start, an end, and other constraints.
+   *
    * @param start Starting pose
    * @param end Ending pose
    * @param maxVelocity maximum velocity in m/s
    * @param maxAccel Maximum acceleration in m/s^2
-   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the
+   *     poses
    * @return
    */
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel,
-                                       boolean genMiddle) {
+  public Trajectory generateTrajectory(
+      Pose2d start, Pose2d end, double maxVelocity, double maxAccel, boolean genMiddle) {
     return generateTrajectory(start, end, maxVelocity, maxAccel, genMiddle, false);
   }
 
   /**
    * Generate trajectory from only a start, an end, and other constraints.
+   *
    * @param start Starting pose
    * @param end Ending pose
    * @param maxVelocity maximum velocity in m/s
    * @param maxAccel Maximum acceleration in m/s^2
-   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the
+   *     poses
    * @return
    */
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, double maxVelocity, double maxAccel,
-                                       boolean genMiddle, boolean reversed) {
+  public Trajectory generateTrajectory(
+      Pose2d start,
+      Pose2d end,
+      double maxVelocity,
+      double maxAccel,
+      boolean genMiddle,
+      boolean reversed) {
     List<Translation2d> interiorWaypoints = new ArrayList<>();
     if (genMiddle) {
-      var middle = new Translation2d(((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
+      var middle =
+          new Translation2d(
+              ((start.getTranslation().getX() + end.getTranslation().getX()) / 2),
               ((start.getTranslation().getY() + end.getTranslation().getY()) / 2));
       interiorWaypoints.add(middle);
     }
@@ -821,9 +939,11 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory from a start and an end using default constraints.
+   *
    * @param start Starting pose
    * @param end Ending pose
-   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the
+   *     poses
    * @return Trajectory generated
    */
   public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean genMiddle) {
@@ -832,44 +952,61 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory from a start and an end using default constraints.
+   *
    * @param start Starting pose
    * @param end Ending pose
-   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the poses
+   * @param genMiddle Whether or not to make an interior waypoint directly at the midpoint of the
+   *     poses
    * @param reversed Whether to reverse trajectory
    * @return Trajectory generated
    */
-  public Trajectory generateTrajectory(Pose2d start, Pose2d end, boolean genMiddle,
-                                       boolean reversed) {
-    return generateTrajectory(start, end, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED, genMiddle, reversed);
+  public Trajectory generateTrajectory(
+      Pose2d start, Pose2d end, boolean genMiddle, boolean reversed) {
+    return generateTrajectory(
+        start,
+        end,
+        MAX_SPEED_METERS_PER_SECOND,
+        MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+        genMiddle,
+        reversed);
   }
 
   /**
    * Generate trajectory that moves robot only in x direction, with specified constraints.
+   *
    * @param start Starting pose
    * @param xMeters Meters to move (positive is right on field [PathWeaver view])
    * @param maxVelocity Maximum velocity
    * @param maxAccel Maximum acceleration
    * @return Trajectory generated under constraints
    */
-  public Trajectory generateXTrajectory(Pose2d start, double xMeters, double maxVelocity, double maxAccel) {
+  public Trajectory generateXTrajectory(
+      Pose2d start, double xMeters, double maxVelocity, double maxAccel) {
     return generateXTrajectory(start, xMeters, maxVelocity, maxAccel, false);
   }
 
   /**
    * Generate trajectory that moves robot only in x direction, with specified constraints.
+   *
    * @param start Starting pose
    * @param xMeters Meters to move (positive is right on field [PathWeaver view])
    * @param maxVelocity Maximum velocity
    * @param maxAccel Maximum acceleration
    * @return Trajectory generated under constraints
    */
-  public Trajectory generateXTrajectory(Pose2d start, double xMeters, double maxVelocity, double maxAccel, boolean reversed) {
-    Pose2d end = new Pose2d(start.getTranslation().getX() + xMeters, start.getTranslation().getY(), start.getRotation());
+  public Trajectory generateXTrajectory(
+      Pose2d start, double xMeters, double maxVelocity, double maxAccel, boolean reversed) {
+    Pose2d end =
+        new Pose2d(
+            start.getTranslation().getX() + xMeters,
+            start.getTranslation().getY(),
+            start.getRotation());
     return generateTrajectory(start, end, maxVelocity, maxAccel, true, reversed);
   }
 
   /**
    * Generate trajectory that moves robot only in x direction, with default constraints.
+   *
    * @param start Starting pose
    * @param xMeters Meters to move (positive is right on field [PathWeaver view])
    * @return Trajectory generated
@@ -880,6 +1017,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory that moves in x direction from current pose, with default constraints.
+   *
    * @param xMeters Meters to move (+ = right on field)
    * @return Trajectory generated
    */
@@ -893,36 +1031,42 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   /**
    * Generate trajectory that moves robot only in x direction, with default constraints.
+   *
    * @param start Starting pose
    * @param xMeters Meters to move (positive is right on field [PathWeaver view])
    * @return Trajectory generated
    */
   public Trajectory generateXTrajectory(Pose2d start, double xMeters, boolean reversed) {
-    return generateXTrajectory(start, xMeters, MAX_SPEED_METERS_PER_SECOND, MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
-            reversed);
+    return generateXTrajectory(
+        start,
+        xMeters,
+        MAX_SPEED_METERS_PER_SECOND,
+        MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
+        reversed);
   }
 
   @Override
   public List<Verification> getVerifications(VerificationSystem system) {
     return List.of(
-      new Verification("Joystick Drive", () -> joystickUsed),
-      // TODO : Update verification system to support TalonFX
-      /*new Verification("Faults", () ->
-              TalonSRXChecker.check("Front Left", frontLeftMotor, system) &&
-              TalonSRXChecker.check("Front Right", frontRightMotor, system) &&
-              TalonSRXChecker.check("Back Left", backLeftMotor, system) &&
-              TalonSRXChecker.check("Back Right", backRightMotor, system)),*/
-      new Verification("Encoders", () -> {
-        if (getLeftPosition() <= 100) {
-          system.error("L. drive encoder pos less than 100");
-          return false;
-        } else if (getRightPosition() <= 100) {
-          system.error("R. drive encoder pos less than 100");
-          return false;
-        }
-        return true;
-      }),
-      new Verification("NavX", navX::isConnected)
-    );
+        new Verification("Joystick Drive", () -> joystickUsed),
+        // TODO : Update verification system to support TalonFX
+        /*new Verification("Faults", () ->
+        TalonSRXChecker.check("Front Left", frontLeftMotor, system) &&
+        TalonSRXChecker.check("Front Right", frontRightMotor, system) &&
+        TalonSRXChecker.check("Back Left", backLeftMotor, system) &&
+        TalonSRXChecker.check("Back Right", backRightMotor, system)),*/
+        new Verification(
+            "Encoders",
+            () -> {
+              if (getLeftPosition() <= 100) {
+                system.error("L. drive encoder pos less than 100");
+                return false;
+              } else if (getRightPosition() <= 100) {
+                system.error("R. drive encoder pos less than 100");
+                return false;
+              }
+              return true;
+            }),
+        new Verification("NavX", navX::isConnected));
   }
 }

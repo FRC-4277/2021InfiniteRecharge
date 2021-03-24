@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems.vision;
 
+import static frc.robot.Constants.Vision.Limelight.*;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.XboxController;
@@ -20,6 +22,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.*;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.Vision.Pixy2Constants;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPaths;
 import frc.robot.subsystems.VerifiableSystem;
@@ -33,9 +36,6 @@ import io.github.pseudoresonance.pixy2api.Pixy2;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC;
 import io.github.pseudoresonance.pixy2api.Pixy2CCC.Block;
 import io.github.pseudoresonance.pixy2api.links.SPILink;
-import static frc.robot.Constants.Vision.Limelight.*;
-import frc.robot.Constants.Vision.Pixy2Constants;
-
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -65,10 +65,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
   private Field2d fieldSim;
   private List<FieldObject2d> fieldSimPowerCells;
 
-  /**
-   * Creates a new VisionSystem.
-   * 
-   */
+  /** Creates a new VisionSystem. */
   public VisionSystem(ShuffleboardTab driverTab, ShuffleboardTab autonomousTab, Field2d fieldSim) {
     this.driverTab = driverTab;
     this.autonomousTab = autonomousTab;
@@ -76,27 +73,39 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     this.limelight = new Limelight(driverPipeline, portPipeline);
     this.galacticVision = new GalacticVision();
 
-    this.layout = this.driverTab.getLayout("Limelight", BuiltInLayouts.kGrid)
-    .withSize(5, 1)
-    .withPosition(6, 1)
-    .withProperties(
-      Map.of(
-    "Label position", "TOP",
-    "Number of columns", 5,
-    "Number of rows", 1
-      )
-    );
+    this.layout =
+        this.driverTab
+            .getLayout("Limelight", BuiltInLayouts.kGrid)
+            .withSize(5, 1)
+            .withPosition(6, 1)
+            .withProperties(
+                Map.of(
+                    "Label position", "TOP",
+                    "Number of columns", 5,
+                    "Number of rows", 1));
 
-    this.layout.addBoolean("Target", () -> this.limelight.getTarget().isPresent())
-    .withWidget(BuiltInWidgets.kBooleanBox);
-    this.layout.addString("X Angle", () -> this.getLimelightDisplayProperty(Target::getX))
-    .withWidget(BuiltInWidgets.kTextView);
-    this.layout.addString("Y Angle", () -> this.getLimelightDisplayProperty(Target::getY))
-    .withWidget(BuiltInWidgets.kTextView);
-    this.layout.addString("Distance", () -> (calculateDistance ? "T" : "F") + " " + String.format("%.2f m", this.calculatedDistanceMeters))
-            .withWidget(BuiltInWidgets.kTextView);
-    this.layout.addString("Distance I", () -> String.format("%.2f in", Units.metersToInches(this.calculatedDistanceMeters)))
-            .withWidget(BuiltInWidgets.kTextView);
+    this.layout
+        .addBoolean("Target", () -> this.limelight.getTarget().isPresent())
+        .withWidget(BuiltInWidgets.kBooleanBox);
+    this.layout
+        .addString("X Angle", () -> this.getLimelightDisplayProperty(Target::getX))
+        .withWidget(BuiltInWidgets.kTextView);
+    this.layout
+        .addString("Y Angle", () -> this.getLimelightDisplayProperty(Target::getY))
+        .withWidget(BuiltInWidgets.kTextView);
+    this.layout
+        .addString(
+            "Distance",
+            () ->
+                (calculateDistance ? "T" : "F")
+                    + " "
+                    + String.format("%.2f m", this.calculatedDistanceMeters))
+        .withWidget(BuiltInWidgets.kTextView);
+    this.layout
+        .addString(
+            "Distance I",
+            () -> String.format("%.2f in", Units.metersToInches(this.calculatedDistanceMeters)))
+        .withWidget(BuiltInWidgets.kTextView);
 
     useDriverPipeline();
 
@@ -147,7 +156,9 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
   }
 
   public void usePortPipeline() {
-    for (int i = 0; i < 5; i++) { // Not sure why the loop is needed..but it makes it work consistently..
+    for (int i = 0;
+        i < 5;
+        i++) { // Not sure why the loop is needed..but it makes it work consistently..
       limelight.setPipeline(portPipeline);
       limelight.setStreamMode(StreamMode.PIP_MAIN);
     }
@@ -180,7 +191,8 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     for (int i = 0; i < pathCells.size(); i++) {
       Translation2d cellPosition = pathCells.get(i);
       FieldObject2d object2d = fieldSimPowerCells.get(i);
-      //Translation2d transformed = new Translation2d(cellPosition.getX(), cellPosition.getY() * -1);
+      // Translation2d transformed = new Translation2d(cellPosition.getX(), cellPosition.getY() *
+      // -1);
       object2d.setPose(new Pose2d(cellPosition, new Rotation2d()));
     }
   }
@@ -229,7 +241,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
       SmartDashboard.putNumber("Block Count", blockCount);
       blocksList = pixy2.getCCC().getBlockCache(); // Gets a list of all blocks found by the Pixy2
 
-      switch(blocksList.size()) {
+      switch (blocksList.size()) {
         case 1:
           setPixyColor(Color.ORANGE);
           break;
@@ -311,7 +323,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     if (blockOptional.isPresent()) {
       Block block = blockOptional.get();
       double x = block.getX();
-      double xFromCenter = (x - (Pixy2Constants.MAX_X  / 2));
+      double xFromCenter = (x - (Pixy2Constants.MAX_X / 2));
       return Optional.of((xFromCenter / Pixy2Constants.MAX_X) * Pixy2Constants.HORIZONTAL_FOV_DEG);
     } else {
       return Optional.empty();
@@ -340,7 +352,8 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
       Target target = targetOptional.get();
       double yAngleDeg = target.getY();
       double yAngleRad = Math.toRadians(yAngleDeg);
-      this.calculatedDistanceMeters = (PORT_CENTER_HEIGHT_M - MOUNT_HEIGHT_M) / Math.tan(MOUNT_ANGLE_RAD + yAngleRad);
+      this.calculatedDistanceMeters =
+          (PORT_CENTER_HEIGHT_M - MOUNT_HEIGHT_M) / Math.tan(MOUNT_ANGLE_RAD + yAngleRad);
     }
   }
 

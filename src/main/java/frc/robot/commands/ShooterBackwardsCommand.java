@@ -13,9 +13,7 @@ import frc.robot.subsystems.Shooter;
 public class ShooterBackwardsCommand extends CommandBase {
   private Shooter shooter;
 
-  /**
-   * Creates a new ShooterBackwardsCommand.
-   */
+  /** Creates a new ShooterBackwardsCommand. */
   public ShooterBackwardsCommand(Shooter shooter) {
     this.shooter = shooter;
     addRequirements(shooter);
@@ -24,8 +22,7 @@ public class ShooterBackwardsCommand extends CommandBase {
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {
-  }
+  public void initialize() {}
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override

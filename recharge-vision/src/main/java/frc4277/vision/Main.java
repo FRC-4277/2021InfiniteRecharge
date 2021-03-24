@@ -1,13 +1,14 @@
-package frc4277.vision;/*----------------------------------------------------------------------------*/
+package frc4277.vision; /*----------------------------------------------------------------------------*/
 /* Copyright (c) 2018 FIRST. All Rights Reserved.                             */
 /* Open Source Software - may be modified and shared by FRC teams. The code   */
 /* must be accompanied by the FIRST BSD license file in the root directory of */
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
+import static frc4277.vision.Constants.*;
+
 import edu.wpi.cscore.*;
 import edu.wpi.first.cameraserver.CameraServer;
-import edu.wpi.first.networktables.EntryNotification;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
@@ -15,18 +16,13 @@ import edu.wpi.first.vision.VisionThread;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.shuffleboard.SimpleWidget;
 import frc4277.vision.pipelines.MainPipeline;
 import frc4277.vision.pipelines.Pipeline;
 import frc4277.vision.pipelines.Pipelines;
 import frc4277.vision.pipelines.setting.Setting;
-import org.opencv.core.Mat;
-import org.opencv.core.Rect;
-
 import java.util.Objects;
 import java.util.function.Consumer;
-
-import static frc4277.vision.Constants.*;
+import org.opencv.core.Mat;
 
 public final class Main {
   private static Main INSTANCE;
@@ -52,7 +48,7 @@ public final class Main {
 
   public static void main(String[] args) {
     boolean ntServer = false;
-    for (String arg  : args) {
+    for (String arg : args) {
       switch (arg) {
         case "server":
           ntServer = true;
@@ -78,7 +74,6 @@ public final class Main {
     setupShuffleboard();
     setupPSEye();
     setupPipelines();
-
 
     System.out.println("Startup complete.");
 
@@ -111,10 +106,12 @@ public final class Main {
 
   private void setupShuffleboard() {
     visionTab = Shuffleboard.getTab("Vision");
-    pipelineOutputEntry = visionTab.add("pipeline_output", "Disabled")
-            .withWidget(BuiltInWidgets.kTextView).getEntry();
+    pipelineOutputEntry =
+        visionTab
+            .add("pipeline_output", "Disabled")
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
   }
-
 
   private void setupPSEye() {
     psEye = new UsbCamera("PSEye", 0);
@@ -125,77 +122,99 @@ public final class Main {
 
     // FPS Setting (Double)
     NetworkTableEntry fpsEntry = psEyeTable.getEntry("fps");
-    fpsEntry.addListener(notification -> {
-      if (!notification.value.isValid() || !notification.value.isDouble() || notification.value.getDouble() == 0D) {
-        fpsEntry.setDouble(PSEYE_DEFAULT_FPS);
-        return;
-      }
-      double fps = fpsEntry.getDouble(PSEYE_DEFAULT_FPS);
-      psEye.setFPS((int) fps);
-    }, NT_UPDATE_FLAGS);
+    fpsEntry.addListener(
+        notification -> {
+          if (!notification.value.isValid()
+              || !notification.value.isDouble()
+              || notification.value.getDouble() == 0D) {
+            fpsEntry.setDouble(PSEYE_DEFAULT_FPS);
+            return;
+          }
+          double fps = fpsEntry.getDouble(PSEYE_DEFAULT_FPS);
+          psEye.setFPS((int) fps);
+        },
+        NT_UPDATE_FLAGS);
 
     // auto, 0 - 100
-    addPSEyeSetting("exposure", String.class, "auto", BuiltInWidgets.kTextView.getWidgetName(), new Consumer<String>() {
-      @Override
-      public void accept(String exposure) {
-        exposure = exposure.trim();
-        if (Objects.equals(exposure, "auto")) {
-          psEye.setExposureAuto();
-        } else if (exposure.matches("\\d+")) {
-          psEye.setExposureManual(Integer.parseInt(exposure));
-        } else {
-          System.out.println("invalid pseye exposure: " + exposure);
-        }
-      }
-    });
+    addPSEyeSetting(
+        "exposure",
+        String.class,
+        "auto",
+        BuiltInWidgets.kTextView.getWidgetName(),
+        new Consumer<String>() {
+          @Override
+          public void accept(String exposure) {
+            exposure = exposure.trim();
+            if (Objects.equals(exposure, "auto")) {
+              psEye.setExposureAuto();
+            } else if (exposure.matches("\\d+")) {
+              psEye.setExposureManual(Integer.parseInt(exposure));
+            } else {
+              System.out.println("invalid pseye exposure: " + exposure);
+            }
+          }
+        });
 
     // 0 - 100
-    addPSEyeSetting("brightness", String.class, "50", BuiltInWidgets.kTextView.getWidgetName(), new Consumer<String>() {
-      @Override
-      public void accept(String brightness) {
-        if (brightness.matches("\\d+")) {
-          psEye.setExposureManual(Integer.parseInt(brightness));
-        } else {
-          System.out.println("invalid pseye brightness: " + brightness);
-        }
-      }
-    });
+    addPSEyeSetting(
+        "brightness",
+        String.class,
+        "50",
+        BuiltInWidgets.kTextView.getWidgetName(),
+        new Consumer<String>() {
+          @Override
+          public void accept(String brightness) {
+            if (brightness.matches("\\d+")) {
+              psEye.setExposureManual(Integer.parseInt(brightness));
+            } else {
+              System.out.println("invalid pseye brightness: " + brightness);
+            }
+          }
+        });
 
     // auto, ??
-    addPSEyeSetting("whiteBalance", String.class, "auto", BuiltInWidgets.kTextView.getWidgetName(), new Consumer<String>() {
-      @Override
-      public void accept(String whiteBalance) {
-        whiteBalance = whiteBalance.trim();
-        if (Objects.equals(whiteBalance, "auto")) {
-          psEye.setWhiteBalanceAuto();
-        } else if (whiteBalance.matches("\\d+")) {
-          psEye.setWhiteBalanceManual(Integer.parseInt(whiteBalance));
-        } else {
-          System.out.println("invalid pseye white balance: " + whiteBalance);
-        }
-      }
-    });
+    addPSEyeSetting(
+        "whiteBalance",
+        String.class,
+        "auto",
+        BuiltInWidgets.kTextView.getWidgetName(),
+        new Consumer<String>() {
+          @Override
+          public void accept(String whiteBalance) {
+            whiteBalance = whiteBalance.trim();
+            if (Objects.equals(whiteBalance, "auto")) {
+              psEye.setWhiteBalanceAuto();
+            } else if (whiteBalance.matches("\\d+")) {
+              psEye.setWhiteBalanceManual(Integer.parseInt(whiteBalance));
+            } else {
+              System.out.println("invalid pseye white balance: " + whiteBalance);
+            }
+          }
+        });
   }
 
-  private <T> void addPSEyeSetting(String key, Class<T> valueClass, T defaultValue, String widget, Consumer<T> updateConsumer) {
+  private <T> void addPSEyeSetting(
+      String key, Class<T> valueClass, T defaultValue, String widget, Consumer<T> updateConsumer) {
     NetworkTableEntry entry = visionTab.add(key, defaultValue).withWidget(widget).getEntry();
-    entry.addListener(notification -> {
-      if (!notification.value.isValid() ||
-              !notification.value.isString() ||
-              notification.value.getString() == null ||
-              notification.value.getString().trim().isEmpty()) {
-        entry.setValue(defaultValue);
-        return;
-      }
-      Object result = notification.value.getValue();
-      if (result == null) {
-        result = defaultValue;
-      }
-      if (result instanceof Double && valueClass == Integer.class) {
-        result = ((Double) result).intValue();
-      }
-      updateConsumer.accept((T) result);
-    }, NT_UPDATE_FLAGS);
+    entry.addListener(
+        notification -> {
+          if (!notification.value.isValid()
+              || !notification.value.isString()
+              || notification.value.getString() == null
+              || notification.value.getString().trim().isEmpty()) {
+            entry.setValue(defaultValue);
+            return;
+          }
+          Object result = notification.value.getValue();
+          if (result == null) {
+            result = defaultValue;
+          }
+          if (result instanceof Double && valueClass == Integer.class) {
+            result = ((Double) result).intValue();
+          }
+          updateConsumer.accept((T) result);
+        },
+        NT_UPDATE_FLAGS);
     // Initial Setting
     updateConsumer.accept(defaultValue);
   }
@@ -203,38 +222,43 @@ public final class Main {
   private void setupPipelines() {
     // Setup pipeline_output option
 
-    pipelineOutputEntry.addListener(notification -> {
-      if (!notification.value.isString()) {
-        System.out.println("pipeline_output is not a string?");
-        return;
-      }
+    pipelineOutputEntry.addListener(
+        notification -> {
+          if (!notification.value.isString()) {
+            System.out.println("pipeline_output is not a string?");
+            return;
+          }
 
-      String pipelineOutputKey = notification.value.getString();
+          String pipelineOutputKey = notification.value.getString();
 
-      if (!notification.value.isValid() || pipelineOutputKey == null || Objects.equals(pipelineOutputKey.trim(), "")) {
-        pipelineOutputEntry.setValue("Disabled");
-      }
+          if (!notification.value.isValid()
+              || pipelineOutputKey == null
+              || Objects.equals(pipelineOutputKey.trim(), "")) {
+            pipelineOutputEntry.setValue("Disabled");
+          }
 
-      Pipelines pipelineFound = null;
-      for (Pipelines pipeline : Pipelines.values()) {
-        if (Objects.equals(pipeline.getInstance().getName(), pipelineOutputKey)) {
-          pipelineFound = pipeline;
-          break;
-        }
-      }
+          Pipelines pipelineFound = null;
+          for (Pipelines pipeline : Pipelines.values()) {
+            if (Objects.equals(pipeline.getInstance().getName(), pipelineOutputKey)) {
+              pipelineFound = pipeline;
+              break;
+            }
+          }
 
-      if (pipelineFound != null) {
-        Main.this.pipelineOutput = pipelineFound;
-        System.out.println("Pipeline image output is enabled for: " + pipelineFound.getInstance().getName());
-        startPipelineOutput();
-      } else if (!Objects.equals(pipelineOutputKey, "Disabled")){
-        System.out.println("Could not find pipeline when pipeline_output is " + pipelineOutputKey);
-        stopPipelineOutput();
-      } else {
-        stopPipelineOutput();
-      }
-
-    }, NT_UPDATE_FLAGS);
+          if (pipelineFound != null) {
+            Main.this.pipelineOutput = pipelineFound;
+            System.out.println(
+                "Pipeline image output is enabled for: " + pipelineFound.getInstance().getName());
+            startPipelineOutput();
+          } else if (!Objects.equals(pipelineOutputKey, "Disabled")) {
+            System.out.println(
+                "Could not find pipeline when pipeline_output is " + pipelineOutputKey);
+            stopPipelineOutput();
+          } else {
+            stopPipelineOutput();
+          }
+        },
+        NT_UPDATE_FLAGS);
 
     // Setup network tables + setting entries for every pipeline
     for (Pipelines pipelineEnum : Pipelines.values()) {
@@ -249,7 +273,9 @@ public final class Main {
     }
 
     // Start Vision Thread
-    VisionThread visionThread = new VisionThread(psEye, new MainPipeline(this, statisticsTable), MainPipeline::printStatistics);
+    VisionThread visionThread =
+        new VisionThread(
+            psEye, new MainPipeline(this, statisticsTable), MainPipeline::printStatistics);
     visionThread.start();
     System.out.println("PS Eye vision thread started");
   }
@@ -261,10 +287,17 @@ public final class Main {
     psEyeOutput = true;
     psEyeServer = cameraServer.addServer("PSEye Processed", PSEYE_OUTPUT_STREAM_PORT);
     // Cap source to 30FPS, not full 187 FPS is needed to show driver
-    psEyeSource = new CvSource("PSEye Processed", VideoMode.PixelFormat.kMJPEG, PSEYE_WIDTH, PSEYE_HEIGHT, PSEYE_OUTPUT_FPS);
+    psEyeSource =
+        new CvSource(
+            "PSEye Processed",
+            VideoMode.PixelFormat.kMJPEG,
+            PSEYE_WIDTH,
+            PSEYE_HEIGHT,
+            PSEYE_OUTPUT_FPS);
     psEyeServer.setSource(psEyeSource);
 
-    System.out.println("Added camera stream w/ pipeline output" + pipelineOutput.getInstance().getName());
+    System.out.println(
+        "Added camera stream w/ pipeline output" + pipelineOutput.getInstance().getName());
     visionTab.add(psEyeSource).withWidget(BuiltInWidgets.kCameraStream);
   }
 
