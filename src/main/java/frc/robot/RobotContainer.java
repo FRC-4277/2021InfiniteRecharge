@@ -64,7 +64,7 @@ public class RobotContainer {
   private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
-  private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
+  //private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
   private final ShuffleboardTab verificationTab = Shuffleboard.getTab("Verification");
   private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
@@ -74,7 +74,7 @@ public class RobotContainer {
   private final Intake intake = new Intake();
   private final VerticalHopper hopper = new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
-  private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
+  //private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   //private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem = new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
@@ -126,7 +126,7 @@ public class RobotContainer {
     SmartDashboard.putData(intake);
     SmartDashboard.putData(hopper);
     SmartDashboard.putData(shooter);
-    SmartDashboard.putData(colorWheel);
+    //SmartDashboard.putData(colorWheel);
     //SmartDashboard.putData(gate);
     SmartDashboard.putData(cameraSystem);
     SmartDashboard.putData(visionSystem);
