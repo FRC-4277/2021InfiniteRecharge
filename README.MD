@@ -10,7 +10,7 @@
 # Usage
 - Most common tasks can be done in the WPILib Command Palette in VS Code
 - To build code: `gradle build`
-- To deploy to robt: `gradle deploy`
+- To deploy to robot: `gradle deploy`
 - To install ShuffleBoard plugin and theme (`gradle :recharge-plugin:installPlugin :recharge-plugin:installTheme`)
   - Select the Cooper theme in ShuffleBoard preferences
   
