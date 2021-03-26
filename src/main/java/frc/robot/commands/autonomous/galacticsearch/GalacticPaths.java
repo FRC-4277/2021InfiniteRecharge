@@ -11,7 +11,7 @@ public class GalacticPaths {
           PathColor.RED,
           PathLetter.A,
           new Translation2d(7.5, 7.5),
-          new Translation2d(12.5 + .75, 5.0 - 0.333), // -0.333 in y added after watching 3/21/21 video
+          new Translation2d(12.5 + .75, 5.0 + 0.333), // +0.333 in y added after watching 3/21/21 video
           new Translation2d(15 + .75, 12.5));
 
   public static final GalacticPath A_BLUE =
@@ -28,7 +28,7 @@ public class GalacticPaths {
           PathLetter.B,
           new Translation2d(7.5, 10.0),
           new Translation2d(12.5 + .75, 5.0),
-          new Translation2d(17.5 + .75 + .5, 10.0 + .25)); // +0.25 in y added after watching 3/21/21 video
+          new Translation2d(17.5 + .75 + .5, 10.0));
 
   public static final GalacticPath B_BLUE =
       GalacticPath.fromFeet(
