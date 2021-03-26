@@ -14,13 +14,13 @@ public class IntakeGalacticBallCommand extends CommandBase {
   private static final double TURN_DEG_TOLERANCE = 5;
   private static final double MIN_TURN_ADJUST = 0.05;
 
-  private GalacticAutoCommand galacticAutoCommand;
-  private DriveTrain driveTrain;
-  private VisionSystem visionSystem;
-  private VerticalHopper verticalHopper;
+  private final GalacticAutoCommand galacticAutoCommand;
+  private final DriveTrain driveTrain;
+  private final VisionSystem visionSystem;
+  private final VerticalHopper verticalHopper;
 
-  private Intake intake;
-  private static int intakeMinStopTimeMs = 400; // From IntakeCommand.java
+  private final Intake intake;
+  private static final int intakeMinStopTimeMs = 400; // From IntakeCommand.java
   private boolean ballIntaking = false; //
   private Long ballIntakeTime = 0L; //
 

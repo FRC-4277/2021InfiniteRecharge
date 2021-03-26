@@ -27,7 +27,12 @@ public class FirstForwardMoveCommand extends CommandBase {
     galacticAutoCommand.setMessage(
         "[First Forward] Distance forward calculated to be " + distanceForward);
     ramseteCommand =
-        driveTrain.generateRamseteCommand(driveTrain.generateXTrajectory(distanceForward), false);
+        driveTrain.generateRamseteCommand(
+            driveTrain.generateXTrajectory(
+                distanceForward,
+                GalacticSearch.FIRST_FORWARD_MAX_VEL,
+                GalacticSearch.FIRST_FORWARD_MAX_ACCEL),
+            false);
     ramseteCommand.initialize();
   }
 

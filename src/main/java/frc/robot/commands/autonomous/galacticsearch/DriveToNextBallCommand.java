@@ -3,7 +3,6 @@ package frc.robot.commands.autonomous.galacticsearch;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import edu.wpi.first.wpiutil.math.VecBuilder;
@@ -63,15 +62,19 @@ public class DriveToNextBallCommand extends CommandBase {
 
     galacticAutoCommand.setMessage("[Next Ball] Target pos: " + targetPosition);
 
-    double velocity = 3;
-    double acceleration = 2;
-    if (ballIndex == 2) {
+    double velocity = 4;
+    double acceleration = 3;
+    /*if (ballIndex == 2) {
       velocity = 1;
       acceleration = 0.5;
-    }
-    Trajectory trajectory =
+    }*/
+
+    // Have end velocity be speed going while intaking
+    var endVelocity =
+        driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED);
+    var trajectory =
         driveTrain.generateTrajectory(
-            currentPosition, targetPosition, velocity, acceleration, false, false);
+            currentPosition, targetPosition, velocity, acceleration, false, false, 0, endVelocity);
     ramseteCommand = driveTrain.generateRamseteCommand(trajectory, false);
     ramseteCommand.initialize();
   }

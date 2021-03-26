@@ -135,24 +135,30 @@ public final class Constants {
 
   public static class GalacticSearch {
     // Area threshold for ball to be considered CLOSE (Pixy camera)
-    public static final int VISION_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL = 3445; // todo: change
-    //
+    // public static final int VISION_AREA_THRESHOLD_FOR_CLOSE_POWER_CELL = 3445; // todo: change
     public static final int VISION_DIFFERENT_X_THRESHOLD = 30;
 
     /* https://www.desmos.com/calculator/sxcsdbgjfv */
     // Robot Start X
     public static final double ROBOT_START_X = Units.feetToMeters(3.15);
+
+    // First Forward constraints
+    public static final double FIRST_FORWARD_MAX_VEL = 4;
+    public static final double FIRST_FORWARD_MAX_ACCEL = 3;
+
     // Distance to CLOSE ball
     public static final double CLOSE_BALL_DISTANCE = Units.feetToMeters(3.68);
     // Distance to FAR ball
     public static final double FAR_BALL_DISTANCE = Units.feetToMeters(11.18);
     // How close to get to the balls, FROM front of robot (hence adding half of length of obt)
     public static final double DESIRED_DISTANCE_TO_BALL =
-        Units.inchesToMeters(12 + 12) + (RobotDimensions.LENGTH / 2d);
+        Units.inchesToMeters(12 + 4)
+            + (RobotDimensions.LENGTH
+                / 2d); // Was 24 inches on 3/21/21, decreased it to 16 inches on 3/25/21*
     // Speed to go when driving towards ball to intake
-    public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.15;
+    public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.25; // Was on 0.15 on 3/21/21
     // Time to wait before moving again after ball is detected at intake sensor
-    public static final double WAIT_AFTER_INTAKE_SECONDS = 0.5;
+    public static final double WAIT_AFTER_INTAKE_SECONDS = 0.2; // Was 0.5 on 3/21/21
 
     // X of end zone, https://www.desmos.com/calculator/yijiq0dal9
     public static final double ROBOT_END_X = Units.feetToMeters(27.5);

@@ -341,6 +341,16 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return RobotBase.isSimulation() ? drivetrainSim.getCurrentDrawAmps() : 0;
   }
 
+  /**
+   * Converts drive motor percent output to velocity
+   *
+   * @param percentOutput percent output of motor
+   * @return velocity in m/s
+   */
+  public double convertPercentToVelocity(double percentOutput) {
+    return motorFeedforward.maxAchievableVelocity(MAX_BATTERY_V * percentOutput, 0);
+  }
+
   public DifferentialDriveOdometry getOdometry() {
     return odometry;
   }
@@ -831,6 +841,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    * @param interiorWaypoints Interior positions of path
    * @param maxVelocity Maximum velocity in m/s
    * @param maxAccel Maximum acceleration in m/s^2
+   * @param startVelocity Velocity at the start in m/s
+   * @param endVelocity Velocity at the end in m/s
    * @return
    */
   public Trajectory generateTrajectory(
@@ -839,14 +851,28 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
       List<Translation2d> interiorWaypoints,
       double maxVelocity,
       double maxAccel,
-      boolean reversed) {
+      boolean reversed,
+      double startVelocity,
+      double endVelocity) {
     var trajectoryConfig =
         new TrajectoryConfig(maxVelocity, maxAccel)
             .setKinematics(KINEMATICS)
             .addConstraint(VOLTAGE_CONSTRAINT)
-            .setReversed(reversed);
+            .setReversed(reversed)
+            .setStartVelocity(startVelocity)
+            .setEndVelocity(endVelocity);
 
     return TrajectoryGenerator.generateTrajectory(start, interiorWaypoints, end, trajectoryConfig);
+  }
+
+  public Trajectory generateTrajectory(
+      Pose2d start,
+      Pose2d end,
+      List<Translation2d> interiorWaypoints,
+      double maxVelocity,
+      double maxAccel,
+      boolean reversed) {
+    return generateTrajectory(start, end, interiorWaypoints, maxVelocity, maxAccel, reversed, 0, 0);
   }
 
   /**
@@ -925,7 +951,9 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
       double maxVelocity,
       double maxAccel,
       boolean genMiddle,
-      boolean reversed) {
+      boolean reversed,
+      double startVelocity,
+      double endVelocity) {
     List<Translation2d> interiorWaypoints = new ArrayList<>();
     if (genMiddle) {
       var middle =
@@ -934,7 +962,18 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
               ((start.getTranslation().getY() + end.getTranslation().getY()) / 2));
       interiorWaypoints.add(middle);
     }
-    return generateTrajectory(start, end, interiorWaypoints, maxVelocity, maxAccel, reversed);
+    return generateTrajectory(
+        start, end, interiorWaypoints, maxVelocity, maxAccel, reversed, startVelocity, endVelocity);
+  }
+
+  public Trajectory generateTrajectory(
+      Pose2d start,
+      Pose2d end,
+      double maxVelocity,
+      double maxAccel,
+      boolean genMiddle,
+      boolean reversed) {
+    return generateTrajectory(start, end, maxVelocity, maxAccel, genMiddle, reversed, 0, 0);
   }
 
   /**
@@ -1025,8 +1064,17 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return generateXTrajectory(getPose(), xMeters, false);
   }
 
+  public Trajectory generateXTrajectory(double xMeters, double maxVel, double maxAccel) {
+    return generateXTrajectory(getPose(), xMeters, false, maxVel, maxAccel);
+  }
+
   public Trajectory generateXTrajectory(double xMeters, boolean reversed) {
     return generateXTrajectory(getPose(), xMeters, reversed);
+  }
+
+  public Trajectory generateXTrajectory(
+      double xMeters, boolean reversed, double maxVel, double maxAccel) {
+    return generateXTrajectory(getPose(), xMeters, reversed, maxVel, maxAccel);
   }
 
   /**
@@ -1043,6 +1091,11 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
         MAX_SPEED_METERS_PER_SECOND,
         MAX_ACCELERATION_METERS_PER_SECOND_SQUARED,
         reversed);
+  }
+
+  public Trajectory generateXTrajectory(
+      Pose2d start, double xMeters, boolean reversed, double maxVel, double maxAccel) {
+    return generateXTrajectory(start, xMeters, maxVel, maxAccel, reversed);
   }
 
   @Override
