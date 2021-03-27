@@ -8,20 +8,20 @@ import frc.robot.subsystems.DriveTrain;
 
 public class Bounce2AutoCommand extends SequentialCommandGroup {
   private static final double MAX_VELOCITY = 3; // m/s
-  private static final double MAX_ACCELERATION = 2; // m/s^2
+  private static final double MAX_ACCELERATION = .5; // m/s^2
   private static final double MAX_CENTRIPETAL_ACCELERATION = 2; // m/s^2
 
   private static final double MAX_VELOCITY_2 = 3; // m/s
-  private static final double MAX_ACCELERATION_2 = 2; // m/s^2
+  private static final double MAX_ACCELERATION_2 = .5; // m/s^2
   private static final double MAX_CENTRIPETAL_ACCELERATION_2 = 2; // m/s^2
 
   private static final double MAX_VELOCITY_3 = 3; // m/s
-  private static final double MAX_ACCELERATION_3 = 2; // m/s^2
+  private static final double MAX_ACCELERATION_3 = .5; // m/s^2
   private static final double MAX_CENTRIPETAL_ACCELERATION_3 = 2; // m/s^2
 
   private static final double MAX_VELOCITY_4 = 4; // m/s
   private static final double END_VELOCITY_4 = 3; // m/s
-  private static final double MAX_ACCELERATION_4 = 2.5; // m/s^2
+  private static final double MAX_ACCELERATION_4 = 3; // m/s^2
   private static final double MAX_CENTRIPETAL_ACCELERATION_4 = 4; // m/s^2
 
   public Bounce2AutoCommand(DriveTrain driveTrain) {
@@ -32,10 +32,12 @@ public class Bounce2AutoCommand extends SequentialCommandGroup {
     var config2 = new TrajectoryConfig(MAX_VELOCITY_2, MAX_ACCELERATION_2);
     config2.addConstraint(new CentripetalAccelerationConstraint(MAX_CENTRIPETAL_ACCELERATION_2));
     config2.setReversed(true);
+    config2.setEndVelocity(0.5);
     var trajectory2 = driveTrain.generateCustomTrajectory("Bounce 2 2", config2);
 
     var config3 = new TrajectoryConfig(MAX_VELOCITY_3, MAX_ACCELERATION_3);
     config3.addConstraint(new CentripetalAccelerationConstraint(MAX_CENTRIPETAL_ACCELERATION_3));
+    config3.setEndVelocity(0.5);
     var trajectory3 = driveTrain.generateCustomTrajectory("Bounce 3 2", config3);
 
     var config4 = new TrajectoryConfig(MAX_VELOCITY_4, MAX_ACCELERATION_4);

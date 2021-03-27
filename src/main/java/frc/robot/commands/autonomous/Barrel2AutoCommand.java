@@ -7,10 +7,10 @@ import frc.robot.commands.DriveStopCommand;
 import frc.robot.subsystems.DriveTrain;
 
 public class Barrel2AutoCommand extends SequentialCommandGroup {
-  private static final double MAX_VELOCITY = 4; // m/s
-  private static final double END_VELOCITY = 3; // m/s
-  private static final double MAX_ACCELERATION = 2.5; // m/s^2
-  private static final double MAX_CENTRIPETAL_ACCELERATION = 4; // m/s^2
+  private static final double MAX_VELOCITY = 3; // m/s
+  private static final double END_VELOCITY = 4; // m/s
+  private static final double MAX_ACCELERATION = 2; // m/s^2
+  private static final double MAX_CENTRIPETAL_ACCELERATION = 2.5; // m/s^2
 
   public Barrel2AutoCommand(DriveTrain driveTrain) {
     var config = new TrajectoryConfig(MAX_VELOCITY, MAX_ACCELERATION);
