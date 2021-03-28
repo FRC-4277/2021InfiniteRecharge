@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.simulation.FlywheelSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
@@ -204,6 +205,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     // This method will be called once per scheduler run
     // shooterRPMDisplayEntry.setString(getLeftRPM() + " | " + getRightRPM());
     shooterRPMDisplayEntry.setString(String.format("%.2f | %.2f", getLeftRPM(), getRightRPM()));
+    SmartDashboard.putNumber("Left RPM", getLeftRPM());
+    SmartDashboard.putNumber("Right RPM", getRightRPM());
   }
 
   @Override

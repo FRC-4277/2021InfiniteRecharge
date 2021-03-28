@@ -196,12 +196,12 @@ public final class Constants {
     public static final int STATUS_3_QUADRATURE_MS = 40; // 160ms default
 
     public static class Characteristics {
-      public static final double P = 0.2;
+      public static final double P = 0.225;
       public static final double I = 0.0;
-      public static final double D = 0.0;
+      public static final double D = 0.35;
       public static final double MAX_BATTERY_V = 12;
-      public static final double ksVolts = RobotBase.isReal() ? 0.281 : 0;
-      public static final double kvVoltRotationsPerSecond = 0.162; // volts per rotations per second
+      public static final double ksVolts = RobotBase.isReal() ? 0.326 : 0;
+      public static final double kvVoltRotationsPerSecond = 0.154; // volts per rotations per second
       public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
       public static final double kaVoltRotationsPerSecond = 0.00493;
       public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
