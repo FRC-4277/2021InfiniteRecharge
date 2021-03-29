@@ -67,12 +67,18 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     setupCANStatusFrames(rightMotor);
 
     if (RobotBase.isReal()) {
+      double iZoneNative = rpmToTicksPerDs(I_ZONE_RPM); // Convert RPM to μ/100ms
+      double iMaxAccumulatorNative = rpmToTicksPerDs(I_MAX_ACCUMULATOR_RPM);
       leftMotor.config_kP(0, P);
       leftMotor.config_kI(0, I);
+      leftMotor.config_IntegralZone(0, iZoneNative);
+      leftMotor.configMaxIntegralAccumulator(0, iMaxAccumulatorNative);
       leftMotor.config_kD(0, D);
       leftMotor.configAllowableClosedloopError(0, 0, 10);
       rightMotor.config_kP(0, P);
       rightMotor.config_kI(0, I);
+      rightMotor.config_IntegralZone(0, iZoneNative);
+      rightMotor.configMaxIntegralAccumulator(0, iMaxAccumulatorNative);
       rightMotor.config_kD(0, D);
       rightMotor.configAllowableClosedloopError(0, 0, 10);
     }

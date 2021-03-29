@@ -196,8 +196,29 @@ public final class Constants {
     public static final int STATUS_3_QUADRATURE_MS = 40; // 160ms default
 
     public static class Characteristics {
+      /*
+      I Calculations:
+        PID runs at 1000 hz
+        I zone set to 40 RPM
+        Considering 40 rpm off from setpoint for 100 ms
+        40 * 100 = 4000 accumulated error RPM
+        4000 accumulated error RPM * (1/60 rps / 1 rpm) * (0.10 rotation per 100 ms / 1 rps) * (4096 sensor units per 100 ms / 1 rotation per 100 ms)
+        = 4000 * (1/60) * 0.10 * 4096 = 27306.666 sensor units / 100 ms
+        (In other words 4000 RPM = 27306.666 sensor units / 100 ms)
+        ------
+        Desired control effort for I = kV * (40 RPM)
+        kV is in V/RPS, so 40 RPM = 40/60 RPS
+        0.154 V/RPS * (40/60 RPS) = 0.10266666666 V
+        Multiply by 1023 because Talon PID considers 1023 to be full output
+        (0.10266666666 V / 12 V) * 1023 = 8.752333 PID control effort units
+        ------
+        27306.666 * kI = 8.752333
+        kI = 8.752333 / 27306.666 = 0.00032052001
+      */
       public static final double P = 0.225;
-      public static final double I = 0.0;
+      public static final double I = 0.00032052001; // Consider doubling, or even a lot more
+      public static final double I_ZONE_RPM = 40.0; // Will be converted to native units (μ/100ms)
+      public static final double I_MAX_ACCUMULATOR_RPM = 40.0 * 100; // Will be converted to native units (μ/100ms)
       public static final double D = 0.35;
       public static final double MAX_BATTERY_V = 12;
       public static final double ksVolts = RobotBase.isReal() ? 0.326 : 0;
@@ -205,7 +226,7 @@ public final class Constants {
       public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
       public static final double kaVoltRotationsPerSecond = 0.00493;
       public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
-      public static final double RPM_THRESHOLD = 50;
+      public static final double RPM_THRESHOLD = 15;
       // We never put kA into our feedforward, so just use extremely small amount?
       public static final LinearSystem<N1, N1, N1> PLANT =
           LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, kaVoltRadiansPerSecond);
