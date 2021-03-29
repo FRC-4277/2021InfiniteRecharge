@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.DemandType;
 import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.TalonSRXSimCollection;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
@@ -122,6 +123,63 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     shootingModeChooser.addOption("Power Port Challenge", ShootingMode.POWER_PORT_CHALLENGE);
     SendableRegistry.setName(shootingModeChooser, "Shooting Mode");
     settingsTab.add(shootingModeChooser).withSize(2, 1).withPosition(2, 1);
+
+    ShuffleboardLayout pidLayout =
+        settingsTab
+            .getLayout("Shooter PID", BuiltInLayouts.kGrid)
+            .withSize(5, 1)
+            .withPosition(4, 1)
+            .withProperties(
+                Map.of(
+                    "Label position", "TOP",
+                    "Number of columns", 5,
+                    "Number of rows", 1));
+
+    // Adjust PID from shuffleboard
+    NetworkTableEntry shooterP = pidLayout.add("P", P).withWidget(BuiltInWidgets.kTextView).getEntry();
+    shooterP.addListener(
+        notification -> {
+          leftMotor.config_kP(0, notification.value.getDouble());
+          rightMotor.config_kP(0, notification.value.getDouble());
+        },
+        EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
+
+    NetworkTableEntry shooterI = pidLayout.add("I", I).withWidget(BuiltInWidgets.kTextView).getEntry();
+    shooterI.addListener(
+        notification -> {
+          leftMotor.config_kI(0, notification.value.getDouble());
+          rightMotor.config_kI(0, notification.value.getDouble());
+        },
+        EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
+
+    NetworkTableEntry shooterIZone = pidLayout.add("I Zone (RPM)", I_ZONE_RPM).withWidget(BuiltInWidgets.kTextView).getEntry();
+    shooterIZone.addListener(
+        notification -> {
+          double setting = rpmToTicksPerDs(notification.value.getDouble());
+          leftMotor.config_IntegralZone(0, setting);
+          rightMotor.config_IntegralZone(0, setting);
+        },
+        EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
+
+    NetworkTableEntry shooterIMax = pidLayout
+      .add("I Accum Max (RPM)", I_MAX_ACCUMULATOR_RPM)
+      .withWidget(BuiltInWidgets.kTextView)
+      .getEntry();
+    shooterIMax.addListener(
+        notification -> {
+          double setting = rpmToTicksPerDs(notification.value.getDouble());
+          leftMotor.configMaxIntegralAccumulator(0, setting);
+          rightMotor.configMaxIntegralAccumulator(0, setting);
+        },
+        EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
+
+    NetworkTableEntry shooterD = pidLayout.add("D", D).withWidget(BuiltInWidgets.kTextView).getEntry();
+    shooterD.addListener(
+        notification -> {
+          leftMotor.config_kD(0, notification.value.getDouble());
+          rightMotor.config_kD(0, notification.value.getDouble());
+        },
+        EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
 
     // Simulation
     if (RobotBase.isSimulation()) {
