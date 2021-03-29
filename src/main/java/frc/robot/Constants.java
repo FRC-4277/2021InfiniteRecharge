@@ -197,7 +197,7 @@ public final class Constants {
 
     public static class Characteristics {
       /*
-      I Calculations:
+      Theoretical I gain Calculation:
         PID runs at 1000 hz
         I zone set to 40 RPM
         Considering 40 rpm off from setpoint for 100 ms
@@ -218,15 +218,20 @@ public final class Constants {
       public static final double P = 0.225;
       public static final double I = 0.00032052001; // Consider doubling, or even a lot more
       public static final double I_ZONE_RPM = 40.0; // Will be converted to native units (μ/100ms)
-      public static final double I_MAX_ACCUMULATOR_RPM = 40.0 * 100; // Will be converted to native units (μ/100ms)
+      public static final double I_MAX_ACCUMULATOR_RPM =
+          40.0 * 100; // Will be converted to native units (μ/100ms)
       public static final double D = 0.35;
+
       public static final double MAX_BATTERY_V = 12;
+
       public static final double ksVolts = RobotBase.isReal() ? 0.326 : 0;
       public static final double kvVoltRotationsPerSecond = 0.154; // volts per rotations per second
       public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
       public static final double kaVoltRotationsPerSecond = 0.00493;
       public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
-      public static final double RPM_THRESHOLD = 15;
+      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 15;
+      public static final double RPM_THRESHOLD_POWER_PORT_CHALLENGE = 50;
+
       // We never put kA into our feedforward, so just use extremely small amount?
       public static final LinearSystem<N1, N1, N1> PLANT =
           LinearSystemId.identifyVelocitySystem(kvVoltRadiansPerSecond, kaVoltRadiansPerSecond);

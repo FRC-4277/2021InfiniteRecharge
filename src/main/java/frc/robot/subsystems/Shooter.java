@@ -37,17 +37,17 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   // public static final double BACKWARDS_SPEED = -0.5;
 
   // private ShuffleboardTab settingsTab;
-  private WPI_TalonSRX leftMotor = new WPI_TalonSRX(LEFT_MOTOR_ID);
-  private WPI_TalonSRX rightMotor = new WPI_TalonSRX(RIGHT_MOTOR_ID);
+  private final WPI_TalonSRX leftMotor = new WPI_TalonSRX(LEFT_MOTOR_ID);
+  private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(RIGHT_MOTOR_ID);
 
-  private NetworkTableEntry shooterSpeedEntry;
-  private NetworkTableEntry shooterRPMDisplayEntry;
-  private NetworkTableEntry shooterDesiredRPMEntry;
-  private NetworkTableEntry shooterReachedRPMEntry;
-  private SendableChooser<RPMSource> rpmSourceSendableChooser;
-  private NetworkTableEntry shooterDesiredRPMSourceEntry;
+  private final NetworkTableEntry shooterSpeedEntry;
+  private final NetworkTableEntry shooterRPMDisplayEntry;
+  private final NetworkTableEntry shooterDesiredRPMEntry;
+  private final NetworkTableEntry shooterReachedRPMEntry;
+  private final SendableChooser<RPMSource> rpmSourceSendableChooser;
+  private final SendableChooser<ShootingMode> shootingModeChooser;
 
-  private SimpleMotorFeedforward feedforward =
+  private final SimpleMotorFeedforward feedforward =
       new SimpleMotorFeedforward(ksVolts, kvVoltRotationsPerSecond);
 
   private FlywheelSim flywheelSim;
@@ -116,6 +116,13 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     SendableRegistry.setName(rpmSourceSendableChooser, "Source");
     layout.add(rpmSourceSendableChooser);
 
+    shootingModeChooser = new SendableChooser<>();
+    shootingModeChooser.setDefaultOption(
+        "Interstellar Accuracy", ShootingMode.INTERSTELLAR_ACCURACY);
+    shootingModeChooser.addOption("Power Port Challenge", ShootingMode.POWER_PORT_CHALLENGE);
+    SendableRegistry.setName(shootingModeChooser, "Shooting Mode");
+    settingsTab.add(shootingModeChooser).withSize(2, 1).withPosition(2, 1);
+
     // Simulation
     if (RobotBase.isSimulation()) {
       flywheelSim = new FlywheelSim(PLANT, DCMotor.getVex775Pro(1), 4);
@@ -136,6 +143,10 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   public void runForward() {
     leftMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble());
     rightMotor.set(ControlMode.PercentOutput, shooterSpeedEntry.getValue().getDouble());
+  }
+
+  public ShootingMode getShootingMode() {
+    return shootingModeChooser.getSelected();
   }
 
   public void holdVelocityRPM(double rpm) {
@@ -171,7 +182,10 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public boolean hasReachedRPM(double rpm) {
-    return Math.abs(getVelocityRPM() - rpm) <= RPM_THRESHOLD;
+    return Math.abs(getVelocityRPM() - rpm)
+        <= (getShootingMode() == ShootingMode.INTERSTELLAR_ACCURACY
+            ? RPM_THRESHOLD_INTERSTELLAR_ACCURACY
+            : RPM_THRESHOLD_POWER_PORT_CHALLENGE);
   }
 
   public void setReachedRPMDisplay(boolean reached) {
@@ -232,5 +246,10 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   @Override
   public List<Verification> getVerifications(VerificationSystem system) {
     return null;
+  }
+
+  public enum ShootingMode {
+    INTERSTELLAR_ACCURACY,
+    POWER_PORT_CHALLENGE
   }
 }

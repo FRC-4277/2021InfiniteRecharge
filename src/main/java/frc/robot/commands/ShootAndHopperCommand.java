@@ -5,21 +5,32 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.commands.ShooterHoldVelocityCommand.RPMSource;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Shooter.ShootingMode;
 import frc.robot.subsystems.VerticalHopper;
 import frc.robot.subsystems.vision.VisionSystem;
 
 public class ShootAndHopperCommand extends CommandBase {
-  private static final int RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT = 40; // 20 ms * 10 = 200ms
-  private static final double HOPPER_UP_TO_TOP_SPEED =
-      0.5; // Speed of hopper when moving ball to top
-  private static final double HOPPER_UP_TO_SHOOTER_SPEED =
-      0.5; // Speed of hopper when moving ball from top to shooter
-  private static final double BALL_PAUSE_AT_TOP_SECONDS =
-      0.5; // Time to ensure ball is stationary at top before shooting.
-  private Shooter shooter;
-  private VerticalHopper hopper;
-  private VisionSystem visionSystem;
-  private RPMSource rpmSource;
+  // !=== Different shooting settings depending on challenge ===!
+
+  private static final ShootSettingSupplier<Integer> RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT =
+      new ShootSettingSupplier<>(40, 5); // 20 ms * 10 = 200ms
+
+  // Speed of hopper when moving ball to top
+  private static final ShootSettingSupplier<Double> HOPPER_UP_TO_TOP_SPEED =
+      new ShootSettingSupplier<>(0.5, 1.0);
+
+  // Speed of hopper when moving ball from top to shooter
+  private static final ShootSettingSupplier<Double> HOPPER_UP_TO_SHOOTER_SPEED =
+      new ShootSettingSupplier<>(0.5, 1.0);
+
+  // Time to ensure ball is stationary at top before shooting.
+  private static final ShootSettingSupplier<Double> BALL_PAUSE_AT_TOP_SECONDS =
+      new ShootSettingSupplier<>(0.5, 0.01);
+
+  private final Shooter shooter;
+  private final VerticalHopper hopper;
+  private final VisionSystem visionSystem;
+  private final RPMSource rpmSource;
   private int loopsReachedRPM = 0;
   private boolean velocityIsStable;
   private Timer ballAtTopTimer;
@@ -113,10 +124,9 @@ public class ShootAndHopperCommand extends CommandBase {
         desiredRPM = Constants.Shooter.METERS_TO_RPM_FUNCTION.apply(meters);
         break;
       case CONSTANT:
-        desiredRPM = this.desiredRPM;
+        // do nothing, desiredRPM is already set
         break;
       default:
-        return;
     }
   }
 
@@ -129,7 +139,7 @@ public class ShootAndHopperCommand extends CommandBase {
     } else {
       loopsReachedRPM = 0;
     }
-    velocityIsStable = loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT;
+    velocityIsStable = loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT.get(shooter);
     shooter.setReachedRPMDisplay(velocityIsStable);
 
     switch (state) {
@@ -139,7 +149,7 @@ public class ShootAndHopperCommand extends CommandBase {
          * If ball is on top: Change state to MOVING_TOP_BALL_INTO_SHOOTER
          */
         if (!hopper.isBallPresentTop()) {
-          hopper.moveUp(HOPPER_UP_TO_TOP_SPEED);
+          hopper.moveUp(HOPPER_UP_TO_TOP_SPEED.get(shooter));
         } else {
           state = State.MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY; // Change state
           ballAtTopTimer = new Timer();
@@ -156,13 +166,13 @@ public class ShootAndHopperCommand extends CommandBase {
         }
         // Do nothing until ball on top is there for specified time (makes sure ball is still at the
         // top first)
-        if (!ballAtTopTimer.hasElapsed(BALL_PAUSE_AT_TOP_SECONDS)) {
+        if (!ballAtTopTimer.hasElapsed(BALL_PAUSE_AT_TOP_SECONDS.get(shooter))) {
           hopper.stopMoving();
           return;
         }
 
         // !!!!! Now start moving up
-        hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED);
+        hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
         // Track when the ball leaves the sensor
         if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
           ballHasLeftTop = true;
@@ -204,5 +214,21 @@ public class ShootAndHopperCommand extends CommandBase {
   public enum State {
     MOVE_BALL_UP_TO_TOP,
     MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY
+  }
+
+  public static class ShootSettingSupplier<T> {
+    private final T interstellarSetting;
+    private final T powerPortSetting;
+
+    public ShootSettingSupplier(T interstellarSetting, T powerPortSetting) {
+      this.interstellarSetting = interstellarSetting;
+      this.powerPortSetting = powerPortSetting;
+    }
+
+    public T get(Shooter shooter) {
+      return shooter.getShootingMode() == ShootingMode.INTERSTELLAR_ACCURACY
+          ? interstellarSetting
+          : powerPortSetting;
+    }
   }
 }
