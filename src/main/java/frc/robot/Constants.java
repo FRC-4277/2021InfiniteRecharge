@@ -229,7 +229,7 @@ public final class Constants {
       public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
       public static final double kaVoltRotationsPerSecond = 0.00493;
       public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
-      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 15;
+      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 25;
       public static final double RPM_THRESHOLD_POWER_PORT_CHALLENGE = 50;
 
       // We never put kA into our feedforward, so just use extremely small amount?
@@ -243,11 +243,19 @@ public final class Constants {
     private static final double minX, maxX, minY, maxY;
 
     static {
-      // Empirical values collected on 3/13/21
+
+      /* Empirical values collected on 3/13/21
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.50), new InterpolatingDouble(4200.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.5), new InterpolatingDouble(2200.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.76), new InterpolatingDouble(2200.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.94), new InterpolatingDouble(2350.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.94), new InterpolatingDouble(2350.0));*/
+
+      // Empirical values collected on 3/29/21
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.61), new InterpolatingDouble(3931.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.58), new InterpolatingDouble(2200.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.20), new InterpolatingDouble(2100.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.08), new InterpolatingDouble(2250.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.15), new InterpolatingDouble(2250.0));
 
       //noinspection OptionalGetWithoutIsPresent (All guaranteed to be present)
       minX =
@@ -262,10 +270,10 @@ public final class Constants {
 
     public static Function<Double, Double> METERS_TO_RPM_FUNCTION =
         x -> {
-          if (x <= 1.50) {
-            return 4200.0;
-          } else if (x >= 7.94) {
-            return 2350.0;
+          if (x <= 1.65) {
+            return 3931.0;
+          } else if (x >= 8.08) {
+            return 2250.0;
           }
           return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };

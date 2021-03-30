@@ -62,6 +62,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     leftMotor.setSensorPhase(LEFT_SENSOR_PHASE);
     rightMotor.configFactoryDefault();
     rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
+    // rightMotor.follow(leftMotor);
     rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
 
     setupCANStatusFrames(leftMotor);
@@ -136,7 +137,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
                     "Number of rows", 1));
 
     // Adjust PID from shuffleboard
-    NetworkTableEntry shooterP = pidLayout.add("P", P).withWidget(BuiltInWidgets.kTextView).getEntry();
+    NetworkTableEntry shooterP =
+        pidLayout.add("P", P).withWidget(BuiltInWidgets.kTextView).getEntry();
     shooterP.addListener(
         notification -> {
           leftMotor.config_kP(0, notification.value.getDouble());
@@ -144,7 +146,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
         },
         EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
 
-    NetworkTableEntry shooterI = pidLayout.add("I", I).withWidget(BuiltInWidgets.kTextView).getEntry();
+    NetworkTableEntry shooterI =
+        pidLayout.add("I", I).withWidget(BuiltInWidgets.kTextView).getEntry();
     shooterI.addListener(
         notification -> {
           leftMotor.config_kI(0, notification.value.getDouble());
@@ -152,7 +155,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
         },
         EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
 
-    NetworkTableEntry shooterIZone = pidLayout.add("I Zone (RPM)", I_ZONE_RPM).withWidget(BuiltInWidgets.kTextView).getEntry();
+    NetworkTableEntry shooterIZone =
+        pidLayout.add("I Zone (RPM)", I_ZONE_RPM).withWidget(BuiltInWidgets.kTextView).getEntry();
     shooterIZone.addListener(
         notification -> {
           double setting = rpmToTicksPerDs(notification.value.getDouble());
@@ -161,10 +165,11 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
         },
         EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
 
-    NetworkTableEntry shooterIMax = pidLayout
-      .add("I Accum Max (RPM)", I_MAX_ACCUMULATOR_RPM)
-      .withWidget(BuiltInWidgets.kTextView)
-      .getEntry();
+    NetworkTableEntry shooterIMax =
+        pidLayout
+            .add("I Accum Max (RPM)", I_MAX_ACCUMULATOR_RPM)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
     shooterIMax.addListener(
         notification -> {
           double setting = rpmToTicksPerDs(notification.value.getDouble());
@@ -173,7 +178,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
         },
         EntryListenerFlags.kUpdate | EntryListenerFlags.kLocal);
 
-    NetworkTableEntry shooterD = pidLayout.add("D", D).withWidget(BuiltInWidgets.kTextView).getEntry();
+    NetworkTableEntry shooterD =
+        pidLayout.add("D", D).withWidget(BuiltInWidgets.kTextView).getEntry();
     shooterD.addListener(
         notification -> {
           leftMotor.config_kD(0, notification.value.getDouble());

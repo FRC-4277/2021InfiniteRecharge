@@ -21,7 +21,7 @@ public class ShootAndHopperCommand extends CommandBase {
 
   // Speed of hopper when moving ball from top to shooter
   private static final ShootSettingSupplier<Double> HOPPER_UP_TO_SHOOTER_SPEED =
-      new ShootSettingSupplier<>(0.5, 1.0);
+      new ShootSettingSupplier<>(0.75, 1.0);
 
   // Time to ensure ball is stationary at top before shooting.
   private static final ShootSettingSupplier<Double> BALL_PAUSE_AT_TOP_SECONDS =

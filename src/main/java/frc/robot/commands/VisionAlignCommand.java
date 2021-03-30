@@ -15,7 +15,7 @@ import frc.robot.subsystems.vision.limelight.Target;
 import java.util.Optional;
 
 public class VisionAlignCommand extends CommandBase {
-  private static final double ROTATE_P = 0.01d;
+  private static final double ROTATE_P = 0.02d;
   private static final double DEG_TOLERANCE = 5d;
   private static final double MIN_COMMAND = 0.1;
   private static final double SEEK_SPEED = 0.1;
