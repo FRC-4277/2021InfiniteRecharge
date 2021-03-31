@@ -32,6 +32,10 @@ public class Intake extends SubsystemBase implements VerifiableSystem {
     motor.set(ControlMode.PercentOutput, INTAKE_SPEED);
   }
 
+  public void runIntake(double speed) {
+    motor.set(ControlMode.PercentOutput, speed);
+  }
+
   public void runReverseIntake() {
     motor.set(ControlMode.PercentOutput, REVERSE_INTAKE_SPEED);
   }

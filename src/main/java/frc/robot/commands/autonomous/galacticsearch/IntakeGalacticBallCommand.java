@@ -18,25 +18,33 @@ public class IntakeGalacticBallCommand extends CommandBase {
   private final DriveTrain driveTrain;
   private final VisionSystem visionSystem;
   private final VerticalHopper verticalHopper;
-
   private final Intake intake;
+
+  //private final Intake intake;
   private static final int intakeMinStopTimeMs = 400; // From IntakeCommand.java
   private boolean ballIntaking = false; //
   private Long ballIntakeTime = 0L; //
 
   private Timer timer;
+  private boolean incremented = false;
+  private GalacticAutoCommand.Incrementer incrementer;
+  private int ballMax;
 
   public IntakeGalacticBallCommand(
-      GalacticAutoCommand galacticAutoCommand,
-      DriveTrain driveTrain,
-      VisionSystem visionSystem,
-      VerticalHopper verticalHopper,
-      Intake intake) {
+    GalacticAutoCommand galacticAutoCommand,
+    DriveTrain driveTrain,
+    VisionSystem visionSystem,
+    VerticalHopper verticalHopper,
+    Intake intake,
+    GalacticAutoCommand.Incrementer incrementer,
+    int ballMax) {
     this.galacticAutoCommand = galacticAutoCommand;
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
     this.verticalHopper = verticalHopper;
     this.intake = intake;
+    this.incrementer = incrementer;
+    this.ballMax = ballMax;
     // NOTE: Purposely not adding vertical hopper so AutoHopperMoveInCommands still runs...
     addRequirements(driveTrain, visionSystem);
   }
@@ -85,11 +93,15 @@ public class IntakeGalacticBallCommand extends CommandBase {
     if (intakeBallPresent && !ballIntaking) {
       ballIntaking = true;
     }
+    if (!incremented && intakeBallPresent) {
+      incrementer.increment(ballMax);
+      incremented = true;
+    }
     if (ballIntaking && (System.currentTimeMillis() - ballIntakeTime >= intakeMinStopTimeMs)) {
       ballIntaking = false;
     }
     if (!ballIntaking) {
-      intake.runIntake();
+      intake.runIntake(.65);
     } else {
       intake.stopIntake();
     }
@@ -98,8 +110,9 @@ public class IntakeGalacticBallCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     visionSystem.setUsingPixy(false);
-    intake.stopIntake(); // From IntakeCommand.java
+    //intake.stopIntake(); // From IntakeCommand.java
     driveTrain.stopDrive();
+    intake.stopIntake();
   }
 
   @Override

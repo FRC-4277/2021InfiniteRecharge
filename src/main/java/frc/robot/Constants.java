@@ -147,7 +147,7 @@ public final class Constants {
     public static final double FIRST_FORWARD_MAX_ACCEL = 3;
 
     // Distance to CLOSE ball
-    public static final double CLOSE_BALL_DISTANCE = Units.feetToMeters(3.68);
+    public static final double CLOSE_BALL_DISTANCE = Units.feetToMeters(3.68) + Units.feetToMeters(0.5);
     // Distance to FAR ball
     public static final double FAR_BALL_DISTANCE = Units.feetToMeters(11.18);
     // How close to get to the balls, FROM front of robot (hence adding half of length of obt)
