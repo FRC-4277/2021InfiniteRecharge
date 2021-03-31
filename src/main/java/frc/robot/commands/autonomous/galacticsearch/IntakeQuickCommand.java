@@ -24,7 +24,11 @@ public class IntakeQuickCommand extends CommandBase {
   private Long ballIntakeTime = 0L;
   private int ballMax;
   /** Creates a new IntakeCommand. */
-  public IntakeQuickCommand(Intake intake, VerticalHopper verticalHopper, GalacticAutoCommand.Incrementer incrementer, int ballMax) {
+  public IntakeQuickCommand(
+      Intake intake,
+      VerticalHopper verticalHopper,
+      GalacticAutoCommand.Incrementer incrementer,
+      int ballMax) {
     this.intake = intake;
     this.verticalHopper = verticalHopper;
     this.incrementer = incrementer;

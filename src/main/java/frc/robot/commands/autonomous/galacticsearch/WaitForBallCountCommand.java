@@ -1,7 +1,6 @@
 package frc.robot.commands.autonomous.galacticsearch;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-
 import java.util.function.Supplier;
 
 public class WaitForBallCountCommand extends CommandBase {

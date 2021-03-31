@@ -20,7 +20,7 @@ public class IntakeGalacticBallCommand extends CommandBase {
   private final VerticalHopper verticalHopper;
   private final Intake intake;
 
-  //private final Intake intake;
+  // private final Intake intake;
   private static final int intakeMinStopTimeMs = 400; // From IntakeCommand.java
   private boolean ballIntaking = false; //
   private Long ballIntakeTime = 0L; //
@@ -31,13 +31,13 @@ public class IntakeGalacticBallCommand extends CommandBase {
   private int ballMax;
 
   public IntakeGalacticBallCommand(
-    GalacticAutoCommand galacticAutoCommand,
-    DriveTrain driveTrain,
-    VisionSystem visionSystem,
-    VerticalHopper verticalHopper,
-    Intake intake,
-    GalacticAutoCommand.Incrementer incrementer,
-    int ballMax) {
+      GalacticAutoCommand galacticAutoCommand,
+      DriveTrain driveTrain,
+      VisionSystem visionSystem,
+      VerticalHopper verticalHopper,
+      Intake intake,
+      GalacticAutoCommand.Incrementer incrementer,
+      int ballMax) {
     this.galacticAutoCommand = galacticAutoCommand;
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
@@ -110,7 +110,7 @@ public class IntakeGalacticBallCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     visionSystem.setUsingPixy(false);
-    //intake.stopIntake(); // From IntakeCommand.java
+    // intake.stopIntake(); // From IntakeCommand.java
     driveTrain.stopDrive();
     intake.stopIntake();
   }

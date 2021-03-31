@@ -27,9 +27,10 @@ public class ZoomToEndCommand extends CommandBase {
     galacticAutoCommand.setMessage("[Zoom to End] Current pos: " + currentPose);
     galacticAutoCommand.setMessage("[Zoom to End] Target pos: " + target);
     // Add middle waypoint so it tries to take quickest path
-    double startVelocity = driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED);
-    Trajectory trajectory = driveTrain.generateTrajectory(currentPose, target, 4.0, 3.0,
-      true, false, startVelocity, 4);
+    double startVelocity =
+        driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED);
+    Trajectory trajectory =
+        driveTrain.generateTrajectory(currentPose, target, 4.0, 3.0, true, false, startVelocity, 4);
     ramseteCommand = driveTrain.generateRamseteCommand(trajectory);
     ramseteCommand.initialize();
   }
