@@ -15,8 +15,6 @@ import frc.robot.subsystems.Shooter;
 import frc.robot.subsystems.VerticalHopper;
 import frc.robot.subsystems.vision.VisionSystem;
 
-import java.util.function.Supplier;
-
 public class GalacticAutoCommand extends SequentialCommandGroup {
   private final RobotContainer container;
   private GalacticPath pathDetected;
@@ -30,13 +28,14 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
       Intake intake,
       Shooter shooter) {
     this.container = container;
-    Incrementer incrementer = (max) -> {
-      ballsCollected++;
-      if (ballsCollected > max) {
-        ballsCollected = max;
-      }
-      SmartDashboard.putNumber("Balls Collected", ballsCollected);
-    };
+    Incrementer incrementer =
+        (max) -> {
+          ballsCollected++;
+          if (ballsCollected > max) {
+            ballsCollected = max;
+          }
+          SmartDashboard.putNumber("Balls Collected", ballsCollected);
+        };
     addCommands(
         // Figure out path from DS computer vision (see /galactic-search-vision/)
         new DetectPathCommand(this, visionSystem),
@@ -45,33 +44,31 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
 
         // Move straight forward to JUST BEFORE first ball #1
         new ParallelDeadlineGroup(
-          new FirstForwardMoveCommand(this, driveTrain),
-          new IntakeQuickCommand(intake, verticalHopper, incrementer, 1)
-        ),
+            new FirstForwardMoveCommand(this, driveTrain),
+            new IntakeQuickCommand(intake, verticalHopper, incrementer, 1)),
         // Pickup ball #1
         new ParallelDeadlineGroup(
-          new WaitForBallCountCommand(() -> ballsCollected, 1),
-          new IntakeGalacticBallCommand(this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 1)
-        ),
+            new WaitForBallCountCommand(() -> ballsCollected, 1),
+            new IntakeGalacticBallCommand(
+                this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 1)),
         new WaitCommand(0.2),
         // Drive to JUST BEFORE ball #2
         new ParallelDeadlineGroup(
-          new DriveToNextBallCommand(this, driveTrain, 1),
-          new IntakeQuickCommand(intake, verticalHopper, incrementer, 2)
-          ),
+            new DriveToNextBallCommand(this, driveTrain, 1),
+            new IntakeQuickCommand(intake, verticalHopper, incrementer, 2)),
         // Pickup ball #2
         new ParallelDeadlineGroup(
-          new WaitForBallCountCommand(() -> ballsCollected, 2),
-          new IntakeGalacticBallCommand(this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 2)
-        ),
+            new WaitForBallCountCommand(() -> ballsCollected, 2),
+            new IntakeGalacticBallCommand(
+                this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 2)),
         new WaitCommand(0.2),
         // Drive to JUST BEFORE ball #3
         new ParallelDeadlineGroup(
-          new DriveToNextBallCommand(this, driveTrain, 2),
-          new IntakeQuickCommand(intake, verticalHopper, incrementer, 3)
-        ),
+            new DriveToNextBallCommand(this, driveTrain, 2),
+            new IntakeQuickCommand(intake, verticalHopper, incrementer, 3)),
         // Pickup ball #3
-        new IntakeGalacticBallCommand(this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 3),
+        new IntakeGalacticBallCommand(
+            this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 3),
         new WaitCommand(0.2),
         // Go to end zone ASAP
         new ZoomToEndCommand(this, driveTrain)
