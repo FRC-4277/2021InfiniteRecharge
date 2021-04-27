@@ -277,7 +277,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void setSolenoidsBasedOnRPM(double rpm) {
-    setSolenoids(SOLENOID_STATE_FUNCTION.apply(rpm));
+    setSolenoids(RPM_TO_SOLENOID_STATE_FUNCTION.apply(rpm));
   }
 
   public double getDriverDesiredRPM() {
