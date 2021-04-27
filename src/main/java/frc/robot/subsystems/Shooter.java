@@ -18,6 +18,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.networktables.EntryListenerFlags;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.RobotBase;
+import edu.wpi.first.wpilibj.Solenoid;
 import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -40,6 +41,9 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   // private ShuffleboardTab settingsTab;
   private final WPI_TalonSRX leftMotor = new WPI_TalonSRX(LEFT_MOTOR_ID);
   private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(RIGHT_MOTOR_ID);
+
+  private final Solenoid leftSolenoid = new Solenoid(LEFT_SOLENOID_ID);
+  private final Solenoid rightSolenoid = new Solenoid(RIGHT_SOLENOID_ID);
 
   private final NetworkTableEntry shooterSpeedEntry;
   private final NetworkTableEntry shooterRPMDisplayEntry;
@@ -213,7 +217,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     return shootingModeChooser.getSelected();
   }
 
-  public void holdVelocityRPM(double rpm) {
+  public void holdVelocityRPMAndSetSolenoids(double rpm) {
+    setSolenoidsBasedOnRPM(rpm);
     shooterDesiredRPMEntry.setDouble(rpm);
     holdVelocity(rpmToTicksPerDs(rpm), rpm);
   }
@@ -264,6 +269,15 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   public void stopShooter() {
     leftMotor.set(ControlMode.PercentOutput, 0);
     rightMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  public void setSolenoids(boolean on) {
+    leftSolenoid.set(on);
+    rightSolenoid.set(on);
+  }
+
+  public void setSolenoidsBasedOnRPM(double rpm) {
+    setSolenoids(SOLENOID_STATE_FUNCTION.apply(rpm));
   }
 
   public double getDriverDesiredRPM() {

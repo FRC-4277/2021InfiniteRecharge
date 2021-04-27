@@ -19,7 +19,6 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import frc.robot.util.interpolation.InterpolatingDouble;
 import frc.robot.util.interpolation.InterpolatingTreeMap;
-import java.util.Comparator;
 import java.util.function.Function;
 
 /**
@@ -173,9 +172,9 @@ public final class Constants {
 
   public static class VerticalHopper {
     // Looking at the robot from the front
-    public static final int LEFT_MOTOR_ID = /*16*/19;
+    public static final int LEFT_MOTOR_ID = /*16*/ 19;
     public static final boolean LEFT_MOTOR_INVERTED = true;
-    public static final int RIGHT_MOTOR_ID = /*57*/17;
+    public static final int RIGHT_MOTOR_ID = /*57*/ 17;
     public static final int INTAKE_SENSOR = 1;
   }
 
@@ -188,6 +187,8 @@ public final class Constants {
   public static class Shooter {
     public static final int LEFT_MOTOR_ID = 30;
     public static final int RIGHT_MOTOR_ID = 31;
+    public static final int LEFT_SOLENOID_ID = 0;
+    public static final int RIGHT_SOLENOID_ID = 1;
     public static final boolean LEFT_MOTOR_INVERTED = false;
     public static final boolean RIGHT_MOTOR_INVERTED = true;
     public static final boolean LEFT_SENSOR_PHASE = false;
@@ -241,7 +242,6 @@ public final class Constants {
     // Linear Interpolation version of Meters to RPM
     public static final InterpolatingTreeMap<InterpolatingDouble, InterpolatingDouble>
         METERS_TO_RPM_MAP = new InterpolatingTreeMap<>();
-    private static final double minX, maxX, minY, maxY;
 
     static {
 
@@ -257,16 +257,6 @@ public final class Constants {
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.20), new InterpolatingDouble(2100.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.08), new InterpolatingDouble(2250.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.15), new InterpolatingDouble(2250.0));
-
-      //noinspection OptionalGetWithoutIsPresent (All guaranteed to be present)
-      minX =
-          METERS_TO_RPM_MAP.keySet().stream().min(Comparator.comparing(d -> d.value)).get().value;
-      maxX =
-          METERS_TO_RPM_MAP.keySet().stream().max(Comparator.comparing(d -> d.value)).get().value;
-      minY =
-          METERS_TO_RPM_MAP.values().stream().min(Comparator.comparing(d -> d.value)).get().value;
-      maxY =
-          METERS_TO_RPM_MAP.values().stream().max(Comparator.comparing(d -> d.value)).get().value;
     }
 
     public static Function<Double, Double> METERS_TO_RPM_FUNCTION =
@@ -279,10 +269,14 @@ public final class Constants {
           return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };
 
-    // Polynomial Regression version of Meters to RPM
+    public static final Function<Double, Boolean> SOLENOID_STATE_FUNCTION =
+        // Solenoid TRUE if in GREEN ZONE
+        x -> x <= 1.61 + .3;
+
+    /*NO LONGER USED// Polynomial Regression version of Meters to RPM
     // Desmos: https://www.desmos.com/calculator/5byzpup30b
     public static final Function<Double, Double> METERS_TO_RPM_POLY_FUNCTION =
-        x -> -30.7828 * Math.pow(x, 3) + 561.778 * Math.pow(x, 2) + -3191.47 * x + 7827.1;
+        x -> -30.7828 * Math.pow(x, 3) + 561.778 * Math.pow(x, 2) + -3191.47 * x + 7827.1;*/
   }
 
   public static class Winch {
