@@ -11,6 +11,7 @@ import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,8 +36,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   private final NetworkTableEntry INDEX_RUN_TIME_MS_ENTRY;
   private final NetworkTableEntry INDEX_TIME_BETWEEN_BALL_ENTRY;
   public static final double DOWN_SPEED = -0.5;
-  private VictorSPX leftMotor = new VictorSPX(LEFT_MOTOR_ID);
-  private VictorSPX rightMotor = new VictorSPX(RIGHT_MOTOR_ID);
+  private TalonSRX leftMotor = new TalonSRX(LEFT_MOTOR_ID);
+  private TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
 
   private boolean gateClosed = true;
   private boolean[] cellsPresent = new boolean[] {false, false, false, false, false};

@@ -172,9 +172,9 @@ public final class Constants {
 
   public static class VerticalHopper {
     // Looking at the robot from the front
-    public static final int LEFT_MOTOR_ID = 16;
+    public static final int LEFT_MOTOR_ID = /*16*/19;
     public static final boolean LEFT_MOTOR_INVERTED = true;
-    public static final int RIGHT_MOTOR_ID = 57;
+    public static final int RIGHT_MOTOR_ID = /*57*/17;
     public static final int INTAKE_SENSOR = 1;
   }
 
