@@ -188,7 +188,6 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 30;
     public static final int RIGHT_MOTOR_ID = 31;
     public static final int LEFT_SOLENOID_ID = 0;
-    public static final int RIGHT_SOLENOID_ID = 1;
     public static final boolean LEFT_MOTOR_INVERTED = false;
     public static final boolean RIGHT_MOTOR_INVERTED = true;
     public static final boolean LEFT_SENSOR_PHASE = false;

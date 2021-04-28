@@ -43,7 +43,6 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   private final WPI_TalonSRX rightMotor = new WPI_TalonSRX(RIGHT_MOTOR_ID);
 
   private final Solenoid leftSolenoid = new Solenoid(LEFT_SOLENOID_ID);
-  private final Solenoid rightSolenoid = new Solenoid(RIGHT_SOLENOID_ID);
 
   private final NetworkTableEntry shooterSpeedEntry;
   private final NetworkTableEntry shooterRPMDisplayEntry;
@@ -272,8 +271,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void setSolenoids(boolean on) {
+    System.out.println("Solenoids set to " + on);
     leftSolenoid.set(on);
-    rightSolenoid.set(on);
   }
 
   public void setSolenoidsBasedOnRPM(double rpm) {
