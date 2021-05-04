@@ -28,7 +28,7 @@ public class ShootAndHopperCommand extends CommandBase {
       new ShootSettingSupplier<>(0.5, 0.01);
 
   private static final ShootSettingSupplier<Double> MOVE_BALL_TO_SHOOTER_DURATION =
-      new ShootSettingSupplier<>(1.0, 0.0);
+      new ShootSettingSupplier<>(0.4, 0.0);
 
   private final Shooter shooter;
   private final VerticalHopper hopper;
