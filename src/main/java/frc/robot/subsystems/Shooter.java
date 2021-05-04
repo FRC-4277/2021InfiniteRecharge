@@ -271,7 +271,6 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
   }
 
   public void setSolenoids(boolean on) {
-    System.out.println("Solenoids set to " + on);
     leftSolenoid.set(on);
   }
 
