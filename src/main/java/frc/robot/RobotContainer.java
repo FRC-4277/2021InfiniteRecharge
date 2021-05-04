@@ -34,6 +34,7 @@ import frc.robot.commands.autonomous.*;
 import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
+import frc.robot.commands.hopper.AutoHopperMoveInCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.util.CooperSendable;
@@ -148,6 +149,12 @@ public class RobotContainer {
     driveTrain.setDefaultCommand(driveCommand);
     hopper.setDefaultCommand(autoHopperMoveInCommand);
 
+    // Hopper move up distance PID
+    /*new Trigger(intake::isSensorTripped)
+      .whenActive(new WaitCommand(hopper.getMoveAfterSensorDelayMs() / 1000d)
+        .andThen(new AutoHopperMoveUpOnceCommand(hopper))
+    );*/
+
     // ShuffleBoard
     setupDriverTab();
     setupAutonomousTab();
@@ -156,6 +163,7 @@ public class RobotContainer {
 
   private void setupTestingTab() {
     testTab.add(toggleCameraCommand);
+    testTab.add(shootAndHopperCommand);
   }
 
   private void setupAutonomousTab() {

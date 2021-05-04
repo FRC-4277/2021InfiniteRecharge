@@ -91,7 +91,7 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     ShuffleboardLayout layout =
         driverTab
             .getLayout("Shooter", BuiltInLayouts.kGrid)
-            .withSize(5, 1)
+            .withSize(6, 1)
             .withPosition(6, 2)
             .withProperties(
                 Map.of(

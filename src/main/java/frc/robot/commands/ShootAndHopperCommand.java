@@ -27,6 +27,9 @@ public class ShootAndHopperCommand extends CommandBase {
   private static final ShootSettingSupplier<Double> BALL_PAUSE_AT_TOP_SECONDS =
       new ShootSettingSupplier<>(0.5, 0.01);
 
+  private static final ShootSettingSupplier<Double> MOVE_BALL_TO_SHOOTER_DURATION =
+      new ShootSettingSupplier<>(1.0, 0.0);
+
   private final Shooter shooter;
   private final VerticalHopper hopper;
   private final VisionSystem visionSystem;
@@ -36,6 +39,8 @@ public class ShootAndHopperCommand extends CommandBase {
   private Timer ballAtTopTimer;
   private State state;
   private boolean ballHasLeftTop = false;
+  private Timer ballLeftTopTimer = null;
+  private boolean ballhasLeftTopAndWaited = false;
   private int ballCount = 0;
   private boolean runForever = false;
   private boolean finished = false;
@@ -108,6 +113,7 @@ public class ShootAndHopperCommand extends CommandBase {
     state = State.MOVE_BALL_UP_TO_TOP; // Start off by moving ball up
     ballCount = 0;
     finished = false;
+    ballLeftTopTimer = null;
     finishTimer = null;
 
     // Get desired RPM from user
@@ -172,10 +178,14 @@ public class ShootAndHopperCommand extends CommandBase {
         }
 
         // !!!!! Now start moving up
-        hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
+        // hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
+        hopper.moveUpForShooting(visionSystem.getCalculatedDistanceMeters());
         // Track when the ball leaves the sensor
         if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
           ballHasLeftTop = true;
+          ballLeftTopTimer = new Timer();
+          ballLeftTopTimer.reset();
+          ballLeftTopTimer.start();
           ballCount++;
         }
 
@@ -189,7 +199,8 @@ public class ShootAndHopperCommand extends CommandBase {
         }*/
 
         // Now that the ball has left sensor, wait for next ball.
-        if (ballHasLeftTop && hopper.isBallPresentTop()) {
+        if ((ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.get(shooter)))
+            && hopper.isBallPresentTop()) {
           // Once next ball is at sensor, set state to MOVE_BALL_UP_TO_TOP
           state = State.MOVE_BALL_UP_TO_TOP;
         }

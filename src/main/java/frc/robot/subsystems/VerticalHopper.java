@@ -10,17 +10,19 @@ package frc.robot.subsystems;
 import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.InvertType;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.RobotBase;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.util.Units;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.RobotContainer;
@@ -29,26 +31,31 @@ import java.util.List;
 import java.util.Map;
 
 public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
-  private static final int DEFAULT_INDEX_RUN_TIME = 300;
-  private static final int DEFAULT_INDEX_BETWEEN_TIME = 400;
+  private static final int DEFAULT_INDEX_RUN_TIME = 300; // ms
+  private static final int DEFAULT_INDEX_BETWEEN_TIME = 400; // ms
+  private static final int DEFAULT_MOVE_AFTER_SENSOR_DELAY = 300; // ms
+  private static final int DEFAULT_MOVE_DISTANCE = 9; // in
+  private static final double DEFAULT_POSITION_THRESHOLD = 0.5; // in
+
+  public static final double DOWN_SPEED = -0.5;
+
   private final NetworkTableEntry UP_SPEED_ENTRY;
   private final NetworkTableEntry INDEX_RUN_TIME_MS_ENTRY;
   private final NetworkTableEntry INDEX_TIME_BETWEEN_BALL_ENTRY;
-  public static final double DOWN_SPEED = -0.5;
-  private TalonSRX leftMotor = new TalonSRX(LEFT_MOTOR_ID);
-  private TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
+  private final NetworkTableEntry POSITION_MOVE_AFTER_SENSOR_DELAY;
+  private final NetworkTableEntry POSITION_MOVE_DISTANCE;
+  private final NetworkTableEntry POSITION_THRESHOLD;
+  private final TalonSRX leftMotor = new TalonSRX(LEFT_MOTOR_ID);
+  private final TalonSRX rightMotor = new TalonSRX(RIGHT_MOTOR_ID);
 
-  private boolean gateClosed = true;
-  private boolean[] cellsPresent = new boolean[] {false, false, false, false, false};
-  private double speedRunning = 0.0;
-  private VerticalHopperSendable sendable = new VerticalHopperSendable();
-
-  private RobotContainer robotContainer;
+  private final RobotContainer robotContainer;
 
   public DigitalInput topBallSensor = new DigitalInput(0);
   public DigitalInput intakeSensor;
 
   public ShuffleboardTab driverTab;
+  private SendableChooser<SpeedSource> speedSourceChooser;
+  private NetworkTableEntry desiredInchesPerSecEntry;
 
   /** Creates a new VerticalHopper. */
   public VerticalHopper(
@@ -59,11 +66,16 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     this.robotContainer = robotContainer;
     this.intakeSensor = intakeSensor;
     this.driverTab = driverTab;
+
     leftMotor.configFactoryDefault();
     leftMotor.setInverted(LEFT_MOTOR_INVERTED);
+    leftMotor.setSensorPhase(LEFT_SENSOR_PHASE);
+    configureMotor(leftMotor);
+
     rightMotor.configFactoryDefault();
-    rightMotor.follow(leftMotor);
-    rightMotor.setInverted(InvertType.OpposeMaster);
+    rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
+    rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
+    configureMotor(rightMotor);
 
     UP_SPEED_ENTRY =
         settingsTab
@@ -82,11 +94,68 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
             .withWidget(BuiltInWidgets.kTextView)
             .getEntry();
 
+    POSITION_MOVE_AFTER_SENSOR_DELAY =
+        settingsTab
+            .add("PID Hopper Move Delay (ms)", DEFAULT_MOVE_AFTER_SENSOR_DELAY)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+    POSITION_MOVE_DISTANCE =
+        settingsTab
+            .add("PID Hopper Move Distance (in)", DEFAULT_MOVE_DISTANCE)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+    POSITION_THRESHOLD =
+        settingsTab
+            .add("PID Hopper Distance Threshold (in)", DEFAULT_POSITION_THRESHOLD)
+            .withWidget(BuiltInWidgets.kTextView)
+            .getEntry();
+
     driverTab
         .addBoolean("Ball At Top", this::isBallPresentTop)
         .withWidget(BuiltInWidgets.kBooleanBox)
         .withPosition(9, 0)
         .withSize(2, 1);
+
+    ShuffleboardLayout layout =
+        driverTab
+            .getLayout("Hopper", BuiltInLayouts.kGrid)
+            .withSize(6, 1)
+            .withPosition(6, 3)
+            .withProperties(
+                Map.of(
+                    "Label position", "TOP",
+                    "Number of columns", 6,
+                    "Number of rows", 1));
+    layout
+        .addNumber("Left Position (in)", this::getLeftPositionInches)
+        .withWidget(BuiltInWidgets.kTextView);
+    layout
+        .addNumber("Right Position (in)", this::getRightPositionInches)
+        .withWidget(BuiltInWidgets.kTextView);
+    // Using unicode ∕ to avoid bug in ShuffleBoard where you can't use normal slashes
+    layout
+        .addNumber("Left Velocity (in s^-1)", this::getLeftVelocityInchesPerS)
+        .withWidget(BuiltInWidgets.kTextView);
+    layout
+        .addNumber("Right Velocity (in s^-1)", this::getRightVelocityInchesPerS)
+        .withWidget(BuiltInWidgets.kTextView);
+    speedSourceChooser = new SendableChooser<>();
+    SendableRegistry.setName(speedSourceChooser, "Speed Source");
+    speedSourceChooser.setDefaultOption("Automatic", SpeedSource.AUTOMATIC);
+    speedSourceChooser.addOption("Manual", SpeedSource.MANUAL);
+    layout.add(speedSourceChooser);
+    desiredInchesPerSecEntry =
+        layout.add("Speed Target (in s^-1)", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+  }
+
+  public void configureMotor(TalonSRX motor) {
+    motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    motor.config_kP(POSITION_SLOT, positionP);
+    motor.config_kI(POSITION_SLOT, positionI);
+    motor.config_kD(POSITION_SLOT, positionD);
+    motor.config_kP(VELOCITY_SLOT, velocityP);
+    motor.config_kI(VELOCITY_SLOT, velocityI);
+    motor.config_kD(VELOCITY_SLOT, velocityD);
   }
 
   @Override
@@ -95,12 +164,97 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     // System.out.println(intakeSensor.get());
   }
 
+  public double pulsesToInches(double pulses) {
+    double outputRotations = (pulses / ENCODER_PULSES_PER_REV) / GEARING;
+    return outputRotations * PULLEY_CIRCUMFERENCE_IN;
+  }
+
+  public double inchesToPulses(double inches) {
+    return (inches / PULLEY_CIRCUMFERENCE_IN) * GEARING * ENCODER_PULSES_PER_REV;
+  }
+
+  public double pulsesPer100msToInchesPerSecond(double pulsesPer100ms) {
+    double pulsesPerSecond = pulsesPer100ms * 10;
+    return pulsesToInches(pulsesPerSecond);
+  }
+
+  public double inchesPerSecondToPulsesPer100ms(double inchesPerSecond) {
+    double inchesPer100ms = inchesPerSecond / 10;
+    return inchesToPulses(inchesPer100ms);
+  }
+
+  public void setPosition(double positionInches) {
+    leftMotor.selectProfileSlot(POSITION_SLOT, 0);
+    rightMotor.selectProfileSlot(POSITION_SLOT, 0);
+    double pulses = inchesToPulses(positionInches);
+    leftMotor.set(ControlMode.Position, pulses);
+    rightMotor.set(ControlMode.Position, pulses);
+  }
+
+  public double getLeftPositionInches() {
+    return pulsesToInches(leftMotor.getSelectedSensorPosition());
+  }
+
+  public double getRightPositionInches() {
+    return pulsesToInches(rightMotor.getSelectedSensorPosition());
+  }
+
+  public double getPositionInches() {
+    return (getLeftPositionInches() + getRightPositionInches()) / 2d;
+  }
+
+  public void setVelocity(double inchesPerSecond) {
+    desiredInchesPerSecEntry.setDouble(inchesPerSecond);
+    leftMotor.selectProfileSlot(VELOCITY_SLOT, 0);
+    rightMotor.selectProfileSlot(VELOCITY_SLOT, 0);
+    double pulsesPer100ms = inchesPerSecondToPulsesPer100ms(inchesPerSecond);
+    leftMotor.set(ControlMode.Velocity, pulsesPer100ms);
+    rightMotor.set(ControlMode.Velocity, pulsesPer100ms);
+  }
+
+  public void moveUpForShooting(double distanceMeters) {
+    double inchesPerSecond;
+    SpeedSource source = speedSourceChooser.getSelected();
+    switch (source) {
+      case MANUAL:
+        inchesPerSecond = desiredInchesPerSecEntry.getDouble(0);
+        break;
+      case AUTOMATIC:
+        inchesPerSecond = ROBOT_METERS_TO_HOPPER_INCHES_PER_SECOND.apply(distanceMeters);
+        break;
+      default:
+        throw new IllegalStateException("Unknown speed source: " + source);
+    }
+    setVelocity(inchesPerSecond);
+  }
+
+  public double getLeftVelocityInchesPerS() {
+    return pulsesPer100msToInchesPerSecond(leftMotor.getSelectedSensorVelocity());
+  }
+
+  public double getRightVelocityInchesPerS() {
+    return pulsesPer100msToInchesPerSecond(rightMotor.getSelectedSensorVelocity());
+  }
+
   public int getIndexRunTimeMs() {
     return (int) Math.round(INDEX_RUN_TIME_MS_ENTRY.getDouble(DEFAULT_INDEX_RUN_TIME));
   }
 
   public int getIndexBetweenBallMs() {
     return (int) Math.round(INDEX_TIME_BETWEEN_BALL_ENTRY.getDouble(DEFAULT_INDEX_BETWEEN_TIME));
+  }
+
+  public int getMoveAfterSensorDelayMs() {
+    return (int)
+        Math.round(POSITION_MOVE_AFTER_SENSOR_DELAY.getDouble(DEFAULT_MOVE_AFTER_SENSOR_DELAY));
+  }
+
+  public double getMoveDistanceIn() {
+    return POSITION_MOVE_DISTANCE.getDouble(DEFAULT_MOVE_DISTANCE);
+  }
+
+  public double getMovePositionThresholdIn() {
+    return POSITION_THRESHOLD.getDouble(DEFAULT_POSITION_THRESHOLD);
   }
 
   public void moveUp() {
@@ -117,10 +271,6 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
 
   public void stopMoving() {
     leftMotor.set(ControlMode.PercentOutput, 0);
-  }
-
-  public VerticalHopperSendable getSendable() {
-    return sendable;
   }
 
   @Override
@@ -149,14 +299,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     return !topBallSensor.get();
   }
 
-  public class VerticalHopperSendable implements Sendable {
-
-    @Override
-    public void initSendable(SendableBuilder builder) {
-      builder.setSmartDashboardType("VerticalHopper");
-      builder.addBooleanProperty("gateClosed", () -> gateClosed, null);
-      builder.addBooleanArrayProperty("cellsPresent", () -> cellsPresent, null);
-      builder.addDoubleProperty("speedRunning", () -> speedRunning, null);
-    }
+  public enum SpeedSource {
+    MANUAL,
+    AUTOMATIC
   }
 }

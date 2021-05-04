@@ -76,7 +76,7 @@ public class VisionSystem extends SubsystemBase implements VerifiableSystem {
     this.layout =
         this.driverTab
             .getLayout("Limelight", BuiltInLayouts.kGrid)
-            .withSize(5, 1)
+            .withSize(6, 1)
             .withPosition(6, 1)
             .withProperties(
                 Map.of(

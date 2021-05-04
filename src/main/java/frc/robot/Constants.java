@@ -173,8 +173,35 @@ public final class Constants {
   public static class VerticalHopper {
     // Looking at the robot from the front
     public static final int LEFT_MOTOR_ID = /*16*/ 19;
-    public static final boolean LEFT_MOTOR_INVERTED = true;
     public static final int RIGHT_MOTOR_ID = /*57*/ 17;
+    // Inversions
+    public static final boolean LEFT_MOTOR_INVERTED = true;
+    public static final boolean RIGHT_MOTOR_INVERTED = false;
+    // Encoder direction
+    public static final boolean LEFT_SENSOR_PHASE = false;
+    public static final boolean RIGHT_SENSOR_PHASE = false;
+
+    // PID
+    public static final int POSITION_SLOT = 0;
+    public static final int VELOCITY_SLOT = 1;
+    public static final double positionP = 0.3;
+    public static final double positionI = 0;
+    public static final double positionD = 0;
+    public static final double velocityP = 0.3;
+    public static final double velocityI = 0;
+    public static final double velocityD = 0;
+
+    // Physical constants
+    public static final double PULLEY_DIAMETER_IN = 2.3;
+    public static final double PULLEY_CIRCUMFERENCE_IN = PULLEY_DIAMETER_IN * Math.PI;
+    public static final double ENCODER_PULSES_PER_REV = 4096;
+    public static final double GEARING = 4;
+
+    // PID velocity speed
+    public static final Function<Double, Double> ROBOT_METERS_TO_HOPPER_INCHES_PER_SECOND =
+        meters -> 10.0;
+
+    // DIO
     public static final int INTAKE_SENSOR = 1;
   }
 

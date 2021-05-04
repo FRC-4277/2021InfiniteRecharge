@@ -36,6 +36,10 @@ public class Intake extends SubsystemBase implements VerifiableSystem {
     motor.set(ControlMode.PercentOutput, speed);
   }
 
+  public boolean isSensorTripped() {
+    return !intakeSensor.get();
+  }
+
   public void runReverseIntake() {
     motor.set(ControlMode.PercentOutput, REVERSE_INTAKE_SPEED);
   }
