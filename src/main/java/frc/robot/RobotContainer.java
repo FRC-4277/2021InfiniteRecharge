@@ -115,6 +115,8 @@ public class RobotContainer {
   // private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
   private final IntakeLineUpCommand intakeLineUpCommand =
       new IntakeLineUpCommand(driveTrain, visionSystem);
+  private final DriverAutoIntakeBallCommand driverAutoIntakeBallCommand =
+      new DriverAutoIntakeBallCommand(driveTrain, intake, visionSystem);
 
   private SendableChooser<Command> autoChooser;
   private NetworkTableEntry resetOdometryOnAuto;
@@ -336,6 +338,13 @@ public class RobotContainer {
 
       POVButton upPOV = new POVButton(driveStick, 0);
       upPOV.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
+
+      Trigger anyDownPOV =
+          new POVButton(driveStick, 180 - 45)
+              .or(new POVButton(driveStick, 180))
+              .or(new POVButton(driveStick, 180 + 45));
+      // Schedules when pressed, and cancelled when let go or finished
+      anyDownPOV.whileActiveOnce(driverAutoIntakeBallCommand);
 
       // Drive with Logitech
       driveCommand.setYControllerSupplier(() -> -driveStick.getY(Hand.kLeft));
