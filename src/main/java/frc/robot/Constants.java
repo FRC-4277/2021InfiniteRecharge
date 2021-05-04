@@ -268,9 +268,9 @@ public final class Constants {
           return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };
 
-    public static final Function<Double, Boolean> RPM_TO_SOLENOID_STATE_FUNCTION =
-        // Solenoid TRUE if greater than or equal to 3500 RPM
-        rpm -> rpm >= 3500;
+    public static final Function<Double, Boolean> DISTANCE_METERS_TO_SOLENOID_STATE_FUNCTION =
+        // Solenoid TRUE if we're in green zone
+        distanceMeters -> distanceMeters <= 2.00;
 
     /*NO LONGER USED// Polynomial Regression version of Meters to RPM
     // Desmos: https://www.desmos.com/calculator/5byzpup30b

@@ -216,8 +216,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     return shootingModeChooser.getSelected();
   }
 
-  public void holdVelocityRPMAndSetSolenoids(double rpm) {
-    setSolenoidsBasedOnRPM(rpm);
+  public void holdVelocityRPMAndSetSolenoids(double rpm, double distanceMeters) {
+    setSolenoidsBasedOnDistance(distanceMeters);
     shooterDesiredRPMEntry.setDouble(rpm);
     holdVelocity(rpmToTicksPerDs(rpm), rpm);
   }
@@ -275,8 +275,8 @@ public class Shooter extends SubsystemBase implements VerifiableSystem {
     leftSolenoid.set(on);
   }
 
-  public void setSolenoidsBasedOnRPM(double rpm) {
-    setSolenoids(RPM_TO_SOLENOID_STATE_FUNCTION.apply(rpm));
+  public void setSolenoidsBasedOnDistance(double meters) {
+    setSolenoids(DISTANCE_METERS_TO_SOLENOID_STATE_FUNCTION.apply(meters));
   }
 
   public double getDriverDesiredRPM() {

@@ -133,7 +133,7 @@ public class ShootAndHopperCommand extends CommandBase {
   @Override
   public void execute() {
     // Spin up shooter & set velocityIsStable to true when velocity is stable
-    shooter.holdVelocityRPMAndSetSolenoids(desiredRPM);
+    shooter.holdVelocityRPMAndSetSolenoids(desiredRPM, visionSystem.getCalculatedDistanceMeters());
     if (shooter.hasReachedRPM(desiredRPM)) {
       loopsReachedRPM++;
     } else {

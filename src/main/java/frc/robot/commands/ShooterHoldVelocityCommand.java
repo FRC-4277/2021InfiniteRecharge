@@ -71,7 +71,7 @@ public class ShooterHoldVelocityCommand extends CommandBase {
       default:
         return;
     }
-    shooter.holdVelocityRPMAndSetSolenoids(desiredRPM);
+    shooter.holdVelocityRPMAndSetSolenoids(desiredRPM, visionSystem.getCalculatedDistanceMeters());
     if (shooter.hasReachedRPM(desiredRPM)) {
       loopsReachedRPM++;
     } else {
