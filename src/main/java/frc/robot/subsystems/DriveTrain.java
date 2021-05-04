@@ -291,6 +291,8 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
 
   @Override
   public void simulationPeriodic() {
+    SmartDashboard.putNumber("Heading", getHeading());
+
     double leftInputVoltage =
         (frontLeftSimMotor.getMotorOutputVoltage() + backLeftSimMotor.getMotorOutputVoltage())
             / 2.0d;
