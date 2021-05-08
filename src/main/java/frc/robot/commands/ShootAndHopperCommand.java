@@ -13,7 +13,7 @@ public class ShootAndHopperCommand extends CommandBase {
   // !=== Different shooting settings depending on challenge ===!
 
   private static final ShootSettingSupplier<Integer> RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT =
-      new ShootSettingSupplier<>(40, 5); // 20 ms * 10 = 200ms
+      new ShootSettingSupplier<>(20, 5); // 20 ms * 10 = 200ms
 
   // Speed of hopper when moving ball to top
   private static final ShootSettingSupplier<Double> HOPPER_UP_TO_TOP_SPEED =
@@ -28,7 +28,7 @@ public class ShootAndHopperCommand extends CommandBase {
       new ShootSettingSupplier<>(0.5, 0.01);
 
   private static final ShootSettingSupplier<Double> MOVE_BALL_TO_SHOOTER_DURATION =
-      new ShootSettingSupplier<>(0.4, 0.0);
+      new ShootSettingSupplier<>(1.5, 0.5);
 
   private final Shooter shooter;
   private final VerticalHopper hopper;
@@ -166,7 +166,7 @@ public class ShootAndHopperCommand extends CommandBase {
         break;
       case MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY:
         // Do nothing until shooter velocity is stable
-        if (!velocityIsStable) {
+        if (hopper.isBallPresentTop() && !velocityIsStable) {
           hopper.stopMoving();
           return;
         }
@@ -180,14 +180,15 @@ public class ShootAndHopperCommand extends CommandBase {
         // !!!!! Now start moving up
         // hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
         hopper.moveUpForShooting(visionSystem.getCalculatedDistanceMeters());
+        //hopper.moveUp(0.5);
         // Track when the ball leaves the sensor
-        if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
+        /*if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
           ballHasLeftTop = true;
           ballLeftTopTimer = new Timer();
           ballLeftTopTimer.reset();
           ballLeftTopTimer.start();
           ballCount++;
-        }
+        }*/
 
         if (ballCount >= 3) {
           finished = true;
@@ -199,7 +200,7 @@ public class ShootAndHopperCommand extends CommandBase {
         }*/
 
         // Now that the ball has left sensor, wait for next ball.
-        if ((ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.get(shooter)))
+        if (ballLeftTopTimer != null && (ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.get(shooter)))
             && hopper.isBallPresentTop()) {
           // Once next ball is at sensor, set state to MOVE_BALL_UP_TO_TOP
           state = State.MOVE_BALL_UP_TO_TOP;

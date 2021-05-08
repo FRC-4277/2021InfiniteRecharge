@@ -11,6 +11,7 @@ import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
+import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -73,6 +74,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     configureMotor(leftMotor);
 
     rightMotor.configFactoryDefault();
+    //rightMotor.follow(leftMotor);
+    //rightMotor.setInverted(InvertType.OpposeMaster);
     rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
     rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
     configureMotor(rightMotor);
@@ -156,6 +159,7 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     motor.config_kP(VELOCITY_SLOT, velocityP);
     motor.config_kI(VELOCITY_SLOT, velocityI);
     motor.config_kD(VELOCITY_SLOT, velocityD);
+    motor.setSelectedSensorPosition(0);
   }
 
   @Override
@@ -259,18 +263,22 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
 
   public void moveUp() {
     leftMotor.set(ControlMode.PercentOutput, UP_SPEED_ENTRY.getDouble(1.0));
+    rightMotor.set(ControlMode.PercentOutput, UP_SPEED_ENTRY.getDouble(1.0));
   }
 
   public void moveUp(double speed) {
     leftMotor.set(ControlMode.PercentOutput, Math.abs(speed));
+    rightMotor.set(ControlMode.PercentOutput, Math.abs(speed));
   }
 
   public void moveDown() {
     leftMotor.set(ControlMode.PercentOutput, DOWN_SPEED);
+    rightMotor.set(ControlMode.PercentOutput, DOWN_SPEED);
   }
 
   public void stopMoving() {
     leftMotor.set(ControlMode.PercentOutput, 0);
+    rightMotor.set(ControlMode.PercentOutput, 0);
   }
 
   @Override

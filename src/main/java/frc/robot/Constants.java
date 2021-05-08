@@ -187,19 +187,19 @@ public final class Constants {
     public static final double positionP = 0.3;
     public static final double positionI = 0;
     public static final double positionD = 0;
-    public static final double velocityP = 0.3;
+    public static final double velocityP = 0.5;
     public static final double velocityI = 0;
-    public static final double velocityD = 0;
+    public static final double velocityD = 0.1;
 
     // Physical constants
     public static final double PULLEY_DIAMETER_IN = 2.3;
     public static final double PULLEY_CIRCUMFERENCE_IN = PULLEY_DIAMETER_IN * Math.PI;
     public static final double ENCODER_PULSES_PER_REV = 4096;
-    public static final double GEARING = 4;
+    public static final double GEARING = 1;
 
     // PID velocity speed
     public static final Function<Double, Double> ROBOT_METERS_TO_HOPPER_INCHES_PER_SECOND =
-        meters -> 10.0;
+        meters -> 50.0;
 
     // DIO
     public static final int INTAKE_SENSOR = 1;
@@ -257,7 +257,7 @@ public final class Constants {
       public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
       public static final double kaVoltRotationsPerSecond = 0.00493;
       public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
-      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 25;
+      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 75;
       public static final double RPM_THRESHOLD_POWER_PORT_CHALLENGE = 50;
 
       // We never put kA into our feedforward, so just use extremely small amount?
@@ -278,19 +278,34 @@ public final class Constants {
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.94), new InterpolatingDouble(2350.0));*/
 
       // Empirical values collected on 3/29/21
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.61), new InterpolatingDouble(3931.0));
+      /*METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.61), new InterpolatingDouble(3931.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.58), new InterpolatingDouble(2200.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.20), new InterpolatingDouble(2100.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.08), new InterpolatingDouble(2250.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.15), new InterpolatingDouble(2250.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.15), new InterpolatingDouble(2250.0));*/
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54-0.3), new InterpolatingDouble(2000.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54), new InterpolatingDouble(2000.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54+0.3), new InterpolatingDouble(2000.0));
+      //
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38-0.3), new InterpolatingDouble(2625.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38), new InterpolatingDouble(2625.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38+0.3), new InterpolatingDouble(2625.0));
+      //
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43-0.3), new InterpolatingDouble(2300.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43), new InterpolatingDouble(2300.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43+0.3), new InterpolatingDouble(2300.0));
+      //
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45-0.3), new InterpolatingDouble(2360.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45), new InterpolatingDouble(2360.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45+0.3), new InterpolatingDouble(2360.0));
     }
 
     public static Function<Double, Double> METERS_TO_RPM_FUNCTION =
         x -> {
-          if (x <= 1.65) {
-            return 3931.0;
-          } else if (x >= 8.08) {
-            return 2250.0;
+          if (x <= 2) {
+            return 2000.0;
+          } else if (x >= 7.45) {
+            return 2360.0;
           }
           return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };
