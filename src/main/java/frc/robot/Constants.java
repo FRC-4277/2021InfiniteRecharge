@@ -143,7 +143,7 @@ public final class Constants {
 
     // First Forward constraints
     public static final double FIRST_FORWARD_MAX_VEL = 4;
-    public static final double FIRST_FORWARD_MAX_ACCEL = 3;
+    public static final double FIRST_FORWARD_MAX_ACCEL = 4.5;
 
     // Distance to CLOSE ball
     public static final double CLOSE_BALL_DISTANCE =
@@ -257,7 +257,7 @@ public final class Constants {
       public static final double kvVoltRadiansPerSecond = kvVoltRotationsPerSecond / (2 * Math.PI);
       public static final double kaVoltRotationsPerSecond = 0.00493;
       public static final double kaVoltRadiansPerSecond = kaVoltRotationsPerSecond / (2 * Math.PI);
-      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 75;
+      public static final double RPM_THRESHOLD_INTERSTELLAR_ACCURACY = 35;
       public static final double RPM_THRESHOLD_POWER_PORT_CHALLENGE = 50;
 
       // We never put kA into our feedforward, so just use extremely small amount?
@@ -291,13 +291,13 @@ public final class Constants {
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38), new InterpolatingDouble(2625.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38+0.3), new InterpolatingDouble(2625.0));
       //
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43-0.3), new InterpolatingDouble(2300.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43), new InterpolatingDouble(2300.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43+0.3), new InterpolatingDouble(2300.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43-0.3), new InterpolatingDouble(2275.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43), new InterpolatingDouble(2275.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43+0.3), new InterpolatingDouble(2275.0));
       //
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45-0.3), new InterpolatingDouble(2360.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45), new InterpolatingDouble(2360.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45+0.3), new InterpolatingDouble(2360.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45-0.3), new InterpolatingDouble(2350.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45), new InterpolatingDouble(2350.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45+0.3), new InterpolatingDouble(2350.0));
     }
 
     public static Function<Double, Double> METERS_TO_RPM_FUNCTION =
@@ -305,7 +305,7 @@ public final class Constants {
           if (x <= 2) {
             return 2000.0;
           } else if (x >= 7.45) {
-            return 2360.0;
+            return 2350.0;
           }
           return METERS_TO_RPM_MAP.getInterpolated(new InterpolatingDouble(x)).value;
         };

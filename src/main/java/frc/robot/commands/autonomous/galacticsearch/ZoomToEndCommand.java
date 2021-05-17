@@ -30,7 +30,7 @@ public class ZoomToEndCommand extends CommandBase {
     double startVelocity =
         driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED);
     Trajectory trajectory =
-        driveTrain.generateTrajectory(currentPose, target, 4.0, 3.0, true, false, startVelocity, 4);
+        driveTrain.generateTrajectory(currentPose, target, 4.0, 5, true, false, startVelocity, 4);
     ramseteCommand = driveTrain.generateRamseteCommand(trajectory);
     ramseteCommand.initialize();
   }

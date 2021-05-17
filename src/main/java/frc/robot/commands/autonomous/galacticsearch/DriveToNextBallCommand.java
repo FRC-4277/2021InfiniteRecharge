@@ -63,7 +63,7 @@ public class DriveToNextBallCommand extends CommandBase {
     galacticAutoCommand.setMessage("[Next Ball] Target pos: " + targetPosition);
 
     double velocity = 4;
-    double acceleration = 3;
+    double acceleration = 4;
     /*if (ballIndex == 2) {
       velocity = 1;
       acceleration = 0.5;
