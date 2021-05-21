@@ -60,7 +60,7 @@ public class IntakeQuickCommand extends CommandBase {
       incremented = true;
     }
     if (!ballIntaking) {
-      intake.runIntake(0.65);
+      intake.runIntake(1.0);
     } else {
       intake.stopIntake();
     }

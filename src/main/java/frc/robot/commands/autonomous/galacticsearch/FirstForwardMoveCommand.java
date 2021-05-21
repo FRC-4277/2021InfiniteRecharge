@@ -1,5 +1,9 @@
 package frc.robot.commands.autonomous.galacticsearch;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Transform2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants.GalacticSearch;
@@ -26,13 +30,17 @@ public class FirstForwardMoveCommand extends CommandBase {
     distanceForward -= GalacticSearch.DESIRED_DISTANCE_TO_BALL;
     galacticAutoCommand.setMessage(
         "[First Forward] Distance forward calculated to be " + distanceForward);
-    ramseteCommand =
+    /*ramseteCommand =
         driveTrain.generateRamseteCommand(
             driveTrain.generateXTrajectory(
                 distanceForward,
                 GalacticSearch.FIRST_FORWARD_MAX_VEL,
                 GalacticSearch.FIRST_FORWARD_MAX_ACCEL),
-            false);
+            false);*/
+    Pose2d end = driveTrain.getPose().transformBy(new Transform2d(new Translation2d(distanceForward, 0), new Rotation2d()));
+    ramseteCommand = driveTrain.generateRamseteCommand(
+      driveTrain.generateTrajectory(driveTrain.getPose(), end, 5, 5, false, false, 0, 4)
+    );
     ramseteCommand.initialize();
   }
 

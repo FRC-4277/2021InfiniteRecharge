@@ -69,12 +69,13 @@ public class DriveToNextBallCommand extends CommandBase {
       acceleration = 0.5;
     }*/
 
+    var intakingVelocity = driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED); // velocity of drive train
     // Have end velocity be speed going while intaking
-    var endVelocity =
-        driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED);
+    var startVelocity = intakingVelocity;
+    var endVelocity =  intakingVelocity + 0.5; // 0.5 boost
     var trajectory =
         driveTrain.generateTrajectory(
-            currentPosition, targetPosition, velocity, acceleration, false, false, 0, endVelocity);
+            currentPosition, targetPosition, velocity, acceleration, false, false, startVelocity, endVelocity);
     ramseteCommand = driveTrain.generateRamseteCommand(trajectory, false);
     ramseteCommand.initialize();
   }

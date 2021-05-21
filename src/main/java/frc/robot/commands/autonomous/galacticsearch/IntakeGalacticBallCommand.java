@@ -101,7 +101,7 @@ public class IntakeGalacticBallCommand extends CommandBase {
       ballIntaking = false;
     }
     if (!ballIntaking) {
-      intake.runIntake(.65);
+      intake.runIntake(1.0);
     } else {
       intake.stopIntake();
     }
