@@ -180,7 +180,7 @@ public class ShootAndHopperCommand extends CommandBase {
         // !!!!! Now start moving up
         // hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
         hopper.moveUpForShooting(visionSystem.getCalculatedDistanceMeters());
-        //hopper.moveUp(0.5);
+        // hopper.moveUp(0.5);
         // Track when the ball leaves the sensor
         /*if (!ballHasLeftTop && !hopper.isBallPresentTop()) {
           ballHasLeftTop = true;
@@ -200,7 +200,8 @@ public class ShootAndHopperCommand extends CommandBase {
         }*/
 
         // Now that the ball has left sensor, wait for next ball.
-        if (ballLeftTopTimer != null && (ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.get(shooter)))
+        if (ballLeftTopTimer != null
+            && (ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.get(shooter)))
             && hopper.isBallPresentTop()) {
           // Once next ball is at sensor, set state to MOVE_BALL_UP_TO_TOP
           state = State.MOVE_BALL_UP_TO_TOP;

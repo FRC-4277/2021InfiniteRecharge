@@ -6,7 +6,6 @@ import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.GalacticSearch;
 import frc.robot.RobotContainer;
 import frc.robot.subsystems.DriveTrain;
@@ -42,19 +41,19 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
         // Reset Odometry to starting position of path
         new GalacticResetOdometryCommand(this, driveTrain, this::getStartPose),
 
-        //<editor-fold desc="Ball 1">
+        // <editor-fold desc="Ball 1">
         // Move straight forward to JUST BEFORE first ball #1
         new ParallelDeadlineGroup(
-              new FirstForwardMoveCommand(this, driveTrain),
-              new IntakeQuickCommand(intake, verticalHopper, incrementer, 1)),
-          // Pickup ball #1
-          new ParallelDeadlineGroup(
-              new WaitForBallCountCommand(() -> ballsCollected, 1),
-              new IntakeGalacticBallCommand(
-                  this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 1)),
-        //new WaitCommand(0.2),
-        //</editor-fold>
-        //<editor-fold desc="Ball 2">
+            new FirstForwardMoveCommand(this, driveTrain),
+            new IntakeQuickCommand(intake, verticalHopper, incrementer, 1)),
+        // Pickup ball #1
+        new ParallelDeadlineGroup(
+            new WaitForBallCountCommand(() -> ballsCollected, 1),
+            new IntakeGalacticBallCommand(
+                this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 1)),
+        // new WaitCommand(0.2),
+        // </editor-fold>
+        // <editor-fold desc="Ball 2">
         // Drive to JUST BEFORE ball #2
         new ParallelDeadlineGroup(
             new DriveToNextBallCommand(this, driveTrain, 1),
@@ -64,9 +63,9 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
             new WaitForBallCountCommand(() -> ballsCollected, 2),
             new IntakeGalacticBallCommand(
                 this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 2)),
-        //new WaitCommand(0.2),
-        //</editor-fold>
-        //<editor-fold desc="Ball 3">
+        // new WaitCommand(0.2),
+        // </editor-fold>
+        // <editor-fold desc="Ball 3">
         // Drive to JUST BEFORE ball #3
         new ParallelDeadlineGroup(
             new DriveToNextBallCommand(this, driveTrain, 2),
@@ -74,10 +73,10 @@ public class GalacticAutoCommand extends SequentialCommandGroup {
         // Pickup ball #3
         new IntakeGalacticBallCommand(
             this, driveTrain, visionSystem, verticalHopper, intake, incrementer, 3),
-        //new WaitCommand(0.2),
-        //</editor-fold>
+        // new WaitCommand(0.2),
+        // </editor-fold>
         // Go to end zone ASAP
-        //new ZoomToEndCommand(this, driveTrain)
+        // new ZoomToEndCommand(this, driveTrain)
         new ZoomToEnd2Command(driveTrain) // new command
         // new ZoomToMiddleCommand(this, driveTrain),
 

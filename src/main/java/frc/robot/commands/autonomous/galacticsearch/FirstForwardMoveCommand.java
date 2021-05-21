@@ -31,20 +31,26 @@ public class FirstForwardMoveCommand extends CommandBase {
     galacticAutoCommand.setMessage(
         "[First Forward] Distance forward calculated to be " + distanceForward);
     /*ramseteCommand =
+    driveTrain.generateRamseteCommand(
+        driveTrain.generateXTrajectory(
+            distanceForward,
+            GalacticSearch.FIRST_FORWARD_MAX_VEL,
+            GalacticSearch.FIRST_FORWARD_MAX_ACCEL),
+        false);*/
+    Pose2d end =
+        driveTrain
+            .getPose()
+            .transformBy(new Transform2d(new Translation2d(distanceForward, 0), new Rotation2d()));
+
+    var intakingVelocity =
+        driveTrain.convertPercentToVelocity(
+            GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED); // velocity of drive train
+    var endVelocity = intakingVelocity + 0.5; // 0.5 boost
+
+    ramseteCommand =
         driveTrain.generateRamseteCommand(
-            driveTrain.generateXTrajectory(
-                distanceForward,
-                GalacticSearch.FIRST_FORWARD_MAX_VEL,
-                GalacticSearch.FIRST_FORWARD_MAX_ACCEL),
-            false);*/
-    Pose2d end = driveTrain.getPose().transformBy(new Transform2d(new Translation2d(distanceForward, 0), new Rotation2d()));
-
-    var intakingVelocity = driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED); // velocity of drive train
-    var endVelocity =  intakingVelocity + 0.5; // 0.5 boost
-
-    ramseteCommand = driveTrain.generateRamseteCommand(
-      driveTrain.generateTrajectory(driveTrain.getPose(), end, 5, 5, false, false, 0, endVelocity)
-    );
+            driveTrain.generateTrajectory(
+                driveTrain.getPose(), end, 5, 5, false, false, 0, endVelocity));
     ramseteCommand.initialize();
   }
 

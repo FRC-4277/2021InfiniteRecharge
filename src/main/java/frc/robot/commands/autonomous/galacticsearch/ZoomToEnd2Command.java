@@ -6,7 +6,8 @@ import frc.robot.subsystems.DriveTrain;
 
 public class ZoomToEnd2Command extends CommandBase {
   private static final double DRIVE_SPEED = 1.0;
-  private static final double TURN_P = 0.01; // multiplied by degrees to get turn adjustment in [-1..1]
+  private static final double TURN_P =
+      0.01; // multiplied by degrees to get turn adjustment in [-1..1]
   private static final double DEGREE_TOLERANCE = 10; // degrees to stop correcting
   private final DriveTrain driveTrain;
 
@@ -16,15 +17,16 @@ public class ZoomToEnd2Command extends CommandBase {
   }
 
   @Override
-  public void initialize() {
-
-  }
+  public void initialize() {}
 
   @Override
   public void execute() {
     double leftSpeed = DRIVE_SPEED;
     double rightSpeed = DRIVE_SPEED;
-    double headingError = driveTrain.getHeading(); // heading is counterclockwise positive, so positive error = positive TURN
+    double headingError =
+        driveTrain
+            .getHeading(); // heading is counterclockwise positive, so positive error = positive
+    // TURN
 
     boolean withinTolerance = Math.abs(headingError) <= DEGREE_TOLERANCE;
     if (!withinTolerance) {

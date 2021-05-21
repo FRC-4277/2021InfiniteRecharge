@@ -283,21 +283,21 @@ public final class Constants {
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.20), new InterpolatingDouble(2100.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.08), new InterpolatingDouble(2250.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(8.15), new InterpolatingDouble(2250.0));*/
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54-0.3), new InterpolatingDouble(2000.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54 - 0.3), new InterpolatingDouble(2000.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54), new InterpolatingDouble(2000.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54+0.3), new InterpolatingDouble(2000.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(1.54 + 0.3), new InterpolatingDouble(2000.0));
       //
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38-0.3), new InterpolatingDouble(2625.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38 - 0.3), new InterpolatingDouble(2625.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38), new InterpolatingDouble(2625.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38+0.3), new InterpolatingDouble(2625.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(3.38 + 0.3), new InterpolatingDouble(2625.0));
       //
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43-0.3), new InterpolatingDouble(2275.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43 - 0.3), new InterpolatingDouble(2275.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43), new InterpolatingDouble(2275.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43+0.3), new InterpolatingDouble(2275.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(5.43 + 0.3), new InterpolatingDouble(2275.0));
       //
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45-0.3), new InterpolatingDouble(2350.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45 - 0.3), new InterpolatingDouble(2350.0));
       METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45), new InterpolatingDouble(2350.0));
-      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45+0.3), new InterpolatingDouble(2350.0));
+      METERS_TO_RPM_MAP.put(new InterpolatingDouble(7.45 + 0.3), new InterpolatingDouble(2350.0));
     }
 
     public static Function<Double, Double> METERS_TO_RPM_FUNCTION =
