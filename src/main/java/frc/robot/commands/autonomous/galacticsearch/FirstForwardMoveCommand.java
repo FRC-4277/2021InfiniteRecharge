@@ -45,7 +45,7 @@ public class FirstForwardMoveCommand extends CommandBase {
     var intakingVelocity =
         driveTrain.convertPercentToVelocity(
             GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED); // velocity of drive train
-    var endVelocity = intakingVelocity + 0.5; // 0.5 boost
+    var endVelocity = intakingVelocity - 0.25; // 0.5 boost
 
     ramseteCommand =
         driveTrain.generateRamseteCommand(

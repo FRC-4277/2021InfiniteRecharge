@@ -156,7 +156,7 @@ public final class Constants {
             + (RobotDimensions.LENGTH
                 / 2d); // Was 24 inches on 3/21/21, decreased it to 16 inches on 3/25/21*
     // Speed to go when driving towards ball to intake
-    public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.5; // Was on 0.15 on 3/21/21
+    public static final double DRIVE_TO_BALL_FOR_INTAKE_SPEED = 0.25; // Was on 0.15 on 3/21/21
     // Time to wait before moving again after ball is detected at intake sensor
     public static final double WAIT_AFTER_INTAKE_SECONDS = 0.2; // Was 0.5 on 3/21/21
 
