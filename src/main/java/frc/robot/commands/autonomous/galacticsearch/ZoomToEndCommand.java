@@ -8,6 +8,11 @@ import edu.wpi.first.wpilibj2.command.RamseteCommand;
 import frc.robot.Constants.GalacticSearch;
 import frc.robot.subsystems.DriveTrain;
 
+/**
+ * Original version of zoom to end, utilizing trajectory
+ *
+ * @author Andrew Tran
+ */
 public class ZoomToEndCommand extends CommandBase {
   private GalacticAutoCommand galacticAutoCommand;
   private DriveTrain driveTrain;
@@ -30,7 +35,7 @@ public class ZoomToEndCommand extends CommandBase {
     double startVelocity =
         driveTrain.convertPercentToVelocity(GalacticSearch.DRIVE_TO_BALL_FOR_INTAKE_SPEED);
     Trajectory trajectory =
-        driveTrain.generateTrajectory(currentPose, target, 4.0, 5, true, false, startVelocity, 4);
+        driveTrain.generateTrajectory(currentPose, target, 5.0, 5, true, false, startVelocity, 5);
     ramseteCommand = driveTrain.generateRamseteCommand(trajectory);
     ramseteCommand.initialize();
   }

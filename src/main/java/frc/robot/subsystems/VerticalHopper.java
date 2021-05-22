@@ -11,7 +11,6 @@ import static frc.robot.Constants.VerticalHopper.*;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.InvertType;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -74,8 +73,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     configureMotor(leftMotor);
 
     rightMotor.configFactoryDefault();
-    //rightMotor.follow(leftMotor);
-    //rightMotor.setInverted(InvertType.OpposeMaster);
+    // rightMotor.follow(leftMotor);
+    // rightMotor.setInverted(InvertType.OpposeMaster);
     rightMotor.setInverted(RIGHT_MOTOR_INVERTED);
     rightMotor.setSensorPhase(RIGHT_SENSOR_PHASE);
     configureMotor(rightMotor);
