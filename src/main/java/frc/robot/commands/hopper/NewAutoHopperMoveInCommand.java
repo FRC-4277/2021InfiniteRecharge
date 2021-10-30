@@ -15,7 +15,7 @@ public class NewAutoHopperMoveInCommand extends CommandBase {
   private final VerticalHopper hopper;
   private double targetInches;
   private Timer timer = new Timer();
-  private static final double MAX_RUN_TIME = 2.0;
+  private static final double MAX_RUN_TIME = 1.5;
 
   /** Creates a new NewAutoHopperMoveInCommand. */
   public NewAutoHopperMoveInCommand(VerticalHopper hopper) {
@@ -28,7 +28,14 @@ public class NewAutoHopperMoveInCommand extends CommandBase {
   @Override
   public void initialize() {
     System.out.println("start");
-    targetInches = hopper.getPositionInches() + hopper.getMoveDistanceIn();
+    double additionalInches = 11;
+    if (hopper.getBalls() == 0) {
+      additionalInches = 9.5;
+    } else if (hopper.getBalls() == 1 || hopper.getBalls() == 2) {
+      additionalInches = 11.5;
+    }
+    targetInches = hopper.getPositionInches() + additionalInches;
+    hopper.addBall();
     timer.reset();
     timer.start();
   }
@@ -36,6 +43,7 @@ public class NewAutoHopperMoveInCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    System.out.println("Ball Count:" + hopper.getBalls());
     System.out.println("executing");
     hopper.setPositionMotionMagic(targetInches);
     

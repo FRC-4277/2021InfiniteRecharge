@@ -34,8 +34,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   private static final int DEFAULT_INDEX_RUN_TIME = 300; // ms
   private static final int DEFAULT_INDEX_BETWEEN_TIME = 400; // ms
   private static final int DEFAULT_MOVE_AFTER_SENSOR_DELAY = 300; // ms
-  private static final double DEFAULT_MOVE_DISTANCE = 10.75; // in
-  private static final double DEFAULT_POSITION_THRESHOLD = 1; // in
+  private static final double DEFAULT_MOVE_DISTANCE = 11; // in
+  private static final double DEFAULT_POSITION_THRESHOLD = 1.5; // in
 
   public static final double DOWN_SPEED = -0.5;
 
@@ -56,6 +56,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   public ShuffleboardTab driverTab;
   private SendableChooser<SpeedSource> speedSourceChooser;
   private NetworkTableEntry desiredInchesPerSecEntry;
+
+  private int ballCount = 0;
 
   /** Creates a new VerticalHopper. */
   public VerticalHopper(
@@ -148,6 +150,18 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     layout.add(speedSourceChooser);
     desiredInchesPerSecEntry =
         layout.add("Speed Target (in s^-1)", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
+  }
+
+  public void addBall() {
+    ballCount++;
+  }
+
+  public void resetBalls() {
+    ballCount = 0;
+  }
+
+  public int getBalls() {
+    return ballCount;
   }
 
   public void configureMotor(TalonSRX motor) {

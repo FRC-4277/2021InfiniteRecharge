@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -426,7 +427,8 @@ public class RobotContainer {
 
     // Intake Trigger
     Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
-    intakeTrigger.whenActive(new SequentialCommandGroup(new WaitCommand(.15), newHopperMoveInCommand));
+    intakeTrigger.whenActive(new ConditionalCommand(new SequentialCommandGroup(new WaitCommand(.3), newHopperMoveInCommand),
+     new DoNothingCommand(), () -> hopper.getBalls() < 4));
   }
 
   private void switchToDriverView() {
