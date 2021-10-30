@@ -404,16 +404,19 @@ public class RobotContainer {
     // upPOVButton.whileActiveOnce(winchClimbCommand);
     upPOVButton.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 
+    JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
+    backButton.whileActiveOnce(winchClimbCommand);
+
     // POVButton downPOVButton = new POVButton(xboxController, 180);
 
     POVButton leftPOVButton = new POVButton(xboxController, 270);
-    // leftPOVButton.whileActiveOnce(hookDownCommand);
+    leftPOVButton.whileActiveOnce(hookDownCommand);
 
     POVButton rightPOVButton = new POVButton(xboxController, 90);
-    // rightPOVButton.whileActiveOnce(hookUpCommand);
+    rightPOVButton.whileActiveOnce(hookUpCommand);
 
-    JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
-    backButton.whileActiveOnce(intakeLineUpCommand);
+    //JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
+    //backButton.whileActiveOnce(intakeLineUpCommand);
 
     // Intake Trigger
     Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
