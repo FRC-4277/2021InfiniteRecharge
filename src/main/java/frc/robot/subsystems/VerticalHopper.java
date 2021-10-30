@@ -158,6 +158,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     motor.config_kP(VELOCITY_SLOT, velocityP);
     motor.config_kI(VELOCITY_SLOT, velocityI);
     motor.config_kD(VELOCITY_SLOT, velocityD);
+    motor.configMotionCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY);
+    motor.configMotionAcceleration(MOTION_MAGIC_CRUISE_ACCELERATION);
     motor.setSelectedSensorPosition(0);
   }
 
@@ -192,6 +194,14 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     double pulses = inchesToPulses(positionInches);
     leftMotor.set(ControlMode.Position, pulses);
     rightMotor.set(ControlMode.Position, pulses);
+  }
+
+  public void setPositionMotionMagic(double positionInches) {
+    leftMotor.selectProfileSlot(POSITION_SLOT, 0);
+    rightMotor.selectProfileSlot(POSITION_SLOT, 0);
+    double pulses = inchesToPulses(positionInches);
+    leftMotor.set(ControlMode.MotionMagic, pulses);
+    rightMotor.set(ControlMode.MotionMagic, pulses);
   }
 
   public double getLeftPositionInches() {

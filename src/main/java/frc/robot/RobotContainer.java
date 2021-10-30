@@ -35,6 +35,7 @@ import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
 import frc.robot.commands.hopper.AutoHopperMoveInCommand;
+import frc.robot.commands.hopper.NewAutoHopperMoveInCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.util.CooperSendable;
@@ -63,7 +64,7 @@ public class RobotContainer {
   private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
-  // private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
+  private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
   private final ShuffleboardTab verificationTab = Shuffleboard.getTab("Verification");
   private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
@@ -75,13 +76,13 @@ public class RobotContainer {
   private final VerticalHopper hopper =
       new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
-  // private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
+  private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   // private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem =
       new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
-  // private final Winch winch = new Winch();
-  // private final HookElevator hookElevator = new HookElevator();
+  private final Winch winch = new Winch();
+  private final HookElevator hookElevator = new HookElevator();
   /*private final VerificationSystem verificationSystem = new VerificationSystem(
   driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
   verificationTab);*/
@@ -108,11 +109,13 @@ public class RobotContainer {
       new UseIntakeCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand =
       new VisionAlignCommand(driveTrain, visionSystem, true, true);
-  private final AutoHopperMoveInCommand autoHopperMoveInCommand =
-      new AutoHopperMoveInCommand(hopper);
-  // private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
-  // private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
-  // private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
+  //private final AutoHopperMoveInCommand autoHopperMoveInCommand =
+      //new AutoHopperMoveInCommand(hopper);
+  private final NewAutoHopperMoveInCommand newHopperMoveInCommand =
+      new NewAutoHopperMoveInCommand(hopper);
+  private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
+  private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
+  private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
   private final IntakeLineUpCommand intakeLineUpCommand =
       new IntakeLineUpCommand(driveTrain, visionSystem);
   private final DriverAutoIntakeBallCommand driverAutoIntakeBallCommand =
@@ -149,7 +152,7 @@ public class RobotContainer {
 
     // Default Commands
     driveTrain.setDefaultCommand(driveCommand);
-    hopper.setDefaultCommand(autoHopperMoveInCommand);
+    //hopper.setDefaultCommand(autoHopperMoveInCommand);
 
     // Hopper move up distance PID
     /*new Trigger(intake::isSensorTripped)
@@ -411,6 +414,10 @@ public class RobotContainer {
 
     JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
     backButton.whileActiveOnce(intakeLineUpCommand);
+
+    // Intake Trigger
+    Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
+    intakeTrigger.whenActive(newHopperMoveInCommand);
   }
 
   private void switchToDriverView() {
