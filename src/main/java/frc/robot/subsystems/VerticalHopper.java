@@ -34,8 +34,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   private static final int DEFAULT_INDEX_RUN_TIME = 300; // ms
   private static final int DEFAULT_INDEX_BETWEEN_TIME = 400; // ms
   private static final int DEFAULT_MOVE_AFTER_SENSOR_DELAY = 300; // ms
-  private static final int DEFAULT_MOVE_DISTANCE = 9; // in
-  private static final double DEFAULT_POSITION_THRESHOLD = 0.5; // in
+  private static final double DEFAULT_MOVE_DISTANCE = 10.75; // in
+  private static final double DEFAULT_POSITION_THRESHOLD = 1; // in
 
   public static final double DOWN_SPEED = -0.5;
 

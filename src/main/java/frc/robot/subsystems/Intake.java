@@ -18,7 +18,7 @@ import java.util.List;
 
 public class Intake extends SubsystemBase implements VerifiableSystem {
   private VictorSPX motor = new WPI_VictorSPX(MOTOR_ID);
-  private static final double INTAKE_SPEED = .75;
+  private static final double INTAKE_SPEED = .4;
   private static final double REVERSE_INTAKE_SPEED = -0.5;
   public DigitalInput intakeSensor = new DigitalInput(INTAKE_SENSOR);
 

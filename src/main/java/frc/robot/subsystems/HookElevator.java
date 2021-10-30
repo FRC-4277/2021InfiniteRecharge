@@ -11,7 +11,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import java.util.List;
 
 public class HookElevator extends SubsystemBase implements VerifiableSystem {
-  private static final double DEFAULT_SPEED = 0.1;
+  private static final double DEFAULT_SPEED = 1;
   private TalonSRX motor = new TalonSRX(MOTOR_ID);
 
   public HookElevator() {
@@ -23,6 +23,7 @@ public class HookElevator extends SubsystemBase implements VerifiableSystem {
   }
 
   public void moveUp() {
+    System.out.println("Moving up");
     moveUp(DEFAULT_SPEED);
   }
 
@@ -32,6 +33,7 @@ public class HookElevator extends SubsystemBase implements VerifiableSystem {
   }
 
   public void moveDown() {
+    System.out.println("Moving down");
     moveDown(-DEFAULT_SPEED);
   }
 

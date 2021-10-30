@@ -26,6 +26,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -114,6 +116,7 @@ public class RobotContainer {
   private final NewAutoHopperMoveInCommand newHopperMoveInCommand =
       new NewAutoHopperMoveInCommand(hopper);
   private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
+  private final ReverseWinchCommand reverseWinchCommand = new ReverseWinchCommand(winch);
   private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
   private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
   private final IntakeLineUpCommand intakeLineUpCommand =
@@ -407,6 +410,9 @@ public class RobotContainer {
     JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
     backButton.whileActiveOnce(winchClimbCommand);
 
+    JoystickButton startButton = new JoystickButton(xboxController, kStart.value);
+    startButton.whileActiveOnce(reverseWinchCommand);
+
     // POVButton downPOVButton = new POVButton(xboxController, 180);
 
     POVButton leftPOVButton = new POVButton(xboxController, 270);
@@ -420,7 +426,7 @@ public class RobotContainer {
 
     // Intake Trigger
     Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
-    intakeTrigger.whenActive(newHopperMoveInCommand);
+    intakeTrigger.whenActive(new SequentialCommandGroup(new WaitCommand(.15), newHopperMoveInCommand));
   }
 
   private void switchToDriverView() {

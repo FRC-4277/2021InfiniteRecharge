@@ -175,8 +175,8 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = /*16*/ 19;
     public static final int RIGHT_MOTOR_ID = /*57*/ 17;
     // Motion Magic Constants
-    public static final int MOTION_MAGIC_CRUISE_VELOCITY = 5000; // native units per 100 ms
-    public static final int MOTION_MAGIC_CRUISE_ACCELERATION = 5000; // native units per 100 ms
+    public static final int MOTION_MAGIC_CRUISE_VELOCITY = 3300; // native units per 100 ms
+    public static final int MOTION_MAGIC_CRUISE_ACCELERATION = 15000; // native units per 100 ms
     // Inversions
     public static final boolean LEFT_MOTOR_INVERTED = true;
     public static final boolean RIGHT_MOTOR_INVERTED = false;
@@ -218,8 +218,8 @@ public final class Constants {
     public static final int LEFT_MOTOR_ID = 31;
     public static final int RIGHT_MOTOR_ID = 30;
     public static final int LEFT_SOLENOID_ID = 0;
-    public static final boolean LEFT_MOTOR_INVERTED = false;
-    public static final boolean RIGHT_MOTOR_INVERTED = true;
+    public static final boolean LEFT_MOTOR_INVERTED = true;
+    public static final boolean RIGHT_MOTOR_INVERTED = false;
     public static final boolean LEFT_SENSOR_PHASE = false;
     public static final boolean RIGHT_SENSOR_PHASE = false;
     public static final int TICKS_PER_REV = 4096;
