@@ -174,6 +174,9 @@ public final class Constants {
     // Looking at the robot from the front
     public static final int LEFT_MOTOR_ID = /*16*/ 19;
     public static final int RIGHT_MOTOR_ID = /*57*/ 17;
+    // Motion Magic Constants
+    public static final int MOTION_MAGIC_CRUISE_VELOCITY = 3380; // native units per 100 ms
+    public static final int MOTION_MAGIC_CRUISE_ACCELERATION = (int) Math.round(3300 * 10d); // native units per 100 ms
     // Inversions
     public static final boolean LEFT_MOTOR_INVERTED = true;
     public static final boolean RIGHT_MOTOR_INVERTED = false;
@@ -212,11 +215,11 @@ public final class Constants {
   }
 
   public static class Shooter {
-    public static final int LEFT_MOTOR_ID = 30;
-    public static final int RIGHT_MOTOR_ID = 31;
+    public static final int LEFT_MOTOR_ID = 31;
+    public static final int RIGHT_MOTOR_ID = 30;
     public static final int LEFT_SOLENOID_ID = 0;
-    public static final boolean LEFT_MOTOR_INVERTED = false;
-    public static final boolean RIGHT_MOTOR_INVERTED = true;
+    public static final boolean LEFT_MOTOR_INVERTED = true;
+    public static final boolean RIGHT_MOTOR_INVERTED = false;
     public static final boolean LEFT_SENSOR_PHASE = false;
     public static final boolean RIGHT_SENSOR_PHASE = false;
     public static final int TICKS_PER_REV = 4096;
@@ -321,18 +324,18 @@ public final class Constants {
   }
 
   public static class Winch {
-    public static final int MAIN_MOTOR_ID = 17;
+    public static final int MAIN_MOTOR_ID = 20;
     public static final boolean MOTOR_INVERTED = true;
     // public static final int SECONDARY_MOTOR_ID = 18;
   }
 
   public static class HookElevator {
-    public static final int MOTOR_ID = 19;
+    public static final int MOTOR_ID = 12;
     public static final boolean MOTOR_INVERTED = true;
   }
 
   public static class ColorWheel {
-    public static final int MOTOR_ID = 20;
+    public static final int MOTOR_ID = 57;
     public static final boolean MOTOR_INVERTED = false;
     public static final I2C.Port COLOR_SENSOR_PORT = I2C.Port.kOnboard;
     public static final double DEFAULT_SPEED = 0.3;

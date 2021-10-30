@@ -34,8 +34,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   private static final int DEFAULT_INDEX_RUN_TIME = 300; // ms
   private static final int DEFAULT_INDEX_BETWEEN_TIME = 400; // ms
   private static final int DEFAULT_MOVE_AFTER_SENSOR_DELAY = 300; // ms
-  private static final int DEFAULT_MOVE_DISTANCE = 9; // in
-  private static final double DEFAULT_POSITION_THRESHOLD = 0.5; // in
+  private static final double DEFAULT_MOVE_DISTANCE = 11; // in
+  private static final double DEFAULT_POSITION_THRESHOLD = 1.5; // in
 
   public static final double DOWN_SPEED = -0.5;
 
@@ -56,6 +56,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
   public ShuffleboardTab driverTab;
   private SendableChooser<SpeedSource> speedSourceChooser;
   private NetworkTableEntry desiredInchesPerSecEntry;
+
+  private int ballCount = 0;
 
   /** Creates a new VerticalHopper. */
   public VerticalHopper(
@@ -150,6 +152,18 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
         layout.add("Speed Target (in s^-1)", 0.0).withWidget(BuiltInWidgets.kTextView).getEntry();
   }
 
+  public void addBall() {
+    ballCount++;
+  }
+
+  public void resetBalls() {
+    ballCount = 0;
+  }
+
+  public int getBalls() {
+    return ballCount;
+  }
+
   public void configureMotor(TalonSRX motor) {
     motor.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     motor.config_kP(POSITION_SLOT, positionP);
@@ -158,6 +172,8 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     motor.config_kP(VELOCITY_SLOT, velocityP);
     motor.config_kI(VELOCITY_SLOT, velocityI);
     motor.config_kD(VELOCITY_SLOT, velocityD);
+    motor.configMotionCruiseVelocity(MOTION_MAGIC_CRUISE_VELOCITY);
+    motor.configMotionAcceleration(MOTION_MAGIC_CRUISE_ACCELERATION);
     motor.setSelectedSensorPosition(0);
   }
 
@@ -192,6 +208,14 @@ public class VerticalHopper extends SubsystemBase implements VerifiableSystem {
     double pulses = inchesToPulses(positionInches);
     leftMotor.set(ControlMode.Position, pulses);
     rightMotor.set(ControlMode.Position, pulses);
+  }
+
+  public void setPositionMotionMagic(double positionInches) {
+    leftMotor.selectProfileSlot(POSITION_SLOT, 0);
+    rightMotor.selectProfileSlot(POSITION_SLOT, 0);
+    double pulses = inchesToPulses(positionInches);
+    leftMotor.set(ControlMode.MotionMagic, pulses);
+    rightMotor.set(ControlMode.MotionMagic, pulses);
   }
 
   public double getLeftPositionInches() {

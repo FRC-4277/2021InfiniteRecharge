@@ -25,7 +25,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SendableRegistry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.ConditionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -35,6 +38,7 @@ import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
 import frc.robot.commands.hopper.AutoHopperMoveInCommand;
+import frc.robot.commands.hopper.NewAutoHopperMoveInCommand;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.vision.VisionSystem;
 import frc.robot.util.CooperSendable;
@@ -63,7 +67,7 @@ public class RobotContainer {
   private final ShuffleboardTab autonomousTab = Shuffleboard.getTab("Autonomous");
   private final ShuffleboardTab settingsTab = Shuffleboard.getTab("Settings");
   private final ShuffleboardTab driverTab = Shuffleboard.getTab("Driver");
-  // private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
+  private final ShuffleboardTab colorWheelTab = Shuffleboard.getTab("Control Panel");
   private final ShuffleboardTab testTab = Shuffleboard.getTab("Testing");
   private final ShuffleboardTab verificationTab = Shuffleboard.getTab("Verification");
   private final ShuffleboardTab simulationTab = Shuffleboard.getTab("Simulation");
@@ -75,13 +79,13 @@ public class RobotContainer {
   private final VerticalHopper hopper =
       new VerticalHopper(this, intake.intakeSensor, driverTab, settingsTab);
   private final Shooter shooter = new Shooter(settingsTab, driverTab);
-  // private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
+  private final ColorWheel colorWheel = new ColorWheel(colorWheelTab);
   // private final Gate gate = new Gate();
   private final CameraSystem cameraSystem = new CameraSystem(driverTab);
   private final VisionSystem visionSystem =
       new VisionSystem(driverTab, autonomousTab, driveTrain.getFieldSim());
-  // private final Winch winch = new Winch();
-  // private final HookElevator hookElevator = new HookElevator();
+  private final Winch winch = new Winch();
+  private final HookElevator hookElevator = new HookElevator();
   /*private final VerificationSystem verificationSystem = new VerificationSystem(
   driveTrain, intake, hopper, shooter, colorWheel, cameraSystem, visionSystem, winch, hookElevator,
   verificationTab);*/
@@ -108,11 +112,14 @@ public class RobotContainer {
       new UseIntakeCameraCommand(cameraSystem);
   private final VisionAlignCommand visionAlignCommand =
       new VisionAlignCommand(driveTrain, visionSystem, true, true);
-  private final AutoHopperMoveInCommand autoHopperMoveInCommand =
-      new AutoHopperMoveInCommand(hopper);
-  // private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
-  // private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
-  // private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
+  //private final AutoHopperMoveInCommand autoHopperMoveInCommand =
+      //new AutoHopperMoveInCommand(hopper);
+  private final NewAutoHopperMoveInCommand newHopperMoveInCommand =
+      new NewAutoHopperMoveInCommand(hopper);
+  private final WinchClimbCommand winchClimbCommand = new WinchClimbCommand(winch);
+  private final ReverseWinchCommand reverseWinchCommand = new ReverseWinchCommand(winch);
+  private final MoveHookUpCommand hookUpCommand = new MoveHookUpCommand(hookElevator);
+  private final MoveHookDownCommand hookDownCommand = new MoveHookDownCommand(hookElevator);
   private final IntakeLineUpCommand intakeLineUpCommand =
       new IntakeLineUpCommand(driveTrain, visionSystem);
   private final DriverAutoIntakeBallCommand driverAutoIntakeBallCommand =
@@ -149,7 +156,7 @@ public class RobotContainer {
 
     // Default Commands
     driveTrain.setDefaultCommand(driveCommand);
-    hopper.setDefaultCommand(autoHopperMoveInCommand);
+    //hopper.setDefaultCommand(autoHopperMoveInCommand);
 
     // Hopper move up distance PID
     /*new Trigger(intake::isSensorTripped)
@@ -401,16 +408,27 @@ public class RobotContainer {
     // upPOVButton.whileActiveOnce(winchClimbCommand);
     upPOVButton.whileActiveOnce(shooterHoldVelocityViaVisionCommand);
 
+    JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
+    backButton.whileActiveOnce(winchClimbCommand);
+
+    JoystickButton startButton = new JoystickButton(xboxController, kStart.value);
+    startButton.whileActiveOnce(reverseWinchCommand);
+
     // POVButton downPOVButton = new POVButton(xboxController, 180);
 
     POVButton leftPOVButton = new POVButton(xboxController, 270);
-    // leftPOVButton.whileActiveOnce(hookDownCommand);
+    leftPOVButton.whileActiveOnce(hookDownCommand);
 
     POVButton rightPOVButton = new POVButton(xboxController, 90);
-    // rightPOVButton.whileActiveOnce(hookUpCommand);
+    rightPOVButton.whileActiveOnce(hookUpCommand);
 
-    JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
-    backButton.whileActiveOnce(intakeLineUpCommand);
+    //JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
+    //backButton.whileActiveOnce(intakeLineUpCommand);
+
+    // Intake Trigger
+    Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
+    intakeTrigger.whenActive(new ConditionalCommand(new SequentialCommandGroup(new WaitCommand(.3), newHopperMoveInCommand),
+     new DoNothingCommand(), () -> hopper.getBalls() < 4));
   }
 
   private void switchToDriverView() {

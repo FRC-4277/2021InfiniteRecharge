@@ -106,6 +106,7 @@ public class ShootAndHopperCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    hopper.resetBalls();
     shooter.setReachedRPMDisplay(false);
     visionSystem.usePortPipeline();
     visionSystem.setCalculateDistance(true);

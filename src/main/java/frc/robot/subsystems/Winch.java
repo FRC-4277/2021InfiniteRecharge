@@ -35,6 +35,10 @@ public class Winch extends SubsystemBase implements VerifiableSystem {
     motor.set(ControlMode.PercentOutput, speed);
   }
 
+  public void reverseClimber() {
+    motor.set(ControlMode.PercentOutput, -DEFAULT_CLIMB_SPEED);
+  }
+
   public void stop() {
     motor.set(ControlMode.PercentOutput, 0);
   }
