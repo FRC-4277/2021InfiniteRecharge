@@ -37,6 +37,7 @@ import frc.robot.commands.autonomous.*;
 import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
+import frc.robot.commands.autonomous.sixball.SixBallAutoCommand;
 import frc.robot.commands.hopper.AutoHopperMoveInCommand;
 import frc.robot.commands.hopper.NewAutoHopperMoveInCommand;
 import frc.robot.subsystems.*;
@@ -180,6 +181,8 @@ public class RobotContainer {
     SendableRegistry.setName(autoChooser, "Autonomous Command");
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
+
+    autoChooser.addOption("6 Ball Auto", new SixBallAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));
 
     autoChooser.addOption("Drive Straight (2m)", new DriveStraightXCommand(driveTrain, 2.0));
     autoChooser.addOption("Drive Straight (-2m)", new DriveStraightXCommand(driveTrain, -2.0));

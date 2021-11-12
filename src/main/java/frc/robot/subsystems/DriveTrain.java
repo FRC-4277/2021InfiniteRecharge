@@ -353,6 +353,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return motorFeedforward.maxAchievableVelocity(MAX_BATTERY_V * percentOutput, 0);
   }
 
+  public double getLargestAbsoluteTiltAngle() {
+    return Math.max(Math.abs(navX.getPitch()), Math.abs(navX.getRoll()));
+  }
+
   public DifferentialDriveOdometry getOdometry() {
     return odometry;
   }
