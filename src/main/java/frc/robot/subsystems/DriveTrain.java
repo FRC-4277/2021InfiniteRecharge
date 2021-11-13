@@ -495,6 +495,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    */
   public void resetOdometry(Pose2d translationPose) {
     resetEncoders();
+    navX.reset();
     odometry.resetPosition(translationPose, Rotation2d.fromDegrees(getHeading()));
   }
 

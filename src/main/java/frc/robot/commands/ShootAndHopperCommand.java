@@ -46,6 +46,8 @@ public class ShootAndHopperCommand extends CommandBase {
   private boolean finished = false;
   private double desiredRPM;
   private Timer finishTimer = null;
+  private boolean incremented = false;
+  private Long lastBallIncrement = -1L;
 
   public ShootAndHopperCommand(
       Shooter shooter,
@@ -116,6 +118,8 @@ public class ShootAndHopperCommand extends CommandBase {
     finished = false;
     ballLeftTopTimer = null;
     finishTimer = null;
+    incremented = false;
+    lastBallIncrement = -1L;
 
     // Get desired RPM from user
     RPMSource rpmSource = this.rpmSource;
@@ -155,6 +159,7 @@ public class ShootAndHopperCommand extends CommandBase {
          * If ball is not on top: Move hopper up
          * If ball is on top: Change state to MOVING_TOP_BALL_INTO_SHOOTER
          */
+        incremented = false;
         if (!hopper.isBallPresentTop()) {
           hopper.moveUp(HOPPER_UP_TO_TOP_SPEED.get(shooter));
         } else {
@@ -182,7 +187,10 @@ public class ShootAndHopperCommand extends CommandBase {
         // hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
         hopper.moveUpForShooting(visionSystem.getCalculatedDistanceMeters());
         //
-        ballCount++;
+        /*if (!incremented) {
+          ballCount++;
+          incremented = true;
+        }*/
         // hopper.moveUp(0.5);
         // Track when the ball leaves the sensor
 
@@ -196,17 +204,28 @@ public class ShootAndHopperCommand extends CommandBase {
             && hopper.isBallPresentTop()) {
           // Once next ball is at sensor, set state to MOVE_BALL_UP_TO_TOP
           state = State.MOVE_BALL_UP_TO_TOP;
+          incremented = false;
         }
         break;
     }
 
-    if (ballCount >= 3 && finishTimer == null) {
+    if (hopper.isBallPresentTop() && (System.currentTimeMillis() - lastBallIncrement) > 740) {
+      ballCount++;
+      System.out.println("@@@@ BALL INCREMENTED");
+      lastBallIncrement = System.currentTimeMillis();
+    }
+
+    System.out.println("@@@@BALL@@@@@ " + ballCount);
+
+    if (ballCount >= 4 && finishTimer == null) {
       finishTimer = new Timer();
       finishTimer.reset();
+      finishTimer.start();
+      System.out.println("TIMER STARTED");
     }
-    // Wait for 1.0 seconds before finishing command to ensure ball has time to shoot
-    if (finishTimer != null && finishTimer.hasElapsed(1.0)) {
-      finished = true;
+    // Wait for 1.0 seconds before finishing command to ensure ball has time 
+    if (finishTimer != null) {
+      System.out.println("Timer: " + finishTimer.get());
     }
   }
 
@@ -221,7 +240,10 @@ public class ShootAndHopperCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return !runForever && finished;
+    if (finishTimer != null && finishTimer.hasElapsed(1.0)) {
+      System.out.println("Ended naturally");
+    }
+    return !runForever && (finishTimer != null && finishTimer.hasElapsed(1.0));
   }
 
   public enum State {
