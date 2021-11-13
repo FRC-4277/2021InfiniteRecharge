@@ -9,12 +9,11 @@ import frc.robot.subsystems.vision.VisionSystem;
 import java.util.Optional;
 
 public class PickupThreeCommand extends CommandBase {
-  private static final double INITIAL_SPEED = 0.2;
-  private static final double MAX_ADJUSTMENT_SPEED = 0.1;
-  private static final double DEGREE_THRESHOLD = 5;
-  private static final double HEADING_PID_P = 0.01;
+  protected static final double INITIAL_SPEED = 0.3;
+  private static final double MAX_ADJUSTMENT_SPEED = 0.02;
+  private static final double DEGREE_THRESHOLD = 10;
+  private static final double HEADING_PID_P = 0.0075;
   private static final double MAX_X_COORDINATE = 8.25;
-  private static final double SLOW_DOWN_X_COORDINATE = 6;
   private static final double TILT_DEGREE_THRESHOLD = 20;
   private static final double INTAKE_BALL_COUNTER_TIME_BETWEEN_BALLS_MS = 300;
   // From Intake.java
@@ -59,21 +58,22 @@ public class PickupThreeCommand extends CommandBase {
   public void execute() {
     /* DRIVING LOGIC */
 
+    boolean intakeBallPresent = !intake.intakeSensor.get();
     // If we want the robot to be angled more left, then make RIGHT more negative
     // If we want the robot to be more angled right, then make LEFT more negative
-    double leftSpeed = INITIAL_SPEED;
-    double rightSpeed = INITIAL_SPEED;
-    if (driveTrain.getPose().getX() <= SLOW_DOWN_X_COORDINATE) {
-      leftSpeed = .75;
-      rightSpeed = .75;
+    double speed = INITIAL_SPEED;
+    if (intakeBallPresent) {
+      speed -= 0.07;
     }
+    double leftSpeed = speed;
+    double rightSpeed = speed;
 
     Optional<Double> ballTargetOptional = visionSystem.getBallTargetDegrees();
     if (ballTargetOptional.isPresent()) {
       double degrees = ballTargetOptional.get();
       if (Math.abs(degrees) > DEGREE_THRESHOLD) {
         double adjustment = degrees * HEADING_PID_P;
-        adjustment = Math.signum(adjustment) * Math.min(adjustment, MAX_ADJUSTMENT_SPEED); // Cap adjustment between -0.1 and .1
+        adjustment = Math.signum(adjustment) * Math.min(adjustment, MAX_ADJUSTMENT_SPEED); // Cap adjustment to -MAX..MAX
         // If ball is on the right, be more angled left, so make RIGHT more negative
         if (degrees > DEGREE_THRESHOLD) {
           leftSpeed += adjustment;
@@ -87,10 +87,10 @@ public class PickupThreeCommand extends CommandBase {
 
     // INTAKE LOGIC, some taken from Intake.java
     intake.runIntake(1.0); // Run intake full speed
-    boolean intakeBallPresent = !intake.intakeSensor.get();
     // Count a ball if sensor is tripped & last sensor trip was more than 300 MS ago
     if (intakeBallPresent && (System.currentTimeMillis() - lastBallIntakeTime) > INTAKE_BALL_COUNTER_TIME_BETWEEN_BALLS_MS) {
       ballCount++;
+      System.out.println(">>> Pickup Three: Picked up " + ballCount);
       lastBallIntakeTime = System.currentTimeMillis();
     }
     if (ballCount >= 3 && finishTimer == null) {
@@ -106,15 +106,13 @@ public class PickupThreeCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     // Stop command if we drive too far to the right
-    if (driveTrain.getPose().getX() > MAX_X_COORDINATE) {
+    // Or if we start tilting (roll or pitch)
+    if (driveTrain.getPose().getX() > MAX_X_COORDINATE || driveTrain.getLargestAbsoluteTiltAngle() > TILT_DEGREE_THRESHOLD) {
       System.out.println("MAX X REACHED");
+      driveTrain.stopDrive();
       return true;
     }
-    // Stop command if we start tilting (roll or pitch)
-    if (driveTrain.getLargestAbsoluteTiltAngle() > TILT_DEGREE_THRESHOLD) {
-      System.out.println("TILT REACHED");
-      return true;
-    }
+
     return finished;
   }
 
