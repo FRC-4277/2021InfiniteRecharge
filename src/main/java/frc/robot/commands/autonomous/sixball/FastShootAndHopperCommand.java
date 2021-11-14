@@ -1,4 +1,4 @@
-package frc.robot.commands;
+package frc.robot.commands.autonomous.sixball;
 
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -9,11 +9,11 @@ import frc.robot.subsystems.Shooter.ShootingMode;
 import frc.robot.subsystems.VerticalHopper;
 import frc.robot.subsystems.vision.VisionSystem;
 
-public class ShootAndHopperCommand extends CommandBase {
+public class FastShootAndHopperCommand extends CommandBase {
   // !=== Different shooting settings depending on challenge ===!
 
   private static final ShootSettingSupplier<Integer> RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT =
-      new ShootSettingSupplier<>(20, 5); // 20 ms * 10 = 200ms
+      new ShootSettingSupplier<>(20, 2); // 20 ms * 10 = 200ms
 
   // Speed of hopper when moving ball to top
   private static final ShootSettingSupplier<Double> HOPPER_UP_TO_TOP_SPEED =
@@ -28,7 +28,7 @@ public class ShootAndHopperCommand extends CommandBase {
       new ShootSettingSupplier<>(0.5, 0.01);
 
   private static final ShootSettingSupplier<Double> MOVE_BALL_TO_SHOOTER_DURATION =
-      new ShootSettingSupplier<>(1.5, 0.5);
+      new ShootSettingSupplier<>(1.5, 0.01);
 
   private final Shooter shooter;
   private final VerticalHopper hopper;
@@ -49,7 +49,7 @@ public class ShootAndHopperCommand extends CommandBase {
   private boolean incremented = false;
   private Long lastBallIncrement = -1L;
 
-  public ShootAndHopperCommand(
+  public FastShootAndHopperCommand(
       Shooter shooter,
       VerticalHopper hopper,
       VisionSystem visionSystem,
@@ -67,7 +67,7 @@ public class ShootAndHopperCommand extends CommandBase {
     runForever = true;
   }
 
-  public ShootAndHopperCommand(
+  public FastShootAndHopperCommand(
       Shooter shooter,
       VerticalHopper hopper,
       VisionSystem visionSystem,
@@ -86,7 +86,7 @@ public class ShootAndHopperCommand extends CommandBase {
     }
   }
 
-  public ShootAndHopperCommand(
+  public FastShootAndHopperCommand(
       Shooter shooter,
       VerticalHopper hopper,
       VisionSystem visionSystem,
@@ -105,6 +105,16 @@ public class ShootAndHopperCommand extends CommandBase {
       addRequirements(shooter, visionSystem);
     }
   }
+
+  public FastShootAndHopperCommand(
+      Shooter shooter,
+      VerticalHopper hopper,
+      VisionSystem visionSystem,
+      boolean runForever,
+      int desiredRPM) {
+    this(shooter, hopper, visionSystem, runForever, desiredRPM, true);
+  }
+
 
   @Override
   public void initialize() {
@@ -145,12 +155,12 @@ public class ShootAndHopperCommand extends CommandBase {
   public void execute() {
     // Spin up shooter & set velocityIsStable to true when velocity is stable
     shooter.holdVelocityRPMAndSetSolenoids(desiredRPM, visionSystem.getCalculatedDistanceMeters());
-    if (shooter.hasReachedRPM(desiredRPM)) {
+    if (Math.abs(shooter.getVelocityRPM() - desiredRPM) <= 110) {
       loopsReachedRPM++;
     } else {
       loopsReachedRPM = 0;
     }
-    velocityIsStable = loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT.get(shooter);
+    velocityIsStable = loopsReachedRPM >= RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT.powerPortSetting;
     shooter.setReachedRPMDisplay(velocityIsStable);
 
     switch (state) {
@@ -161,7 +171,7 @@ public class ShootAndHopperCommand extends CommandBase {
          */
         incremented = false;
         if (!hopper.isBallPresentTop()) {
-          hopper.moveUp(HOPPER_UP_TO_TOP_SPEED.get(shooter));
+          hopper.moveUp(HOPPER_UP_TO_TOP_SPEED.powerPortSetting);
         } else {
           state = State.MOVING_TOP_BALL_INTO_SHOOTER_WHEN_READY; // Change state
           ballAtTopTimer = new Timer();
@@ -178,13 +188,13 @@ public class ShootAndHopperCommand extends CommandBase {
         }
         // Do nothing until ball on top is there for specified time (makes sure ball is still at the
         // top first)
-        if (!ballAtTopTimer.hasElapsed(BALL_PAUSE_AT_TOP_SECONDS.get(shooter))) {
+        if (!ballAtTopTimer.hasElapsed(BALL_PAUSE_AT_TOP_SECONDS.powerPortSetting)) {
           hopper.stopMoving();
           return;
         }
 
         // !!!!! Now start moving up
-        // hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.get(shooter));
+        // hopper.moveUp(HOPPER_UP_TO_SHOOTER_SPEED.powerPortSetting);
         hopper.moveUpForShooting(visionSystem.getCalculatedDistanceMeters());
         //
         /*if (!incremented) {
@@ -200,7 +210,7 @@ public class ShootAndHopperCommand extends CommandBase {
 
         // Now that the ball has left sensor, wait for next ball.
         if (ballLeftTopTimer != null
-            && (ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.get(shooter)))
+            && (ballLeftTopTimer.hasElapsed(MOVE_BALL_TO_SHOOTER_DURATION.powerPortSetting))
             && hopper.isBallPresentTop()) {
           // Once next ball is at sensor, set state to MOVE_BALL_UP_TO_TOP
           state = State.MOVE_BALL_UP_TO_TOP;
@@ -240,7 +250,7 @@ public class ShootAndHopperCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    if (finishTimer != null && finishTimer.hasElapsed(1.0)) {
+    if (finishTimer != null && finishTimer.hasElapsed(0.1)) {
       System.out.println("Ended naturally");
     }
     return !runForever && (finishTimer != null && finishTimer.hasElapsed(1.0));

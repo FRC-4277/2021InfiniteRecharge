@@ -51,7 +51,7 @@ public class GalacticAutoVideoCommand extends SequentialCommandGroup {
         // Go to end zone ASAP
         // new ZoomToEndCommand(this, driveTrain)
         new ZoomToMiddleCommand(this, driveTrain),
-        new VisionAlignCommand(driveTrain, visionSystem, false, true, false).withTimeout(7.0),
+        new VisionAlignCommand(driveTrain, visionSystem, false, true, false, true).withTimeout(7.0),
         new ShootAndHopperCommand(shooter, verticalHopper, visionSystem, true, 2150, false)
             .withTimeout(15.0));
   }

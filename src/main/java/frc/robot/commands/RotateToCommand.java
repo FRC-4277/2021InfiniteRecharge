@@ -11,8 +11,8 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveTrain;
 
 public class RotateToCommand extends CommandBase {
-  private static final double MIN_POWER = 0.25;
-  private static final double DEG_TOLERANCE = 5;
+  private static final double MIN_POWER = 0.08;
+  private static final double DEG_TOLERANCE = 6;
   private static final int CORRECT_LOOPS_NEEDED = 5;
   private DriveTrain driveTrain;
   private double targetHeading;
@@ -40,7 +40,7 @@ public class RotateToCommand extends CommandBase {
     // If error is positive, we must spin counterclockwise
     // If turning power is positive, we turn clockwise, so invert
     double turningPower = -error;
-    turningPower *= 0.015; // P loop
+    turningPower *= 0.0075; // P loop
     if (Math.abs(turningPower) < MIN_POWER) {
       turningPower = Math.copySign(MIN_POWER, turningPower);
     }

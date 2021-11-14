@@ -19,7 +19,7 @@ public class VisionAlignCommand extends CommandBase {
   private static final double DEG_TOLERANCE = 0.7d;
   private static final double MIN_COMMAND = 0.1;
   private static final double SEEK_SPEED = 0.1;
-  private static final double CORRECT_LOOPS_NEEDED = 10;
+  private static final double CORRECT_LOOPS_NEEDED = 6;
 
   private DriveTrain driveTrain;
   private VisionSystem visionSystem;
@@ -29,12 +29,12 @@ public class VisionAlignCommand extends CommandBase {
   private boolean vibrate;
 
   public VisionAlignCommand(DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever) {
-    this(driveTrain, visionSystem, runForever, null, false);
+    this(driveTrain, visionSystem, runForever, null, false, true);
   }
 
   public VisionAlignCommand(
       DriveTrain driveTrain, VisionSystem visionSystem, boolean runForever, boolean vibrate) {
-    this(driveTrain, visionSystem, runForever, null, vibrate);
+    this(driveTrain, visionSystem, runForever, null, vibrate, true);
   }
 
   /** Creates a new VisionAlignCommand. */
@@ -43,14 +43,18 @@ public class VisionAlignCommand extends CommandBase {
       VisionSystem visionSystem,
       boolean runForever,
       Boolean seekRight,
-      boolean vibrate) {
+      boolean vibrate,
+      boolean requireVisionSystem) {
     this.driveTrain = driveTrain;
     this.visionSystem = visionSystem;
     this.runForever = runForever;
     this.seekRight = seekRight;
     this.vibrate = vibrate;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(driveTrain, visionSystem);
+    addRequirements(driveTrain);
+    if (requireVisionSystem) {
+      addRequirements(visionSystem);
+    }
   }
 
   // Called when the command is initially scheduled.

@@ -83,6 +83,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
   private boolean joystickUsed = false;
 
   private NetworkTableEntry neutralModeEntry, autoPathMessageEntry;
+  public SendableChooser<NeutralMode> neutralModeChooser;
 
   // Simulation stuff
   private DifferentialDrivetrainSim drivetrainSim;
@@ -150,11 +151,11 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     testTab.add(new ZeroNavXCommand(this));
     testTab.add(new RotateToCommand(this, 90));
 
-    SendableChooser<NeutralMode> chooser = new SendableChooser<>();
-    SendableRegistry.setName(chooser, "Neutral Mode");
-    chooser.setDefaultOption("Coast", NeutralMode.Coast);
-    chooser.addOption("Brake", NeutralMode.Brake);
-    settingsTab.add(chooser).withSize(2, 1).withPosition(0, 1);
+    neutralModeChooser = new SendableChooser<>();
+    SendableRegistry.setName(neutralModeChooser, "Neutral Mode");
+    neutralModeChooser.setDefaultOption("Coast", NeutralMode.Coast);
+    neutralModeChooser.addOption("Brake", NeutralMode.Brake);
+    settingsTab.add(neutralModeChooser).withSize(2, 1).withPosition(0, 1);
 
     neutralModeEntry =
         NetworkTableInstance.getDefault()
@@ -164,7 +165,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
             .getEntry("active");
     neutralModeEntry.addListener(
         entryNotification -> {
-          NeutralMode neutralMode = chooser.getSelected();
+          NeutralMode neutralMode = neutralModeChooser.getSelected();
           frontLeftMotor.setNeutralMode(neutralMode);
           frontRightMotor.setNeutralMode(neutralMode);
           backLeftMotor.setNeutralMode(neutralMode);
@@ -353,6 +354,10 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
     return motorFeedforward.maxAchievableVelocity(MAX_BATTERY_V * percentOutput, 0);
   }
 
+  public double getLargestAbsoluteTiltAngle() {
+    return Math.max(Math.abs(navX.getPitch()), Math.abs(navX.getRoll()));
+  }
+
   public DifferentialDriveOdometry getOdometry() {
     return odometry;
   }
@@ -491,6 +496,7 @@ public class DriveTrain extends SubsystemBase implements VerifiableSystem {
    */
   public void resetOdometry(Pose2d translationPose) {
     resetEncoders();
+    navX.reset();
     odometry.resetPosition(translationPose, Rotation2d.fromDegrees(getHeading()));
   }
 
