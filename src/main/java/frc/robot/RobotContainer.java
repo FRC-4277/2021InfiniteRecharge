@@ -37,7 +37,10 @@ import frc.robot.commands.autonomous.*;
 import frc.robot.commands.autonomous.galacticsearch.GalacticAutoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticAutoVideoCommand;
 import frc.robot.commands.autonomous.galacticvideo.GalacticPath;
+import frc.robot.commands.autonomous.sixball.AlignShootMoveBackCommand;
+import frc.robot.commands.autonomous.sixball.ShootMoveBackAutoCommand;
 import frc.robot.commands.autonomous.sixball.SixBallAutoCommand;
+import frc.robot.commands.autonomous.sixball.SixBallAutoNoShootCommand;
 import frc.robot.commands.hopper.AutoHopperMoveInCommand;
 import frc.robot.commands.hopper.NewAutoHopperMoveInCommand;
 import frc.robot.subsystems.*;
@@ -135,6 +138,8 @@ public class RobotContainer {
   private boolean drivingFromHome = false;
   private boolean drivingFromHomeInverted = false;
 
+  private boolean triggerInitialized = false;
+
   // private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
@@ -182,7 +187,11 @@ public class RobotContainer {
     // = Do Nothing
     autoChooser.setDefaultOption("Nothing", null);
 
-    autoChooser.addOption("6 Ball Auto", new SixBallAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));
+    autoChooser.addOption("5 Ball Auto", new SixBallAutoCommand(driveTrain, visionSystem, shooter, hopper, intake));
+    autoChooser.addOption("6 Ball Auto (No 2nd shots)", new SixBallAutoNoShootCommand(driveTrain, visionSystem, shooter, hopper, intake));
+    autoChooser.addOption("Align (to left), Shoot, Move", new AlignShootMoveBackCommand(driveTrain, visionSystem, shooter, hopper, false));
+    autoChooser.addOption("Align (to right), Shoot, Move", new AlignShootMoveBackCommand(driveTrain, visionSystem, shooter, hopper, true));
+    autoChooser.addOption("No Align, Shoot, Move", new ShootMoveBackAutoCommand(driveTrain, visionSystem, shooter, hopper));
 
     autoChooser.addOption("Drive Straight (2m)", new DriveStraightXCommand(driveTrain, 2.0));
     autoChooser.addOption("Drive Straight (-2m)", new DriveStraightXCommand(driveTrain, -2.0));
@@ -427,11 +436,6 @@ public class RobotContainer {
 
     //JoystickButton backButton = new JoystickButton(xboxController, kBack.value);
     //backButton.whileActiveOnce(intakeLineUpCommand);
-
-    // Intake Trigger
-    Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
-    intakeTrigger.whenActive(new ConditionalCommand(new SequentialCommandGroup(new WaitCommand(.3), newHopperMoveInCommand),
-     new DoNothingCommand(), () -> hopper.getBalls() < 4));
   }
 
   private void switchToDriverView() {
@@ -440,6 +444,14 @@ public class RobotContainer {
   }
 
   protected void teleopInit() {
+    // Intake Trigger
+    if (!triggerInitialized) {
+      triggerInitialized = true;
+      Trigger intakeTrigger = new Trigger(() -> intake.isSensorTripped());
+      intakeTrigger.whenActive(new ConditionalCommand(new SequentialCommandGroup(new WaitCommand(.3), newHopperMoveInCommand),
+      new DoNothingCommand(), () -> hopper.getBalls() < 4));
+    }
+
     switchToDriverView();
 
     // Initial camera state for inverted controls

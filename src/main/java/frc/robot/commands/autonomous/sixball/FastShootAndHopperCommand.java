@@ -13,7 +13,7 @@ public class FastShootAndHopperCommand extends CommandBase {
   // !=== Different shooting settings depending on challenge ===!
 
   private static final ShootSettingSupplier<Integer> RPM_REACHED_LOOPS_REQUIRED_TO_SHOOT =
-      new ShootSettingSupplier<>(20, 4); // 20 ms * 10 = 200ms
+      new ShootSettingSupplier<>(20, 2); // 20 ms * 10 = 200ms
 
   // Speed of hopper when moving ball to top
   private static final ShootSettingSupplier<Double> HOPPER_UP_TO_TOP_SPEED =
@@ -28,7 +28,7 @@ public class FastShootAndHopperCommand extends CommandBase {
       new ShootSettingSupplier<>(0.5, 0.01);
 
   private static final ShootSettingSupplier<Double> MOVE_BALL_TO_SHOOTER_DURATION =
-      new ShootSettingSupplier<>(1.5, 0.5);
+      new ShootSettingSupplier<>(1.5, 0.01);
 
   private final Shooter shooter;
   private final VerticalHopper hopper;
@@ -106,6 +106,16 @@ public class FastShootAndHopperCommand extends CommandBase {
     }
   }
 
+  public FastShootAndHopperCommand(
+      Shooter shooter,
+      VerticalHopper hopper,
+      VisionSystem visionSystem,
+      boolean runForever,
+      int desiredRPM) {
+    this(shooter, hopper, visionSystem, runForever, desiredRPM, true);
+  }
+
+
   @Override
   public void initialize() {
     hopper.resetBalls();
@@ -145,7 +155,7 @@ public class FastShootAndHopperCommand extends CommandBase {
   public void execute() {
     // Spin up shooter & set velocityIsStable to true when velocity is stable
     shooter.holdVelocityRPMAndSetSolenoids(desiredRPM, visionSystem.getCalculatedDistanceMeters());
-    if (shooter.hasReachedRPM(desiredRPM)) {
+    if (Math.abs(shooter.getVelocityRPM() - desiredRPM) <= 110) {
       loopsReachedRPM++;
     } else {
       loopsReachedRPM = 0;
@@ -240,7 +250,7 @@ public class FastShootAndHopperCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    if (finishTimer != null && finishTimer.hasElapsed(0.5)) {
+    if (finishTimer != null && finishTimer.hasElapsed(0.1)) {
       System.out.println("Ended naturally");
     }
     return !runForever && (finishTimer != null && finishTimer.hasElapsed(1.0));

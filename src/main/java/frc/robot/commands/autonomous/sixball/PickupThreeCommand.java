@@ -9,8 +9,8 @@ import frc.robot.subsystems.vision.VisionSystem;
 import java.util.Optional;
 
 public class PickupThreeCommand extends CommandBase {
-  protected static final double INITIAL_SPEED = 0.3;
-  private static final double MAX_ADJUSTMENT_SPEED = 0.02;
+  protected static final double INITIAL_SPEED = 0.175;
+  private static final double MAX_ADJUSTMENT_SPEED = 0.00;
   private static final double DEGREE_THRESHOLD = 10;
   private static final double HEADING_PID_P = 0.0075;
   private static final double MAX_X_COORDINATE = 8.25;
@@ -62,24 +62,17 @@ public class PickupThreeCommand extends CommandBase {
     // If we want the robot to be angled more left, then make RIGHT more negative
     // If we want the robot to be more angled right, then make LEFT more negative
     double speed = INITIAL_SPEED;
-    if (intakeBallPresent) {
-      speed -= 0.07;
-    }
     double leftSpeed = speed;
     double rightSpeed = speed;
 
-    Optional<Double> ballTargetOptional = visionSystem.getBallTargetDegrees();
-    if (ballTargetOptional.isPresent()) {
-      double degrees = ballTargetOptional.get();
-      if (Math.abs(degrees) > DEGREE_THRESHOLD) {
-        double adjustment = degrees * HEADING_PID_P;
-        adjustment = Math.signum(adjustment) * Math.min(adjustment, MAX_ADJUSTMENT_SPEED); // Cap adjustment to -MAX..MAX
-        // If ball is on the right, be more angled left, so make RIGHT more negative
-        if (degrees > DEGREE_THRESHOLD) {
-          leftSpeed += adjustment;
-        } else if (degrees < DEGREE_THRESHOLD) {
-          rightSpeed += adjustment;
-        }
+    double degrees = driveTrain.getHeading();
+    double adjustment = degrees * 0.0125;
+    adjustment = Math.signum(adjustment) * Math.min(0.09, adjustment);
+    if (Math.abs(degrees) > 5) {
+      if (degrees > 0) {
+        leftSpeed += adjustment;
+      } else {
+        rightSpeed += adjustment;
       }
     }
 
@@ -93,12 +86,12 @@ public class PickupThreeCommand extends CommandBase {
       System.out.println(">>> Pickup Three: Picked up " + ballCount);
       lastBallIntakeTime = System.currentTimeMillis();
     }
-    if (ballCount >= 3 && finishTimer == null) {
+    if (ballCount >= 2 && finishTimer == null) {
       finishTimer = new Timer();
       finishTimer.reset();
       finishTimer.start();
     }
-    if (finishTimer != null && finishTimer.hasElapsed(0.5)) {
+    if (finishTimer != null && finishTimer.hasElapsed(0.2)) {
       finished = true;
     }
   }
@@ -113,7 +106,7 @@ public class PickupThreeCommand extends CommandBase {
       return true;
     }
 
-    return finished;
+    return false;
   }
 
   @Override

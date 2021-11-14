@@ -1,3 +1,7 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
 package frc.robot.commands.autonomous.sixball;
 
 import com.ctre.phoenix.motorcontrol.NeutralMode;
@@ -18,7 +22,7 @@ import frc.robot.subsystems.vision.VisionSystem;
 
 import java.util.List;
 
-public class SixBallAutoCommand extends SequentialCommandGroup {
+public class SixBallAutoNoShootCommand extends SequentialCommandGroup {
   private static final double BALL_Y_COORDINATE = 7.457;
   private static final Pose2d START_POSE = new Pose2d(new Translation2d(3.16, BALL_Y_COORDINATE), new Rotation2d());
   private static final Pose2d RIGHT_BEFORE_FIRST_BALL_POSE = new Pose2d(new Translation2d(4.9, BALL_Y_COORDINATE), new Rotation2d());
@@ -27,10 +31,10 @@ public class SixBallAutoCommand extends SequentialCommandGroup {
   private static final double MAX_VELOCITY = 4;
   private static final double MAX_ACCEL = 3;
   private static final int DESIRED_RPM_1 = 2400; // RPM for first shots
-  private static final int DESIRED_RPM_2 = 2175; // RPM for second shots
+  private static final int DESIRED_RPM_2 = 2190; // RPM for second shots
   private Timer timer = new Timer();
 
-  public SixBallAutoCommand(DriveTrain driveTrain, VisionSystem visionSystem, Shooter shooter, VerticalHopper hopper, Intake intake) {
+  public SixBallAutoNoShootCommand(DriveTrain driveTrain, VisionSystem visionSystem, Shooter shooter, VerticalHopper hopper, Intake intake) {
     addCommands(
       // Start timer
       new InstantCommand(() -> {
@@ -64,24 +68,25 @@ public class SixBallAutoCommand extends SequentialCommandGroup {
       // Pickup three balls
       // Also use old hopper move in command for SPEEEED
       new ParallelDeadlineGroup(
-        new PickupThreeCommand(driveTrain, visionSystem, intake).withTimeout(4.0),
+        new PickupThreeCommand(driveTrain, visionSystem, intake).withTimeout(5.5),
         new AutoHopperMoveInCommand(hopper)
       ),
       new PrintTimerCommand(timer, "Finish pickup three balls"),
       // Drive back to end position for last shots
       new LazyRamseteCommand(driveTrain, () -> driveTrain.generateTrajectory(driveTrain.getPose(), END_POSITION, 4, 2, false, true, 0, 0)),
       new PrintTimerCommand(timer, "Finish drive back to end position"),
+      new VisionAlignCommand(driveTrain, visionSystem, false, false, false, false).withTimeout(1.5)
       // Align & shoot in parallel
-      new ParallelDeadlineGroup(
+      /*new ParallelDeadlineGroup(
         new SequentialCommandGroup(
           new WaitCommand(0.5),
           new FastShootAndHopperCommand(shooter, hopper, visionSystem, false, DESIRED_RPM_2, false)
         ),
         new VisionAlignCommand(driveTrain, visionSystem, false, false, false, false).withTimeout(1.0)
-      ),
-      new PrintTimerCommand(timer, "COMPLETE AUTONOMOUS"),
+      )*/
+      /*new PrintTimerCommand(timer, "COMPLETE AUTONOMOUS"),
       // Go back to user selected neutral mode (brake or coast)
-      new InstantCommand(() -> driveTrain.setNeutralMode(driveTrain.neutralModeChooser.getSelected()))
+      new InstantCommand(() -> driveTrain.setNeutralMode(driveTrain.neutralModeChooser.getSelected()))*/
     );
   }
 }
